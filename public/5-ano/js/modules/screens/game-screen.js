@@ -165,13 +165,14 @@ class GameScreen extends BaseScreen {
         respostasContainer.id = 'respostas-container';
         respostasContainer.style.cssText = `
             position: absolute;
-            bottom: 0%;
+            bottom: 10%;
             left: 50%;
             transform: translate(-50%, 0%);
             display: flex;
             flex-direction: column;
             gap: 20px;
             z-index: 2101;
+            pointer-events: auto;
         `;
         
         respostas.forEach((respostaSrc, index) => {
@@ -179,11 +180,14 @@ class GameScreen extends BaseScreen {
             respostaImg.src = respostaSrc;
             respostaImg.alt = `Resposta ${index + 1}`;
             respostaImg.style.cssText = `
-                max-width: 300px;
-                max-height: 200px;
+                max-width: 400px;
+                max-height: 300px;
+                width: 100%;
+                height: auto;
                 object-fit: contain;
                 cursor: pointer;
                 transition: transform 0.2s ease;
+                pointer-events: auto;
             `;
             
             // Adicionar evento de clique
