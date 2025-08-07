@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for sae-ra-01 on 2025-07-24T12:20:56Z
+# fly.toml app configuration file generated for conquista-ra on 2025-08-07T15:13:36Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'sae-ra-01'
-primary_region = 'gru'
+app = 'conquista-ra'
+primary_region = 'gig'
 
 [build]
 
