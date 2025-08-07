@@ -1,0 +1,47 @@
+{
+    "fase1": {
+        "pergunta": "assets/textures/fase1/pergunta.png",
+        "respostas": [
+            "assets/textures/fase1/resposta-01.png",
+            "assets/textures/fase1/resposta-02.png"
+        ],
+        "fallbacks": [
+            "assets/textures/fase1/fallback-01.png",
+            "assets/textures/fase1/fallback-02.png"
+        ]
+    }, 
+    "fase2": {
+        "pergunta": "assets/textures/fase2/pergunta.png",
+        "respostas": [
+            "assets/textures/fase2/resposta-01.png",
+            "assets/textures/fase2/resposta-02.png"
+        ],
+        "fallbacks": [
+            "assets/textures/fase2/fallback-01.png",
+            "assets/textures/fase2/fallback-02.png"
+        ]
+    },
+    "fase3": {
+        "pergunta": "assets/textures/fase3/pergunta.png",
+        "respostas": [
+            "assets/textures/fase3/resposta-01.png",
+            "assets/textures/fase3/resposta-02.png"
+        ],
+        "fallbacks": [
+            "assets/textures/fase3/fallback-01.png",
+            "assets/textures/fase3/fallback-02.png"
+        ]
+    },  
+    "fase4": {
+        "pergunta": "assets/textures/fase4/pergunta.png",
+        "respostas": [
+            "assets/textures/fase4/resposta-01.png",
+            "assets/textures/fase4/resposta-02.png"
+        ],
+        "fallbacks": [
+            "assets/textures/fase4/fallback-01.png",
+            "assets/textures/fase4/fallback-02.png"
+        ]
+    }
+
+}

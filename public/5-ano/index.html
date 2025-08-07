@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>SAE RA - Realidade Aumentada</title>
+
+    <!-- Estilos da aplicação -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/viewport-units-buggyfill@0.6.2/viewport-units-buggyfill.js"></script>
+    
+    <!-- html2canvas para captura de tela -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- FileSaver.js para melhor compatibilidade com iOS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Canvas2Image para fallback adicional -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas2image/1.0.5/canvas2image.min.js"></script>
+</head>
+
+<body>    
+    <div class="controls" style="display: none;">
+        <button id="toggleMode" class="mode-button">🌅 Modo HDRI</button>
+        <button id="clearPecas" class="mode-button" style="background: rgba(255, 0, 0, 0.8);">🗑️ Limpar Peças</button>
+    </div>
+
+    <div id="main">
+        <img id="main-top" src="assets/textures/main-top.png" alt="Logo">
+        <img id="main-bottom" src="assets/textures/main-bottom.png" alt="Background">
+        <!-- Glass Blur UI Elements -->
+       
+        <button id="main-button"></button>
+    </div>
+
+    <div id="tutorial">
+        <img id="narracao-tutorial" class="narracao-icon" src="assets/textures/narracao-icon.png" alt="Parabéns">
+        <div id="tutorial-content">
+            <button id="tutorial-button"></button>
+        </div>
+    </div>
+
+    <div id="game">
+        <div id="game-content">
+            <img id="game-top" src="assets/textures/game-top.png" alt="Game">
+            <img id="game-bottom" src="assets/textures/game-bottom.png" alt="Game">
+
+
+        </div>
+        <div id="fallback">
+            <img id="personagem-game" src="" alt="Personagem">
+        </div>
+
+        <div id="goto-selfie">
+            <img id="goto-selfie-button" src="assets/textures/goto-selfie.png" alt="Selfie">
+
+        </div>
+    </div>
+
+    <!-- Tela de Selfie -->
+    <div id="selfie" class="selfie-screen">
+        <video id="selfie-camera" autoplay muted playsinline></video>
+        <canvas id="selfie-canvas" style="display: none;"></canvas>
+        <img id="certificado-top" src="assets/textures/certificado-top.png" alt="Selfie">
+        <img id="certificado-bottom" src="assets/textures/certificado-bottom.png" alt="Selfie">
+        <img id="camera-icon-selfie" class="camera-icon" src="assets/textures/bt_camera.png" alt="Camera">
+        <img id="personagem-game-selfie" src="" alt="Personagem">
+        <!-- Glass Blur UI Elements -->
+        
+    </div>
+
+    <!-- Efeito de flash da câmera -->
+    <div class="camera-flash" id="camera-flash"></div>
+
+    
+
+    <!-- Vídeo da webcam como fundo -->
+    
+
+    <!-- Cena A-Frame AR -->
+    <a-scene vr-mode-ui="enabled: false" background="transparent: true" cursor="rayOrigin: mouse"
+        renderer="alpha: true; antialias: true; colorManagement: true;"
+        environment="preset: none; skyType: atmosphere; horizonColor: #212121; lightPosition: 0.5 0.8 -0.6;">
+        <!-- Assets -->
+        <a-assets>
+            <!-- Fallback: Gradient Sky -->
+            <img id="gradientSky"
+                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCAxMDI0IDUxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6Izg3Q0VFQjtzdG9wLW9wYWNpdHk6MSIgLz4KPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkY7c3RvcC1vcGFjaXR5OjEiIC8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzQ2ODJCNDtzdG9wLW9wYWNpdHk6MSIgLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+Cjwvc3ZnPgo="
+                crossorigin="anonymous">
+        </a-assets>
+
+        <!-- Sky (Gradient como fallback) -->
+        <a-sky src="#gradientSky" rotation="0 0 0" visible="false"></a-sky>
+
+        <!-- Luzes (reduzidas para combinar com HDRI) -->
+        <a-light type="ambient" color="#FFFFFF" intensity="0.3"></a-light>
+        <a-light type="directional" position="2 4 5" color="#FFFFFF" intensity="0.4"></a-light>
+
+        <!-- Modelo 3D principal -->
+        <a-entity id="main-model" gltf-model="" position="0 0 0" rotation="0 0 0" scale="1 1 1">
+        </a-entity>
+
+        <!-- Container para objetos interativos -->
+        <a-entity id="interactive-objects"></a-entity>
+
+        <!-- As peças serão criadas dinamicamente quando clicadas -->
+
+        <!-- Câmera no centro do cinturão -->
+        <a-camera position="0 1.6 0" look-controls="enabled: true" wasd-controls="enabled: true">
+            <!-- Sistema de detecção automática por direção da câmera -->
+            <a-entity 
+                id="main-cursor"
+                auto-detect=""
+            ></a-entity>
+        </a-camera>
+    </a-scene>
+
+    <!-- Scripts da aplicação (carregados por último) -->
+    
+    <!-- Script principal (carregado primeiro para disponibilizar funções globais) -->
+    <script src="script.js"></script>
+    
+    <!-- Módulos de Tela (carregados depois do script principal) -->
+    <script src="js/modules/screens/base-screen.js"></script>
+    <script src="js/modules/screens/main-screen.js"></script>
+    <script src="js/modules/screens/tutorial-screen.js"></script>
+    <script src="js/modules/screens/game-screen.js"></script>
+    <script src="js/modules/screens/selfie-screen.js"></script>
+    <script src="js/modules/screen-manager.js"></script>    
+    
+    <!-- Landscape Blocker -->
+    <script src="js/modules/landscape-blocker.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "sae-ra-experience",
+  "version": "1.0.0",
+  "description": "Experiência de Realidade Aumentada simples com A-Frame",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["ar", "aframe", "nodejs", "realidade-aumentada"],
+  "author": "",
+  "license": "MIT"
+} 
