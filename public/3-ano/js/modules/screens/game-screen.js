@@ -345,7 +345,7 @@ class GameScreen extends BaseScreen {
         
         // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
-            this.questionBg2D.style.left = `${faceX}px`;
+            this.questionBg2D.style.left = `${faceX - 20}px`;
             this.questionBg2D.style.top = `${faceY - 150}px`; // MAIS ACIMA (era -80)
             this.questionBg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.questionBg2D.style.opacity = opacity;
@@ -787,10 +787,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: normal;
             text-align: center;
-            width: 280px;
+            width: 150px;
             pointer-events: none;
             user-select: none;
         `;
