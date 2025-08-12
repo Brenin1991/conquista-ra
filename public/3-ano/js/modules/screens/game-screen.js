@@ -285,8 +285,8 @@ class GameScreen extends BaseScreen {
             const foreheadX = foreheadCenter.x * scaleX;
             const foreheadY = foreheadCenter.y * scaleY;
             
-            // Posicionar elementos 2D na testa
-            this.position2DElements(foreheadX, foreheadY);
+            // Posicionar elementos 2D na testa com profundidade
+            this.position2DElements(foreheadX, foreheadY, realDepth);
             
             console.log(`🎯 Elementos 2D fixados na TESTA: ${foreheadX.toFixed(0)}px, ${foreheadY.toFixed(0)}px`);
             console.log(`📏 Profundidade real: ${realDepth.toFixed(3)}m (face width: ${(faceWidthNormalized * 100).toFixed(1)}%)`);
@@ -302,47 +302,86 @@ class GameScreen extends BaseScreen {
             const centerX = (x + width/2) * scaleX;
             const centerY = (y + height/2) * scaleY;
             
-            this.position2DElements(centerX, centerY);
+            this.position2DElements(centerX, centerY, realDepth);
             console.log(`🎯 Elementos 2D fixados no centro do rosto: ${centerX.toFixed(0)}px, ${centerY.toFixed(0)}px`);
         }
     }
     
-    position2DElements(faceX, faceY) {
+    position2DElements(faceX, faceY, depth = null) {
         if (!this.gameElements2D) return;
         
         // CENTRALIZAR PERFEITAMENTE NO MEIO DO ROSTO
         // faceX e faceY são as coordenadas do centro do rosto
         
+        // CALCULAR ESCALA BASEADA NA PROFUNDIDADE (EFEITO 3D)
+        let scale = 1.0;
+        let opacity = 1.0;
+        
+        if (depth !== null) {
+            // INVERTER LÓGICA: Como se estivesse PRESO NA CABEÇA
+            // Ao AFASTAR diminui, ao APROXIMAR aumenta
+            const minDepth = 0.5; // 50cm (muito próximo)
+            const maxDepth = 2.0;  // 2m (muito distante)
+            const minScale = 0.8;  // Escala mínima (muito próximo = pequeno)
+            const maxScale = 1.5;  // Escala máxima (muito distante = grande)
+            
+            // Calcular escala baseada na profundidade (INVERTIDA)
+            if (depth < minDepth) {
+                scale = minScale; // Muito próximo = pequeno (preso na cabeça)
+                opacity = 1.0;
+            } else if (depth > maxDepth) {
+                scale = maxScale; // Muito distante = grande (afastado)
+                opacity = 0.7;
+            } else {
+                // Interpolação linear INVERTIDA
+                const depthRatio = (depth - minDepth) / (maxDepth - minDepth);
+                scale = minScale + (maxScale - minScale) * depthRatio;
+                opacity = 1.0 + (0.7 - 1.0) * depthRatio;
+            }
+            
+            console.log(`🎯 Profundidade: ${depth.toFixed(2)}m, Escala: ${scale.toFixed(2)}x, Opacidade: ${opacity.toFixed(2)} (PRESO NA CABEÇA)`);
+        }
+        
         // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
             this.questionBg2D.style.left = `${faceX}px`;
             this.questionBg2D.style.top = `${faceY - 60}px`; // Acima do centro
+            this.questionBg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            this.questionBg2D.style.opacity = opacity;
         }
         
         // Posicionar opção 1 (esquerda) - CENTRADA
         if (this.option1Bg2D) {
-            this.option1Bg2D.style.left = `${faceX - 90}px`; // Esquerda do centro
+            this.option1Bg2D.style.left = `${faceX - 90}px`;
             this.option1Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
+            this.option1Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            this.option1Bg2D.style.opacity = opacity;
         }
         
         // Posicionar opção 2 (direita) - CENTRADA
         if (this.option2Bg2D) {
-            this.option2Bg2D.style.left = `${faceX + 90}px`; // Direita do centro
+            this.option2Bg2D.style.left = `${faceX + 90}px`;
             this.option2Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
+            this.option2Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            this.option2Bg2D.style.opacity = opacity;
         }
         
         // Posicionar indicadores CENTRADOS
         if (this.leftIndicator2D) {
             this.leftIndicator2D.style.left = `${faceX - 90}px`;
             this.leftIndicator2D.style.top = `${faceY + 100}px`;
+            this.leftIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            this.leftIndicator2D.style.opacity = opacity;
         }
         
         if (this.rightIndicator2D) {
             this.rightIndicator2D.style.left = `${faceX + 90}px`;
             this.rightIndicator2D.style.top = `${faceY + 100}px`;
+            this.rightIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            this.rightIndicator2D.style.opacity = opacity;
         }
         
-        console.log(`🎯 Elementos centralizados no rosto: ${faceX}px, ${faceY}px`);
+        console.log(`🎯 Elementos centralizados no rosto: ${faceX}px, ${faceY}px, Escala: ${scale.toFixed(2)}x`);
     }
     
     calibrateDepthWithLandmarks(landmarks, baseDepth) {
