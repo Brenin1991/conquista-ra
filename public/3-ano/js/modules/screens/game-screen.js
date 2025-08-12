@@ -346,7 +346,7 @@ class GameScreen extends BaseScreen {
         // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
             this.questionBg2D.style.left = `${faceX}px`;
-            this.questionBg2D.style.top = `${faceY - 300}px`; // MAIS ACIMA (era -80)
+            this.questionBg2D.style.top = `${faceY - 250}px`; // MAIS ACIMA (era -80)
             this.questionBg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.questionBg2D.style.opacity = opacity;
         }
@@ -765,8 +765,8 @@ class GameScreen extends BaseScreen {
         questionBg.id = 'question-bg-2d';
         questionBg.style.cssText = `
             position: absolute;
-            width: 500px;
-            height: 200px;
+            width: 400px;
+            height: 100px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -787,7 +787,7 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: normal;
             text-align: center;
             width: 280px;
@@ -800,8 +800,8 @@ class GameScreen extends BaseScreen {
         option1Bg.id = 'option1-bg-2d';
         option1Bg.style.cssText = `
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 100px;
+            height: 100px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -822,7 +822,7 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: normal;
             text-align: center;
             width: 100px;
@@ -835,8 +835,8 @@ class GameScreen extends BaseScreen {
         option2Bg.id = 'option2-bg-2d';
         option2Bg.style.cssText = `
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 100px;
+            height: 100px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -857,7 +857,7 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: normal;
             text-align: center;
             width: 100px;
