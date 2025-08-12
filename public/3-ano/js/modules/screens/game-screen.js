@@ -353,16 +353,16 @@ class GameScreen extends BaseScreen {
         
         // Posicionar opção 1 (esquerda) - MAIS AFASTADA
         if (this.option1Bg2D) {
-            this.option1Bg2D.style.left = `${faceX - 180}px`; // Esquerda
-            this.option1Bg2D.style.top = `${faceY - 120}px`; // MAIS ACIMA (era +60)
+            this.option1Bg2D.style.left = `${faceX - 80}px`; // Esquerda
+            this.option1Bg2D.style.top = `${faceY - 60}px`; // MAIS ACIMA (era +60)
             this.option1Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option1Bg2D.style.opacity = opacity;
         }
         
         // Posicionar opção 2 (direita) - MAIS AFASTADA
         if (this.option2Bg2D) {
-            this.option2Bg2D.style.left = `${faceX + 180}px`; // Direita
-            this.option2Bg2D.style.top = `${faceY - 120}px`; // MAIS ACIMA (era +60)
+            this.option2Bg2D.style.left = `${faceX + 30}px`; // Direita
+            this.option2Bg2D.style.top = `${faceY - 60}px`; // MAIS ACIMA (era +60)
             this.option2Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option2Bg2D.style.opacity = opacity;
         }
@@ -822,10 +822,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: normal;
             text-align: center;
-            width: 100px;
+            width: 50px;
             pointer-events: none;
             user-select: none;
         `;
@@ -857,10 +857,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: normal;
             text-align: center;
-            width: 100px;
+            width: 50px;
             pointer-events: none;
             user-select: none;
         `;
