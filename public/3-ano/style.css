@@ -1,0 +1,573 @@
+/* Prevenir zoom de pinça e melhorar responsividade */
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    font-family: Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    touch-action: manipulation;
+}
+
+/* Prevenir zoom em inputs e textareas */
+input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    font-size: 16px; /* Previne zoom automático no iOS */
+}
+
+.info {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    font-size: 14px;
+}
+
+.controls {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    text-align: center;
+    max-width: 80%;
+    line-height: 1.4;
+}
+
+
+
+#main {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    background-image: url(assets/textures/main-bg.png);
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    /* Fallback para dispositivos que não suportam vh/vw */
+    width: 100%;
+    height: 100%;
+}
+
+#main-top{
+    position: fixed;
+    top: 5%;
+    left: 0;
+    transform: translate(50%, 0%);
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+    z-index: 2100;
+}
+
+#main-bottom{
+    position: fixed;
+    bottom: 5%;
+    left: 25%;
+    transform: translate(50%, 0%);
+    width: 25%;
+    height: auto;
+    object-fit: cover;
+}
+
+
+#main-button{
+    position: fixed;
+    bottom: 30%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    z-index: 2100;
+    width: 40%;
+    height: 100px;
+    background-image: url(assets/textures/btn-jogar.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+#tutorial {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    /* Fallback para dispositivos que não suportam vh/vw */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Fallback para garantir que a thumbnail seja exibida */
+    background-image: url('assets/textures/tutorial-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#tutorial-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 80vw;
+    height: 80vh;
+    background-image: url(assets/textures/tutorial-text.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#tutorial-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    z-index: 2101;
+}
+
+#tutorial-button {
+    z-index: 2100;
+    width: 300px;
+    height: 100px;
+    background-image: url(assets/textures/btn-comecar.png);
+    position: absolute;
+    bottom: -5%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+#tutorial-animation {
+    position: absolute;
+    top: 70%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    z-index: 2101;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#narracao-button {
+    position: fixed;
+    top: 0%;
+    left: 11%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 50px;
+    height: 50px;
+    background-image: url(assets/textures/narracao-icon.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    z-index: 9101;
+}
+
+#narracao-text {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 100vw;
+    height: auto;
+    object-fit: contain;
+    z-index: 8101;
+}
+
+#game {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    /* Fallback para dispositivos que não suportam vh/vw */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Fallback para garantir que a thumbnail seja exibida */
+   
+}
+
+#game-top { 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+#game-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+#game-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2100;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-image: url('assets/textures/game-bg.png');
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    display: block;
+}
+
+#fallback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    background-image: url('assets/textures/game-bg.png');
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+}
+
+#goto-selfie {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/textures/tutorial-bg.png');
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    display: none;
+}
+
+#goto-selfie-button {
+    position: fixed;
+    bottom: 10%;
+    left: 0%;
+    /* transform: translate(50%, 50%); */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    scale: 0.8;
+}
+
+#personagem-game {
+    position: fixed;
+    bottom: 0%;
+    left: 0%;
+    width: 40%;
+    height: auto;
+    object-fit: contain;
+    z-index: 99992100;
+}
+
+
+#personagem-game-selfie {
+    position: fixed;
+    bottom: 0%;
+    left: 0%;
+    width: 40%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ===== TELA DE SELFIE ===== */
+.selfie-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 16000;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    background: #000;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+#certificado-top {
+    position: fixed;
+    top: 0%;
+    left: 5%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+#certificado-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.selfie-screen.ativo {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#selfie-camera {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Espelhar para selfie */
+}
+
+#camera-icon-selfie {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    z-index: 16001;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+#camera-icon-selfie:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+#camera-icon-selfie:active {
+    transform: scale(0.95);
+} 
+
+
+/* Responsividade para botão de certificado */
+@media (max-width: 768px) {
+    #btn-certificado {
+        max-width: 80%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #btn-certificado {
+        max-width: 90%;
+    }
+} 
+
+/* ===== ANIMAÇÕES DE TRANSIÇÃO DE TELAS ===== */
+
+/* Animações de entrada e saída - DESABILITADAS TEMPORARIAMENTE */
+.entering {
+    /* animation: screenEnter 0.5s ease-out forwards; */
+}
+
+.screen-exiting {
+    /* animation: screenExit 0.4s ease-in forwards; */
+}
+
+@keyframes screenEnter {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes screenExit {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Animações específicas para cada tela */
+#main {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tutorial {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#ui {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.puzzle-screen {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.congratulations-screen {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.selfie-screen {
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efeitos de hover para botões durante transições - DESABILITADOS */
+.entering .selfie-button,
+.entering .puzzle-button,
+.entering .congratulations-button {
+    /* animation: buttonFade 0.6s ease-out 0.2s both; */
+}
+
+@keyframes buttonFade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Animações de elementos internos - DESABILITADAS */
+.entering .puzzle-header,
+.entering .selfie-header,
+.entering .congratulations-content {
+    /* animation: contentFade 0.6s ease-out 0.1s both; */
+}
+
+@keyframes contentFade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Otimizações para mobile */
+@media (max-width: 768px) {
+    .entering {
+        /* animation-duration: 0.4s; */
+    }
+    
+    .screen-exiting {
+        /* animation-duration: 0.3s; */
+    }
+} 
+
+/* Estilos para o jogo */
+#game {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1000;
+}
+
+#game #video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+#game #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#game #camera-status {
+    z-index: 3;
+}
+
+#game #game-instructions {
+    z-index: 3;
+}
+
+#game #game-back-button {
+    z-index: 3;
+} 

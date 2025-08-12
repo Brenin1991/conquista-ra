@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Frame Face Detection</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Video element for camera feed -->
+    <video id="video" autoplay muted playsinline></video>
+    
+    <!-- Canvas for face-api.js overlay -->
+    <canvas id="overlay"></canvas>
+    
+    <!-- Camera status indicator -->
+    <div id="camera-status" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; z-index: 100;">
+        📹 Carregando câmera...
+    </div>
+    
+    <!-- A-Frame Scene -->
+    <a-scene 
+        embedded 
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false">
+        
+        <!-- Assets -->
+        <a-assets>
+            <a-mixin id="cube" geometry="primitive: box"></a-mixin>
+        </a-assets>
+
+        <!-- Camera with look controls -->
+        <a-camera 
+            id="camera"
+            look-controls="enabled: true"
+            wasd-controls="enabled: false"
+            position="0 1.6 3">
+        </a-camera>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#404040"></a-light>
+        <a-light type="point" position="0 2 0" color="#ffffff"></a-light>
+
+      
+
+        <!-- Face detection indicator cube -->
+        <a-box 
+            id="face-cube"
+            position="0 2 -2"
+            rotation="0 45 0"
+            color="#FF6B6B"
+            animation="property: rotation; to: 0 405 0; loop: true; dur: 3000"
+            visible="false">
+        </a-box>
+
+        <!-- Expression indicators -->
+        <a-text 
+            id="expression-text"
+            position="0 3 -2"
+            value="Detectando..."
+            color="#FFFFFF"
+            align="center"
+            width="8">
+        </a-text>
+
+        <!-- Emotion spheres -->
+        <a-sphere 
+            id="happy-sphere"
+            position="-2 2 -2"
+            radius="0.3"
+            color="#FFD93D"
+            visible="false">
+        </a-sphere>
+
+        <a-sphere 
+            id="sad-sphere"
+            position="2 2 -2"
+            radius="0.3"
+            color="#6BCF7F"
+            visible="false">
+        </a-sphere>
+
+        <a-sphere 
+            id="angry-sphere"
+            position="0 2.5 -1"
+            radius="0.3"
+            color="#FF6B6B"
+            visible="false">
+        </a-sphere>
+
+        <a-sphere 
+            id="surprised-sphere"
+            position="-1 1.5 -1.5"
+            radius="0.3"
+            color="#4ECDC4"
+            visible="false">
+        </a-sphere>
+
+                 <!-- Sky -->
+         <a-sky color="#000000" opacity="0.1"></a-sky>
+    </a-scene>
+
+    <script src="script.js"></script>
+</body>
+</html> 

@@ -1,0 +1,176 @@
+{
+    "frase1": {
+        "pergunta": "Me sinto acumulada e com muita energia, mal consigo relaxar…",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "Que tal... dar um passeio ao ar livre?",
+                    "fallback": "Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    },
+    "frase2": {
+        "pergunta": "Eu não sei dizer certinho o que tô sentindo agora... Acho que preciso de um tempo pra pensar e entender...",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "Que tal... pensar sobre o assunto sozinho?",
+                    "fallback": "Pensar sozinho me deu mais clareza sobre meus sentimentos... Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    },
+    "frase3": {
+        "pergunta": "Aconteceu algo hoje na escola que me deixou irritado...",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "Que tal... conversar sobre o que aconteceu?    ",
+                    "fallback": "Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    },
+    "frase4": {
+        "pergunta": "Estou me sentindo um pouco triste hoje. Acho que receber carinho deixaria meu dia um pouco melhor...",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "que tal... nos abraçarmos?",
+                    "fallback": "Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    },
+    "frase5": {
+        "pergunta": "Fiquei triste com meu irmão no final de semana, pois ele só queria ficar no celular e não brincou comigo...",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "que tal... contar a ele como se sentiu?",
+                    "fallback": "Contei para ele como me senti, conversamos a respeito e até combinamos de brincar mais tarde depois da aula! Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    },
+    "frase6": {
+        "pergunta": "Eu falei uma coisa que não devia pro meu amigo e agora me arrependi. Sinto meu coração pesado...",
+        "respostas": {
+            "00": [
+                {
+                    "resposta": "que tal... se desculpar e fazer as pazes?",
+                    "fallback": "Falei para meu amigo que me arrependi, que não queria ter feito ele se sentir mal. Pedi desculpas e falei que não vou fazer isso de novo! Nos abraçamos e estamos de pazes novamente. Isso me fez sentir melhor! Muito obrigado!"
+                }
+            ],
+            "01": [
+                {
+                    "resposta": "que tal... se sentar e relaxar um pouco?",
+                    "fallback": "Ficar parado e relaxar as vezes ajuda, mas hoje me sinto um pouco agitado... podemos tentar outra solução?"
+                }
+            ],
+            "02": [
+                {
+                    "resposta": "que tal... tomar um copo de água?",
+                    "fallback": "Tomar água costuma ajudar a me sentir melhor... mas hoje preciso gastar minha energia. podemos tentar outra solução?"
+                }
+            ],
+            "03": [
+                {
+                    "resposta": "que tal... comer algo gostoso?",
+                    "fallback": "Eu agradeço sua preocupação, mas não estou com fome. Podemos tentar outra solução?"
+                }
+            ]
+        }
+    }
+}
