@@ -317,7 +317,6 @@ class GameScreen extends BaseScreen {
     
     position2DElements(faceX, faceY) {
         console.log('🎯 position2DElements chamado com:', faceX, faceY);
-        faceX = faceX + 300;
         
         if (!this.gameElements2D) {
             console.log('❌ gameElements2D não existe!');
