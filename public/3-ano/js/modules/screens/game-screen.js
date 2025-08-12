@@ -276,39 +276,31 @@ class GameScreen extends BaseScreen {
             const foreheadRight = positions[22]; // Testa direita
             const foreheadCenter = positions[21]; // Centro da testa
             
-            // Calcular posição da testa na tela
-            const foreheadX = foreheadCenter.x;
-            const foreheadY = foreheadCenter.y;
+            // CONVERTER COORDENADAS COMO OS ELEMENTOS DO FACE TRACKING
+            // Usar o mesmo sistema de escala do canvas
+            const scaleX = this.canvas.width / this.video.videoWidth;
+            const scaleY = this.canvas.height / this.video.videoHeight;
             
-            // DEBUG: Verificar se os elementos 2D existem
-            console.log(`🔍 DEBUG: Elementos 2D existem?`, {
-                gameElements2D: !!this.gameElements2D,
-                questionBg2D: !!this.questionBg2D,
-                option1Bg2D: !!this.option1Bg2D,
-                option2Bg2D: !!this.option2Bg2D
-            });
+            // Calcular posição da testa na tela (convertida)
+            const foreheadX = foreheadCenter.x * scaleX;
+            const foreheadY = foreheadCenter.y * scaleY;
             
             // Posicionar elementos 2D na testa
             this.position2DElements(foreheadX, foreheadY);
             
             console.log(`🎯 Elementos 2D fixados na TESTA: ${foreheadX.toFixed(0)}px, ${foreheadY.toFixed(0)}px`);
             console.log(`📏 Profundidade real: ${realDepth.toFixed(3)}m (face width: ${(faceWidthNormalized * 100).toFixed(1)}%)`);
-            console.log(`🧠 Testa: ${(foreheadX / this.video.videoWidth * 100).toFixed(1)}%, ${(foreheadY / this.video.videoHeight * 100).toFixed(1)}%`);
+            console.log(`🧠 Testa convertida: ${foreheadX.toFixed(0)}px, ${foreheadY.toFixed(0)}px (escala: X:${scaleX.toFixed(2)}, Y:${scaleY.toFixed(2)})`);
             
             // CALIBRAR PROFUNDIDADE USANDO LANDMARKS ESPECÍFICOS
             this.calibrateDepthWithLandmarks(landmarks, realDepth);
         } else {
-            // Fallback: usar posição do centro do rosto
-            const centerX = x + width/2;
-            const centerY = y + height/2;
+            // Fallback: usar posição do centro do rosto (convertida)
+            const scaleX = this.canvas.width / this.video.videoWidth;
+            const scaleY = this.canvas.height / this.video.videoHeight;
             
-            // DEBUG: Verificar se os elementos 2D existem
-            console.log(`🔍 DEBUG: Elementos 2D existem?`, {
-                gameElements2D: !!this.gameElements2D,
-                questionBg2D: !!this.questionBg2D,
-                option1Bg2D: !!this.option1Bg2D,
-                option2Bg2D: !!this.option2Bg2D
-            });
+            const centerX = (x + width/2) * scaleX;
+            const centerY = (y + height/2) * scaleY;
             
             this.position2DElements(centerX, centerY);
             console.log(`🎯 Elementos 2D fixados no centro do rosto: ${centerX.toFixed(0)}px, ${centerY.toFixed(0)}px`);
@@ -316,61 +308,41 @@ class GameScreen extends BaseScreen {
     }
     
     position2DElements(faceX, faceY) {
-        console.log('🎯 position2DElements chamado com:', faceX, faceY);
+        if (!this.gameElements2D) return;
         
-        if (!this.gameElements2D) {
-            console.log('❌ gameElements2D não existe!');
-            return;
-        }
+        // CENTRALIZAR PERFEITAMENTE NO MEIO DO ROSTO
+        // faceX e faceY são as coordenadas do centro do rosto
         
-        // POSICIONAR ELEMENTOS SEGUINDO O ROSTO (FACE TRACKING)
-        // faceX e faceY são as coordenadas da testa em pixels
-        
-        // Posicionar fundo da pergunta na testa
+        // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
             this.questionBg2D.style.left = `${faceX}px`;
-            this.questionBg2D.style.top = `${faceY - 150}px`; // Acima da testa
-            console.log('✅ Pergunta posicionada em:', faceX, faceY - 150);
-        } else {
-            console.log('❌ questionBg2D não existe!');
+            this.questionBg2D.style.top = `${faceY - 60}px`; // Acima do centro
         }
         
-        // Posicionar opção 1 (esquerda) ao lado esquerdo do rosto
+        // Posicionar opção 1 (esquerda) - CENTRADA
         if (this.option1Bg2D) {
-            this.option1Bg2D.style.left = `${faceX - 250}px`;
-            this.option1Bg2D.style.top = `${faceY + 50}px`; // Abaixo da testa
-            console.log('✅ Opção 1 posicionada em:', faceX - 250, faceY + 50);
-        } else {
-            console.log('❌ option1Bg2D não existe!');
+            this.option1Bg2D.style.left = `${faceX - 90}px`; // Esquerda do centro
+            this.option1Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
         }
         
-        // Posicionar opção 2 (direita) ao lado direito do rosto
+        // Posicionar opção 2 (direita) - CENTRADA
         if (this.option2Bg2D) {
-            this.option2Bg2D.style.left = `${faceX + 250}px`;
-            this.option2Bg2D.style.top = `${faceY + 50}px`; // Abaixo da testa
-            console.log('✅ Opção 2 posicionada em:', faceX + 250, faceY + 50);
-        } else {
-            console.log('❌ option2Bg2D não existe!');
+            this.option2Bg2D.style.left = `${faceX + 90}px`; // Direita do centro
+            this.option2Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
         }
         
-        // Posicionar indicadores abaixo das opções
+        // Posicionar indicadores CENTRADOS
         if (this.leftIndicator2D) {
-            this.leftIndicator2D.style.left = `${faceX - 250}px`;
-            this.leftIndicator2D.style.top = `${faceY + 180}px`;
-            console.log('✅ Indicador esquerda posicionado em:', faceX - 250, faceY + 180);
-        } else {
-            console.log('❌ leftIndicator2D não existe!');
+            this.leftIndicator2D.style.left = `${faceX - 90}px`;
+            this.leftIndicator2D.style.top = `${faceY + 100}px`;
         }
         
         if (this.rightIndicator2D) {
-            this.rightIndicator2D.style.left = `${faceX + 250}px`;
-            this.rightIndicator2D.style.top = `${faceY + 180}px`;
-            console.log('✅ Indicador direita posicionado em:', faceX + 250, faceY + 180);
-        } else {
-            console.log('❌ rightIndicator2D não existe!');
+            this.rightIndicator2D.style.left = `${faceX + 90}px`;
+            this.rightIndicator2D.style.top = `${faceY + 100}px`;
         }
         
-        console.log(`🎯 Elementos 2D posicionados no rosto: ${faceX}px, ${faceY}px`);
+        console.log(`🎯 Elementos centralizados no rosto: ${faceX}px, ${faceY}px`);
     }
     
     calibrateDepthWithLandmarks(landmarks, baseDepth) {
@@ -743,7 +715,7 @@ class GameScreen extends BaseScreen {
         questionBg.id = 'question-bg-2d';
         questionBg.style.cssText = `
             position: absolute;
-            width: 500px;
+            width: 400px;
             height: 120px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
@@ -751,6 +723,7 @@ class GameScreen extends BaseScreen {
             background-position: center;
             pointer-events: none;
             transform: translate(-50%, -50%);
+            z-index: 1001;
         `;
         
         // Criar texto da pergunta
@@ -767,7 +740,7 @@ class GameScreen extends BaseScreen {
             font-size: 20px;
             font-weight: bold;
             text-align: center;
-            width: 480px;
+            width: 380px;
             pointer-events: none;
             user-select: none;
         `;
@@ -777,14 +750,15 @@ class GameScreen extends BaseScreen {
         option1Bg.id = 'option1-bg-2d';
         option1Bg.style.cssText = `
             position: absolute;
-            width: 180px;
-            height: 180px;
+            width: 160px;
+            height: 160px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             pointer-events: none;
             transform: translate(-50%, -50%);
+            z-index: 1001;
         `;
         
         // Criar texto da opção 1
@@ -798,10 +772,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             text-align: center;
-            width: 160px;
+            width: 140px;
             pointer-events: none;
             user-select: none;
         `;
@@ -811,14 +785,15 @@ class GameScreen extends BaseScreen {
         option2Bg.id = 'option2-bg-2d';
         option2Bg.style.cssText = `
             position: absolute;
-            width: 180px;
-            height: 180px;
+            width: 160px;
+            height: 160px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             pointer-events: none;
             transform: translate(-50%, -50%);
+            z-index: 1001;
         `;
         
         // Criar texto da opção 2
@@ -829,13 +804,12 @@ class GameScreen extends BaseScreen {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             text-align: center;
-            width: 160px;
+            width: 140px;
             pointer-events: none;
             user-select: none;
         `;
@@ -851,6 +825,7 @@ class GameScreen extends BaseScreen {
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
+            z-index: 1002;
         `;
         
         const rightIndicator = document.createElement('div');
@@ -863,6 +838,7 @@ class GameScreen extends BaseScreen {
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
+            z-index: 1002;
         `;
         
         // Adicionar elementos ao container
@@ -883,14 +859,6 @@ class GameScreen extends BaseScreen {
         this.option2Bg2D = option2Bg;
         this.leftIndicator2D = leftIndicator;
         this.rightIndicator2D = rightIndicator;
-        
-        console.log(`✅ Elementos 2D criados:`, {
-            questionBg2D: !!this.questionBg2D,
-            option1Bg2D: !!this.option1Bg2D,
-            option2Bg2D: !!this.option2Bg2D,
-            leftIndicator2D: !!this.leftIndicator2D,
-            rightIndicator2D: !!this.rightIndicator2D
-        });
     }
     
     positionElementsOnFace() {
@@ -1144,23 +1112,18 @@ class GameScreen extends BaseScreen {
     }
 
     clearScene() {
-        console.log('🧹 clearScene chamado');
-        
         // Limpar elementos 3D
         if (this.gameElements) {
             while (this.gameElements.children.length > 0) {
                 this.gameElements.removeChild(this.gameElements.children[0]);
             }
-            console.log('✅ Elementos 3D limpos');
         }
         
-        // NÃO limpar elementos 2D aqui - eles devem persistir
-        // if (this.gameElements2D) {
-        //     this.gameElements2D.style.display = 'none';
-        //     this.gameElements2D.innerHTML = '';
-        // }
-        
-        console.log('✅ Elementos 2D mantidos (não limpos)');
+        // Limpar elementos 2D
+        if (this.gameElements2D) {
+            this.gameElements2D.style.display = 'none';
+            this.gameElements2D.innerHTML = '';
+        }
     }
 }
 
