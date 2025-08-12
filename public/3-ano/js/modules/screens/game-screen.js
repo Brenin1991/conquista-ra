@@ -266,7 +266,7 @@ class GameScreen extends BaseScreen {
         // Adicionar offset para manter elementos mais distantes
         const worldZ = -(realDepth + 1.0); // +1m de distância extra
         
-        // POSICIONAR ELEMENTOS NA TESTA USANDO LANDMARKS
+        // POSICIONAR ELEMENTOS 2D NA TESTA USANDO LANDMARKS
         if (landmarks && landmarks.positions) {
             // Usar landmarks específicos para posicionar na testa
             const positions = landmarks.positions;
@@ -277,33 +277,101 @@ class GameScreen extends BaseScreen {
             const foreheadCenter = positions[21]; // Centro da testa
             
             // Calcular posição da testa na tela
-            const foreheadX = (foreheadCenter.x / this.video.videoWidth);
-            const foreheadY = (foreheadCenter.y / this.video.videoHeight);
+            const foreheadX = foreheadCenter.x;
+            const foreheadY = foreheadCenter.y;
             
-            // Converter para coordenadas 3D do A-Frame
-            const worldX = (foreheadX - 0.5) * 4; // -2 a 2
-            const worldY = (0.5 - foreheadY) * 4; // Invertido e ajustado para testa
+            // DEBUG: Verificar se os elementos 2D existem
+            console.log(`🔍 DEBUG: Elementos 2D existem?`, {
+                gameElements2D: !!this.gameElements2D,
+                questionBg2D: !!this.questionBg2D,
+                option1Bg2D: !!this.option1Bg2D,
+                option2Bg2D: !!this.option2Bg2D
+            });
             
-            // Posicionar os textos na testa com profundidade real
-            this.gameElements.setAttribute('position', `${worldX} ${worldY} ${worldZ}`);
+            // Posicionar elementos 2D na testa
+            this.position2DElements(foreheadX, foreheadY);
             
-            console.log(`🎯 Textos fixados na TESTA: ${worldX.toFixed(2)}, ${worldY.toFixed(2)}, ${worldZ.toFixed(3)}m`);
+            console.log(`🎯 Elementos 2D fixados na TESTA: ${foreheadX.toFixed(0)}px, ${foreheadY.toFixed(0)}px`);
             console.log(`📏 Profundidade real: ${realDepth.toFixed(3)}m (face width: ${(faceWidthNormalized * 100).toFixed(1)}%)`);
-            console.log(`🧠 Testa: ${(foreheadX * 100).toFixed(1)}%, ${(foreheadY * 100).toFixed(1)}%`);
+            console.log(`🧠 Testa: ${(foreheadX / this.video.videoWidth * 100).toFixed(1)}%, ${(foreheadY / this.video.videoHeight * 100).toFixed(1)}%`);
             
             // CALIBRAR PROFUNDIDADE USANDO LANDMARKS ESPECÍFICOS
             this.calibrateDepthWithLandmarks(landmarks, realDepth);
         } else {
             // Fallback: usar posição do centro do rosto
-            const worldX = (screenX - 0.5) * 4; // -2 a 2
-            const worldY = (0.5 - screenY) * 4; // Ajustado para testa
+            const centerX = x + width/2;
+            const centerY = y + height/2;
             
-            this.gameElements.setAttribute('position', `${worldX} ${worldY} ${worldZ}`);
-            console.log(`🎯 Textos fixados no centro do rosto: ${worldX.toFixed(2)}, ${worldY.toFixed(2)}, ${worldZ.toFixed(3)}m`);
+            // DEBUG: Verificar se os elementos 2D existem
+            console.log(`🔍 DEBUG: Elementos 2D existem?`, {
+                gameElements2D: !!this.gameElements2D,
+                questionBg2D: !!this.questionBg2D,
+                option1Bg2D: !!this.option1Bg2D,
+                option2Bg2D: !!this.option2Bg2D
+            });
+            
+            this.position2DElements(centerX, centerY);
+            console.log(`🎯 Elementos 2D fixados no centro do rosto: ${centerX.toFixed(0)}px, ${centerY.toFixed(0)}px`);
+        }
+    }
+    
+    position2DElements(faceX, faceY) {
+        console.log('🎯 position2DElements chamado com:', faceX, faceY);
+        faceX = faceX + 300;
+        
+        if (!this.gameElements2D) {
+            console.log('❌ gameElements2D não existe!');
+            return;
         }
         
-        // Fazer os textos sempre olharem para a câmera
-        this.gameElements.setAttribute('rotation', '0 0 0');
+        // POSICIONAR ELEMENTOS SEGUINDO O ROSTO (FACE TRACKING)
+        // faceX e faceY são as coordenadas da testa em pixels
+        
+        // Posicionar fundo da pergunta na testa
+        if (this.questionBg2D) {
+            this.questionBg2D.style.left = `${faceX}px`;
+            this.questionBg2D.style.top = `${faceY - 150}px`; // Acima da testa
+            console.log('✅ Pergunta posicionada em:', faceX, faceY - 150);
+        } else {
+            console.log('❌ questionBg2D não existe!');
+        }
+        
+        // Posicionar opção 1 (esquerda) ao lado esquerdo do rosto
+        if (this.option1Bg2D) {
+            this.option1Bg2D.style.left = `${faceX - 250}px`;
+            this.option1Bg2D.style.top = `${faceY + 50}px`; // Abaixo da testa
+            console.log('✅ Opção 1 posicionada em:', faceX - 250, faceY + 50);
+        } else {
+            console.log('❌ option1Bg2D não existe!');
+        }
+        
+        // Posicionar opção 2 (direita) ao lado direito do rosto
+        if (this.option2Bg2D) {
+            this.option2Bg2D.style.left = `${faceX + 250}px`;
+            this.option2Bg2D.style.top = `${faceY + 50}px`; // Abaixo da testa
+            console.log('✅ Opção 2 posicionada em:', faceX + 250, faceY + 50);
+        } else {
+            console.log('❌ option2Bg2D não existe!');
+        }
+        
+        // Posicionar indicadores abaixo das opções
+        if (this.leftIndicator2D) {
+            this.leftIndicator2D.style.left = `${faceX - 250}px`;
+            this.leftIndicator2D.style.top = `${faceY + 180}px`;
+            console.log('✅ Indicador esquerda posicionado em:', faceX - 250, faceY + 180);
+        } else {
+            console.log('❌ leftIndicator2D não existe!');
+        }
+        
+        if (this.rightIndicator2D) {
+            this.rightIndicator2D.style.left = `${faceX + 250}px`;
+            this.rightIndicator2D.style.top = `${faceY + 180}px`;
+            console.log('✅ Indicador direita posicionado em:', faceX + 250, faceY + 180);
+        } else {
+            console.log('❌ rightIndicator2D não existe!');
+        }
+        
+        console.log(`🎯 Elementos 2D posicionados no rosto: ${faceX}px, ${faceY}px`);
     }
     
     calibrateDepthWithLandmarks(landmarks, baseDepth) {
@@ -633,143 +701,197 @@ class GameScreen extends BaseScreen {
 
         createQuestionElements() {
         console.log('🎯 createQuestionElements chamado');
-        console.log('📍 gameElements:', this.gameElements);
-        
-        if (!this.gameElements) {
-            console.error('❌ gameElements não encontrado!');
-            return;
-        }
         
         // Limpar elementos anteriores
         this.clearScene();
         
-        console.log('✨ Criando elementos 3D...');
+        console.log('✨ Criando elementos 2D sobrepostos...');
         
-                // Criar elementos de texto para perguntas e respostas com texturas
-        this.gameElements.innerHTML = `
-            <!-- Fundo da pergunta com textura -->
-            <a-plane 
-                id="question-bg"
-                src="assets/textures/pergunta-balao.png"
-                position="0 0.8 0.01"
-                width="4"
-                height="1.2"
-                billboard=""
-                transparent="true"
-                opacity="0.9"
-                material="shader: flat; transparent: true; opacity: 0.9">
-            </a-plane>
-            
-            <!-- Texto da pergunta (na testa) -->
-            <a-text 
-                id="question-text"
-                value="${this.currentQuestion.pergunta}"
-                position="0 0.8 0.02"
-                align="center"
-                width="3.5"
-                color="#000000"
-                font="kelsonsans"
-                billboard=""
-                animation="property: scale; to: 1.05 1.05 1.05; loop: true; dir: alternate; dur: 2000">
-            </a-text>
-            
-            <!-- Fundo da opção 1 (esquerda) - QUADRADO PERFEITO -->
-            <a-plane 
-                id="option1-bg"
-                src="assets/textures/resposta-balao.png"
-                position="-1.5 0.2 0.01"
-                width="1.5"
-                height="1.5"
-                billboard=""
-                transparent="true"
-                opacity="0.9"
-                material="shader: flat; transparent: true; opacity: 0.9">
-            </a-plane>
-            
-            <!-- Opção 1 (esquerda) -->
-            <a-text 
-                id="option1-text"
-                value="1. ${this.getRandomWrongOption().resposta}"
-                position="-1.5 0.2 0.02"
-                align="center"
-                width="1.3"
-                color="#000000"
-                font="kelsonsans"
-                billboard=""
-                animation="property: scale; to: 1.1 1.1 1.1; loop: true; dir: alternate; dur: 1500">
-            </a-text>
-            
-            <!-- Fundo da opção 2 (direita) - QUADRADO PERFEITO -->
-            <a-plane 
-                id="option2-bg"
-                src="assets/textures/resposta-balao.png"
-                position="1.5 0.2 0.01"
-                width="1.5"
-                height="1.5"
-                billboard=""
-                transparent="true"
-                opacity="0.9"
-                material="shader: flat; transparent: true; opacity: 0.9">
-            </a-plane>
-            
-            <!-- Opção 2 (direita) -->
-            <a-text 
-                id="option2-text"
-                value="2. ${this.currentQuestion.respostas['00'][0].resposta}"
-                position="1.5 0.2 0.02"
-                align="center"
-                width="1.3"
-                color="#000000"
-                font="kelsonsans"
-                billboard=""
-                animation="property: scale; to: 1.1 1.1 1.1; loop: true; dir: alternate; dur: 1500">
-            </a-text>
-            
-            <!-- Indicador esquerda (esfera) -->
-            <a-sphere 
-                id="left-indicator"
-                position="-1.5 -0.3 0.02"
-                radius="0.15"
-                color="#4ECDC4"
-                billboard=""
-                material="shader: flat"
-                animation="property: scale; to: 1.3 1.3 1.3; loop: true; dir: alternate; dur: 1000">
-            </a-sphere>
-            
-            <!-- Indicador direita (esfera) -->
-            <a-sphere 
-                id="right-indicator"
-                position="1.5 -0.3 0.02"
-                radius="0.15"
-                color="#FF6B6B"
-                billboard=""
-                material="shader: flat"
-                animation="property: scale; to: 1.3 1.3 1.3; loop: true; dir: alternate; dur: 1000">
-            </a-sphere>
-            
-            <!-- Linha de separação -->
-            <a-cylinder 
-                position="0 0.2 0.02"
-                rotation="0 0 90"
-                height="3"
-                radius="0.02"
-                color="#666666"
-                opacity="0.5"
-                billboard=""
-                material="shader: flat; transparent: true; opacity: 0.5">
-            </a-cylinder>
-        `;
+        // Criar elementos 2D que seguem o rosto (como face tracking)
+        this.create2DQuestionElements();
         
         // Sempre resposta correta à direita para simplificar
         this.correctSide = 'right';
         
-        // Guardar referências
-        this.questionText = document.getElementById('question-text');
-        this.option1Text = document.getElementById('option1-text');
-        this.option2Text = document.getElementById('option2-text');
-        
         // Elementos criados com sucesso
-        console.log('✅ Perguntas e respostas 3D criadas!');
+        console.log('✅ Perguntas e respostas 2D criadas!');
+    }
+    
+    create2DQuestionElements() {
+        // Criar container para elementos 2D
+        if (!this.gameElements2D) {
+            this.gameElements2D = document.createElement('div');
+            this.gameElements2D.id = 'game-elements-2d';
+            this.gameElements2D.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1000;
+                display: none;
+            `;
+            document.body.appendChild(this.gameElements2D);
+        }
+        
+        // Limpar elementos anteriores
+        this.gameElements2D.innerHTML = '';
+        this.gameElements2D.style.display = 'block';
+        
+        // Criar fundo da pergunta
+        const questionBg = document.createElement('div');
+        questionBg.id = 'question-bg-2d';
+        questionBg.style.cssText = `
+            position: absolute;
+            width: 500px;
+            height: 120px;
+            background-image: url('assets/textures/pergunta-balao.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        `;
+        
+        // Criar texto da pergunta
+        const questionText = document.createElement('div');
+        questionText.id = 'question-text-2d';
+        questionText.textContent = this.currentQuestion.pergunta;
+        questionText.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            width: 480px;
+            pointer-events: none;
+            user-select: none;
+        `;
+        
+        // Criar fundo da opção 1 (esquerda)
+        const option1Bg = document.createElement('div');
+        option1Bg.id = 'option1-bg-2d';
+        option1Bg.style.cssText = `
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background-image: url('assets/textures/resposta-balao.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        `;
+        
+        // Criar texto da opção 1
+        const option1Text = document.createElement('div');
+        option1Text.id = 'option1-text-2d';
+        option1Text.textContent = `1. ${this.getRandomWrongOption().resposta}`;
+        option1Text.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            width: 160px;
+            pointer-events: none;
+            user-select: none;
+        `;
+        
+        // Criar fundo da opção 2 (direita)
+        const option2Bg = document.createElement('div');
+        option2Bg.id = 'option2-bg-2d';
+        option2Bg.style.cssText = `
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background-image: url('assets/textures/resposta-balao.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        `;
+        
+        // Criar texto da opção 2
+        const option2Text = document.createElement('div');
+        option2Text.id = 'option2-text-2d';
+        option2Text.textContent = `2. ${this.currentQuestion.respostas['00'][0].resposta}`;
+        option2Text.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            width: 160px;
+            pointer-events: none;
+            user-select: none;
+        `;
+        
+        // Criar indicadores coloridos
+        const leftIndicator = document.createElement('div');
+        leftIndicator.id = 'left-indicator-2d';
+        leftIndicator.style.cssText = `
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #4ECDC4;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        `;
+        
+        const rightIndicator = document.createElement('div');
+        rightIndicator.id = 'right-indicator-2d';
+        rightIndicator.style.cssText = `
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #FF6B6B;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        `;
+        
+        // Adicionar elementos ao container
+        questionBg.appendChild(questionText);
+        option1Bg.appendChild(option1Text);
+        option2Bg.appendChild(option1Text.cloneNode(true));
+        option2Bg.appendChild(option2Text);
+        
+        this.gameElements2D.appendChild(questionBg);
+        this.gameElements2D.appendChild(option1Bg);
+        this.gameElements2D.appendChild(option2Bg);
+        this.gameElements2D.appendChild(leftIndicator);
+        this.gameElements2D.appendChild(rightIndicator);
+        
+        // Guardar referências para posicionamento
+        this.questionBg2D = questionBg;
+        this.option1Bg2D = option1Bg;
+        this.option2Bg2D = option2Bg;
+        this.leftIndicator2D = leftIndicator;
+        this.rightIndicator2D = rightIndicator;
+        
+        console.log(`✅ Elementos 2D criados:`, {
+            questionBg2D: !!this.questionBg2D,
+            option1Bg2D: !!this.option1Bg2D,
+            option2Bg2D: !!this.option2Bg2D,
+            leftIndicator2D: !!this.leftIndicator2D,
+            rightIndicator2D: !!this.rightIndicator2D
+        });
     }
     
     positionElementsOnFace() {
@@ -824,8 +946,43 @@ class GameScreen extends BaseScreen {
         showFeedback() {
         const isCorrect = this.selectedAnswer === this.correctSide;
         
-        // Ir direto para a mensagem de fallback, sem mostrar "Correto/Tente novamente"
-        this.showFallbackMessage(isCorrect);
+        // Mostrar feedback 2D
+        this.show2DFeedback(isCorrect);
+    }
+    
+    show2DFeedback(isCorrect) {
+        if (!this.gameElements2D) return;
+        
+        // Limpar elementos anteriores
+        this.gameElements2D.innerHTML = '';
+        
+        // Criar mensagem de feedback
+        const feedbackText = document.createElement('div');
+        feedbackText.textContent = isCorrect ? '✅ Correto!' : '❌ Tente novamente!';
+        feedbackText.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: ${isCorrect ? '#4ECDC4' : '#FF6B6B'};
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1001;
+        `;
+        
+        this.gameElements2D.appendChild(feedbackText);
+        
+        // Mostrar por 2 segundos e ir para fallback
+        setTimeout(() => {
+            this.showFallbackMessage(isCorrect);
+        }, 2000);
     }
 
         showFallbackMessage(isCorrect) {
@@ -841,45 +998,81 @@ class GameScreen extends BaseScreen {
             fallbackMessage = wrongOption.fallback;
         }
         
-        // Mostrar mensagem 3D fixa no rosto
-        this.gameElements.innerHTML = `
-            <!-- Fundo da mensagem com textura (mesma da pergunta) -->
-            <a-plane 
-                id="fallback-bg"
-                src="assets/textures/pergunta-balao.png"
-                position="0 0.8 -0.5"
-                width="4"
-                height="1.2"
-                billboard=""
-                transparent="true"
-                opacity="0.9"
-                material="shader: flat; transparent: true; opacity: 0.9">
-            </a-plane>
-            
-            <a-text 
-                value="${fallbackMessage}"
-                position="0 0.8 -0.4"
-                align="center"
-                width="3"
-                color="#000000"
-                font="kelsonsans"
-                billboard=""
-                animation="property: scale; to: 1.1 1.1 1.1; loop: true; dir: alternate; dur: 1500">
-            </a-text>
-            
-            <!-- Esfera decorativa -->
-            <a-sphere 
-                position="0 0.2 -0.5"
-                radius="0.15"
-                color="#FFD93D"
-                billboard=""
-                material="shader: flat"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-            </a-sphere>
+        // Mostrar mensagem 2D fixa no rosto
+        this.show2DFallbackMessage(fallbackMessage, isCorrect);
+    }
+    
+    show2DFallbackMessage(fallbackMessage, isCorrect) {
+        if (!this.gameElements2D) return;
+        
+        // Limpar elementos anteriores
+        this.gameElements2D.innerHTML = '';
+        
+        // Criar fundo da mensagem
+        const fallbackBg = document.createElement('div');
+        fallbackBg.style.cssText = `
+            position: absolute;
+            width: 300px;
+            height: 80px;
+            background-image: url('assets/textures/pergunta-balao.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
         `;
         
-        // Posicionar no rosto
-        this.positionElementsOnFace();
+        // Criar texto da mensagem
+        const fallbackText = document.createElement('div');
+        fallbackText.textContent = fallbackMessage;
+        fallbackText.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            width: 280px;
+            pointer-events: none;
+            user-select: none;
+        `;
+        
+        // Criar esfera decorativa
+        const decorativeSphere = document.createElement('div');
+        decorativeSphere.style.cssText = `
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #FFD93D;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            top: 60%;
+            left: 50%;
+            animation: spin 2s linear infinite;
+        `;
+        
+        // Adicionar CSS para animação
+        if (!document.getElementById('fallback-animations')) {
+            const style = document.createElement('style');
+            style.id = 'fallback-animations';
+            style.textContent = `
+                @keyframes spin {
+                    from { transform: translate(-50%, -50%) rotate(0deg); }
+                    to { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        fallbackBg.appendChild(fallbackText);
+        this.gameElements2D.appendChild(fallbackBg);
+        this.gameElements2D.appendChild(decorativeSphere);
         
         // Próxima pergunta ou finalizar
         setTimeout(() => {
@@ -952,12 +1145,23 @@ class GameScreen extends BaseScreen {
     }
 
     clearScene() {
+        console.log('🧹 clearScene chamado');
+        
+        // Limpar elementos 3D
         if (this.gameElements) {
-            // Remover todos os elementos, incluindo debug
             while (this.gameElements.children.length > 0) {
                 this.gameElements.removeChild(this.gameElements.children[0]);
             }
+            console.log('✅ Elementos 3D limpos');
         }
+        
+        // NÃO limpar elementos 2D aqui - eles devem persistir
+        // if (this.gameElements2D) {
+        //     this.gameElements2D.style.display = 'none';
+        //     this.gameElements2D.innerHTML = '';
+        // }
+        
+        console.log('✅ Elementos 2D mantidos (não limpos)');
     }
 }
 
