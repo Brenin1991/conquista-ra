@@ -105,13 +105,12 @@
         <a-light type="ambient" color="#FFFFFF" intensity="0.3"></a-light>
         <a-light type="directional" position="2 4 5" color="#FFFFFF" intensity="0.4"></a-light>
 
-        <!-- Câmera principal -->
+        <!-- Câmera principal SEM GIROSCÓPIO -->
         <a-camera 
             id="main-camera"
             position="0 1.6 0" 
-            look-controls="enabled: false" 
-            wasd-controls="enabled: false"
-            device-orientation-permission-ui="enabled: false">
+            look-controls="enabled: false"
+            wasd-controls="enabled: false">
             
 
         </a-camera>
@@ -139,17 +138,13 @@
     <!-- Landscape Blocker -->
     <script src="js/modules/landscape-blocker.js"></script>
     
-    <!-- Script para desabilitar completamente giroscópio e orientação -->
+    <!-- Script para desabilitar completamente o giroscópio -->
     <script>
-        // DESABILITAR COMPLETAMENTE GIROSCÓPIO E ORIENTAÇÃO
+        // DESABILITAR COMPLETAMENTE O GIROSCÓPIO
         document.addEventListener('DOMContentLoaded', function() {
-            // Desabilitar permissão de orientação
+            // Desabilitar permissões de orientação do dispositivo
             if (screen.orientation && screen.orientation.lock) {
-                try {
-                    screen.orientation.lock('portrait');
-                } catch (e) {
-                    console.log('Não foi possível travar orientação:', e);
-                }
+                screen.orientation.lock('portrait').catch(() => {});
             }
             
             // Desabilitar eventos de orientação
@@ -157,54 +152,29 @@
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
-            }, { passive: false });
+            }, { passive: false, capture: true });
             
             // Desabilitar eventos de movimento
             window.addEventListener('devicemotion', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
-            }, { passive: false });
+            }, { passive: false, capture: true });
             
-            // Desabilitar permissões de sensor
-            if (navigator.permissions) {
-                navigator.permissions.query({ name: 'accelerometer' }).then(function(result) {
-                    if (result.state === 'granted') {
-                        console.log('Acelerômetro desabilitado');
-                    }
-                });
+            // Forçar câmera a não usar giroscópio
+            const camera = document.getElementById('main-camera');
+            if (camera) {
+                camera.setAttribute('look-controls', 'enabled: false');
+                camera.setAttribute('wasd-controls', 'enabled: false');
                 
-                navigator.permissions.query({ name: 'gyroscope' }).then(function(result) {
-                    if (result.state === 'granted') {
-                        console.log('Giroscópio desabilitado');
-                    }
-                });
+                // Remover qualquer componente de look-controls
+                const lookControls = camera.components['look-controls'];
+                if (lookControls) {
+                    lookControls.remove();
+                }
             }
             
-            // Desabilitar orientação da tela
-            if (screen.orientation) {
-                screen.orientation.addEventListener('change', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-            }
-            
-            console.log('🚫 Giroscópio e orientação COMPLETAMENTE DESABILITADOS no 3-ano!');
-        });
-        
-        // Interceptar e bloquear todas as tentativas de acesso ao giroscópio
-        Object.defineProperty(window, 'DeviceOrientationEvent', {
-            get: function() {
-                console.log('🚫 Tentativa de acessar DeviceOrientationEvent bloqueada!');
-                return null;
-            }
-        });
-        
-        Object.defineProperty(window, 'DeviceMotionEvent', {
-            get: function() {
-                console.log('🚫 Tentativa de acessar DeviceMotionEvent bloqueada!');
-                return null;
-            }
+            console.log('🚫 GIROSCÓPIO COMPLETAMENTE DESABILITADO!');
         });
     </script>
 </body>
