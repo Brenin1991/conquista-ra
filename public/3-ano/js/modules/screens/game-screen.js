@@ -765,7 +765,7 @@ class GameScreen extends BaseScreen {
         questionBg.id = 'question-bg-2d';
         questionBg.style.cssText = `
             position: absolute;
-            width: 400px;
+            width: 450px;
             height: 100px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
@@ -787,7 +787,7 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: normal;
             text-align: center;
             width: 280px;
