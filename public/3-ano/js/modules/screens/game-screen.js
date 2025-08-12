@@ -266,23 +266,44 @@ class GameScreen extends BaseScreen {
         // Adicionar offset para manter elementos mais distantes
         const worldZ = -(realDepth + 1.0); // +1m de distância extra
         
-        // Converter para coordenadas 3D (-1 a 1)
-        const worldX = (screenX - 0.5) * 4; // -2 a 2
-        const worldY = (0.78 - screenY) * 8; // -2 a 2
-        
-        // Posicionar os textos no rosto com profundidade real
-        this.gameElements.setAttribute('position', `${worldX} ${worldY} ${worldZ}`);
+        // POSICIONAR ELEMENTOS NA TESTA USANDO LANDMARKS
+        if (landmarks && landmarks.positions) {
+            // Usar landmarks específicos para posicionar na testa
+            const positions = landmarks.positions;
+            
+            // Landmarks para testa (índices 19-22: região da testa)
+            const foreheadLeft = positions[19];  // Testa esquerda
+            const foreheadRight = positions[22]; // Testa direita
+            const foreheadCenter = positions[21]; // Centro da testa
+            
+            // Calcular posição da testa na tela
+            const foreheadX = (foreheadCenter.x / this.video.videoWidth);
+            const foreheadY = (foreheadCenter.y / this.video.videoHeight);
+            
+            // Converter para coordenadas 3D do A-Frame
+            const worldX = (foreheadX - 0.5) * 4; // -2 a 2
+            const worldY = (0.5 - foreheadY) * 4; // Invertido e ajustado para testa
+            
+            // Posicionar os textos na testa com profundidade real
+            this.gameElements.setAttribute('position', `${worldX} ${worldY} ${worldZ}`);
+            
+            console.log(`🎯 Textos fixados na TESTA: ${worldX.toFixed(2)}, ${worldY.toFixed(2)}, ${worldZ.toFixed(3)}m`);
+            console.log(`📏 Profundidade real: ${realDepth.toFixed(3)}m (face width: ${(faceWidthNormalized * 100).toFixed(1)}%)`);
+            console.log(`🧠 Testa: ${(foreheadX * 100).toFixed(1)}%, ${(foreheadY * 100).toFixed(1)}%`);
+            
+            // CALIBRAR PROFUNDIDADE USANDO LANDMARKS ESPECÍFICOS
+            this.calibrateDepthWithLandmarks(landmarks, realDepth);
+        } else {
+            // Fallback: usar posição do centro do rosto
+            const worldX = (screenX - 0.5) * 4; // -2 a 2
+            const worldY = (0.5 - screenY) * 4; // Ajustado para testa
+            
+            this.gameElements.setAttribute('position', `${worldX} ${worldY} ${worldZ}`);
+            console.log(`🎯 Textos fixados no centro do rosto: ${worldX.toFixed(2)}, ${worldY.toFixed(2)}, ${worldZ.toFixed(3)}m`);
+        }
         
         // Fazer os textos sempre olharem para a câmera
         this.gameElements.setAttribute('rotation', '0 0 0');
-        
-        console.log(`🎯 Textos fixados no rosto: ${worldX.toFixed(2)}, ${worldY.toFixed(2)}, ${worldZ.toFixed(3)}m`);
-        console.log(`📏 Profundidade real: ${realDepth.toFixed(3)}m (face width: ${(faceWidthNormalized * 100).toFixed(1)}%)`);
-        
-        // CALIBRAR PROFUNDIDADE USANDO LANDMARKS ESPECÍFICOS
-        if (landmarks && landmarks.positions) {
-            this.calibrateDepthWithLandmarks(landmarks, realDepth);
-        }
     }
     
     calibrateDepthWithLandmarks(landmarks, baseDepth) {
@@ -312,11 +333,16 @@ class GameScreen extends BaseScreen {
         
         // Aplicar profundidade calibrada se for mais precisa
         if (Math.abs(calibratedDepth - baseDepth) < 0.5) { // Diferença menor que 50cm
-            const worldZ = (calibratedDepth + 1.0); // +1m de distância extra
-            this.gameElements.setAttribute('position', 
-                `${this.gameElements.getAttribute('position').split(' ')[0]} ${this.gameElements.getAttribute('position').split(' ')[1]} ${worldZ}`);
+            const worldZ = -(calibratedDepth + 1.0); // +1m de distância extra (Z negativo)
+            
+            // Pegar posição atual e atualizar apenas o Z (manter X e Y da testa)
+            const currentPosition = this.gameElements.getAttribute('position');
+            const newPosition = `${currentPosition.x} ${currentPosition.y} ${worldZ}`;
+            
+            this.gameElements.setAttribute('position', newPosition);
             
             console.log(`🎯 Profundidade calibrada: ${calibratedDepth.toFixed(3)}m (eye distance: ${(eyeDistanceNormalized * 100).toFixed(1)}%)`);
+            console.log(`🧠 Mantendo posição da testa: X=${currentPosition.x.toFixed(2)}, Y=${currentPosition.y.toFixed(2)}`);
         }
     }
 
