@@ -346,7 +346,7 @@ class GameScreen extends BaseScreen {
         // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
             this.questionBg2D.style.left = `${faceX}px`;
-            this.questionBg2D.style.top = `${faceY - 250}px`; // MAIS ACIMA (era -80)
+            this.questionBg2D.style.top = `${faceY - 150}px`; // MAIS ACIMA (era -80)
             this.questionBg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.questionBg2D.style.opacity = opacity;
         }
