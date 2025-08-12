@@ -281,8 +281,9 @@ class GameScreen extends BaseScreen {
             const scaleX = this.canvas.width / this.video.videoWidth;
             const scaleY = this.canvas.height / this.video.videoHeight;
             
-            // Calcular posição da testa na tela (convertida)
-            const foreheadX = foreheadCenter.x * scaleX;
+            // INVERTER COORDENADA X PARA CÂMERA ESPELHADA
+            // Calcular posição da testa na tela (convertida e INVERTIDA)
+            const foreheadX = (this.canvas.width - foreheadCenter.x * scaleX);
             const foreheadY = foreheadCenter.y * scaleY;
             
             // Posicionar elementos 2D na testa com profundidade
@@ -295,11 +296,11 @@ class GameScreen extends BaseScreen {
             // CALIBRAR PROFUNDIDADE USANDO LANDMARKS ESPECÍFICOS
             this.calibrateDepthWithLandmarks(landmarks, realDepth);
         } else {
-            // Fallback: usar posição do centro do rosto (convertida)
+            // Fallback: usar posição do centro do rosto (convertida e INVERTIDA)
             const scaleX = this.canvas.width / this.video.videoWidth;
             const scaleY = this.canvas.height / this.video.videoHeight;
             
-            const centerX = (x + width/2) * scaleX;
+            const centerX = (this.canvas.width - (x + width/2) * scaleX);
             const centerY = (y + height/2) * scaleY;
             
             this.position2DElements(centerX, centerY, realDepth);
@@ -345,38 +346,38 @@ class GameScreen extends BaseScreen {
         // Posicionar fundo da pergunta CENTRADO no meio do rosto
         if (this.questionBg2D) {
             this.questionBg2D.style.left = `${faceX}px`;
-            this.questionBg2D.style.top = `${faceY - 60}px`; // Acima do centro
+            this.questionBg2D.style.top = `${faceY - 300}px`; // MAIS ACIMA (era -80)
             this.questionBg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.questionBg2D.style.opacity = opacity;
         }
         
-        // Posicionar opção 1 (esquerda) - CENTRADA
+        // Posicionar opção 1 (esquerda) - MAIS AFASTADA
         if (this.option1Bg2D) {
-            this.option1Bg2D.style.left = `${faceX - 90}px`;
-            this.option1Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
+            this.option1Bg2D.style.left = `${faceX - 180}px`; // Esquerda
+            this.option1Bg2D.style.top = `${faceY - 120}px`; // MAIS ACIMA (era +60)
             this.option1Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option1Bg2D.style.opacity = opacity;
         }
         
-        // Posicionar opção 2 (direita) - CENTRADA
+        // Posicionar opção 2 (direita) - MAIS AFASTADA
         if (this.option2Bg2D) {
-            this.option2Bg2D.style.left = `${faceX + 90}px`;
-            this.option2Bg2D.style.top = `${faceY + 40}px`; // Abaixo do centro
+            this.option2Bg2D.style.left = `${faceX + 180}px`; // Direita
+            this.option2Bg2D.style.top = `${faceY - 120}px`; // MAIS ACIMA (era +60)
             this.option2Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option2Bg2D.style.opacity = opacity;
         }
         
         // Posicionar indicadores CENTRADOS
         if (this.leftIndicator2D) {
-            this.leftIndicator2D.style.left = `${faceX - 90}px`;
-            this.leftIndicator2D.style.top = `${faceY + 100}px`;
+            this.leftIndicator2D.style.left = `${faceX - 140}px`; // Esquerda
+            this.leftIndicator2D.style.top = `${faceY + 80}px`; // MAIS ACIMA (era +120)
             this.leftIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.leftIndicator2D.style.opacity = opacity;
         }
         
         if (this.rightIndicator2D) {
-            this.rightIndicator2D.style.left = `${faceX + 90}px`;
-            this.rightIndicator2D.style.top = `${faceY + 100}px`;
+            this.rightIndicator2D.style.left = `${faceX + 140}px`; // Direita
+            this.rightIndicator2D.style.top = `${faceY + 80}px`; // MAIS ACIMA (era +120)
             this.rightIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.rightIndicator2D.style.opacity = opacity;
         }
@@ -411,16 +412,9 @@ class GameScreen extends BaseScreen {
         
         // Aplicar profundidade calibrada se for mais precisa
         if (Math.abs(calibratedDepth - baseDepth) < 0.5) { // Diferença menor que 50cm
-            const worldZ = -(calibratedDepth + 1.0); // +1m de distância extra (Z negativo)
-            
-            // Pegar posição atual e atualizar apenas o Z (manter X e Y da testa)
-            const currentPosition = this.gameElements.getAttribute('position');
-            const newPosition = `${currentPosition.x} ${currentPosition.y} ${worldZ}`;
-            
-            this.gameElements.setAttribute('position', newPosition);
-            
+            // ELEMENTOS 3D NÃO SÃO MAIS USADOS - APENAS LOG
             console.log(`🎯 Profundidade calibrada: ${calibratedDepth.toFixed(3)}m (eye distance: ${(eyeDistanceNormalized * 100).toFixed(1)}%)`);
-            console.log(`🧠 Mantendo posição da testa: X=${currentPosition.x.toFixed(2)}, Y=${currentPosition.y.toFixed(2)}`);
+            console.log(`🧠 Profundidade disponível para elementos 2D: ${calibratedDepth.toFixed(3)}m`);
         }
     }
 
@@ -491,6 +485,12 @@ class GameScreen extends BaseScreen {
     update3DDebugElements(headX) {
         if (!this.gameElements) return;
 
+        // DESABILITAR ELEMENTOS 3D DE DEBUG - APENAS 2D AGORA
+        console.log('🚫 Elementos 3D de debug desabilitados - usando apenas 2D');
+        return;
+
+        // CÓDIGO COMENTADO - ELEMENTOS 3D NÃO SÃO MAIS USADOS
+        /*
         // Remover elementos de debug anteriores
         const existingDebug = this.gameElements.querySelectorAll('[data-debug="true"]');
         existingDebug.forEach(el => el.remove());
@@ -549,6 +549,7 @@ class GameScreen extends BaseScreen {
         rightThreshold.setAttribute('color', '#FF6B6B');
         rightThreshold.setAttribute('opacity', '0.7');
         this.gameElements.appendChild(rightThreshold);
+        */
     }
 
     handleHeadMovement(headX) {
@@ -667,6 +668,10 @@ class GameScreen extends BaseScreen {
             if (this.scene && this.gameElements) {
                 console.log('✅ Cena A-Frame inicializada');
                 console.log('📍 Posição inicial dos elementos:', this.gameElements.getAttribute('position'));
+                
+                // OCULTAR ELEMENTOS 3D IMEDIATAMENTE
+                this.gameElements.setAttribute('visible', false);
+                console.log('🚫 Elementos 3D ocultados na inicialização');
             } else {
                 console.error('❌ Elementos A-Frame não encontrados!');
             }
@@ -715,6 +720,12 @@ class GameScreen extends BaseScreen {
         // Limpar elementos anteriores
         this.clearScene();
         
+        // OCULTAR TODOS OS ELEMENTOS 3D
+        if (this.gameElements) {
+            this.gameElements.setAttribute('visible', false);
+            console.log('🚫 Elementos 3D ocultados');
+        }
+        
         console.log('✨ Criando elementos 2D sobrepostos...');
         
         // Criar elementos 2D que seguem o rosto (como face tracking)
@@ -754,8 +765,8 @@ class GameScreen extends BaseScreen {
         questionBg.id = 'question-bg-2d';
         questionBg.style.cssText = `
             position: absolute;
-            width: 400px;
-            height: 120px;
+            width: 500px;
+            height: 200px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -776,10 +787,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: normal;
             text-align: center;
-            width: 380px;
+            width: 280px;
             pointer-events: none;
             user-select: none;
         `;
@@ -789,8 +800,8 @@ class GameScreen extends BaseScreen {
         option1Bg.id = 'option1-bg-2d';
         option1Bg.style.cssText = `
             position: absolute;
-            width: 160px;
-            height: 160px;
+            width: 200px;
+            height: 200px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -811,10 +822,10 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: normal;
             text-align: center;
-            width: 140px;
+            width: 100px;
             pointer-events: none;
             user-select: none;
         `;
@@ -824,8 +835,8 @@ class GameScreen extends BaseScreen {
         option2Bg.id = 'option2-bg-2d';
         option2Bg.style.cssText = `
             position: absolute;
-            width: 160px;
-            height: 160px;
+            width: 200px;
+            height: 200px;
             background-image: url('assets/textures/resposta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -843,12 +854,13 @@ class GameScreen extends BaseScreen {
             position: absolute;
             top: 50%;
             left: 50%;
+            transform: translate(-50%, -50%);
             color: #000000;
             font-family: Arial, sans-serif;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: normal;
             text-align: center;
-            width: 140px;
+            width: 100px;
             pointer-events: none;
             user-select: none;
         `;
@@ -883,8 +895,7 @@ class GameScreen extends BaseScreen {
         // Adicionar elementos ao container
         questionBg.appendChild(questionText);
         option1Bg.appendChild(option1Text);
-        option2Bg.appendChild(option1Text.cloneNode(true));
-        option2Bg.appendChild(option2Text);
+        option2Bg.appendChild(option2Text); // Apenas o texto da opção 2
         
         this.gameElements2D.appendChild(questionBg);
         this.gameElements2D.appendChild(option1Bg);
@@ -901,6 +912,12 @@ class GameScreen extends BaseScreen {
     }
     
     positionElementsOnFace() {
+        // FUNÇÃO DESABILITADA - ELEMENTOS 3D NÃO SÃO MAIS USADOS
+        console.log('🚫 positionElementsOnFace desabilitada - usando apenas 2D');
+        return;
+        
+        // CÓDIGO COMENTADO - ELEMENTOS 3D NÃO SÃO MAIS USADOS
+        /*
         // Posicionar elementos 3D no rosto quando detectado
         if (this.faceDetected && this.gameElements) {
             // Ajustar posição baseada na posição da câmera
@@ -921,6 +938,7 @@ class GameScreen extends BaseScreen {
                     `${cameraRot.x} ${cameraRot.y} ${cameraRot.z}`);
             }
         }
+        */
     }
     
     getRandomWrongOption() {
@@ -973,7 +991,7 @@ class GameScreen extends BaseScreen {
             color: ${isCorrect ? '#4ECDC4' : '#FF6B6B'};
             font-family: Arial, sans-serif;
             font-size: 24px;
-            font-weight: bold;
+            font-weight: normal;
             text-align: center;
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
@@ -1018,8 +1036,8 @@ class GameScreen extends BaseScreen {
         const fallbackBg = document.createElement('div');
         fallbackBg.style.cssText = `
             position: absolute;
-            width: 300px;
-            height: 80px;
+            width: 500px;
+            height: 200px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -1041,7 +1059,7 @@ class GameScreen extends BaseScreen {
             color: #000000;
             font-family: Arial, sans-serif;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: normal;
             text-align: center;
             width: 280px;
             pointer-events: none;
@@ -1106,41 +1124,8 @@ class GameScreen extends BaseScreen {
         // Limpar cena
         this.clearScene();
         
-        // Mostrar mensagem de conclusão 3D fixa no rosto
-        this.gameElements.innerHTML = `
-            <a-text 
-                value="🎉 Parabéns! Você completou todas as perguntas!"
-                position="0 0.8 -0.5"
-                align="center"
-                width="4"
-                color="#4ECDC4"
-                font="kelsonsans"
-                billboard=""
-                animation="property: scale; to: 1.2 1.2 1.2; loop: true; dir: alternate; dur: 1000">
-            </a-text>
-            
-            <!-- Esferas de celebração -->
-            <a-sphere 
-                position="-0.8 0.2 -0.5"
-                radius="0.1"
-                color="#FFD93D"
-                billboard=""
-                material="shader: flat"
-                animation="property: scale; to: 1.5 1.5 1.5; loop: true; dir: alternate; dur: 800">
-            </a-sphere>
-            
-            <a-sphere 
-                position="0.8 0.2 -0.5"
-                radius="0.1"
-                color="#FF6B6B"
-                billboard=""
-                material="shader: flat"
-                animation="property: scale; to: 1.5 1.5 1.5; loop: true; dir: alternate; dur: 800">
-            </a-sphere>
-        `;
-        
-        // Posicionar no rosto
-        this.positionElementsOnFace();
+        // Mostrar mensagem de conclusão 2D
+        this.show2DGameCompleted();
         
         // Botão para continuar
         setTimeout(() => {
@@ -1149,6 +1134,81 @@ class GameScreen extends BaseScreen {
             }
         }, 3000);
     }
+    
+    show2DGameCompleted() {
+        if (!this.gameElements2D) return;
+        
+        this.gameElements2D.style.display = 'block';
+        this.gameElements2D.innerHTML = '';
+        
+        // Mensagem de parabéns
+        const congratsText = document.createElement('div');
+        congratsText.textContent = '🎉 Parabéns! Você completou todas as perguntas!';
+        congratsText.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #4ECDC4;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: normal;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 1003;
+        `;
+        
+        // Esferas de celebração
+        const leftSphere = document.createElement('div');
+        leftSphere.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            width: 30px;
+            height: 30px;
+            background-color: #FFD93D;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1003;
+            animation: bounce 1s infinite alternate;
+        `;
+        
+        const rightSphere = document.createElement('div');
+        rightSphere.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 70%;
+            width: 30px;
+            height: 30px;
+            background-color: #FF6B6B;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1003;
+            animation: bounce 1s infinite alternate;
+        `;
+        
+        // Adicionar animação CSS
+        if (!document.getElementById('bounce-animation')) {
+            const style = document.createElement('style');
+            style.id = 'bounce-animation';
+            style.textContent = `
+                @keyframes bounce {
+                    from { transform: translate(-50%, -50%) scale(1); }
+                    to { transform: translate(-50%, -50%) scale(1.2); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        this.gameElements2D.appendChild(congratsText);
+        this.gameElements2D.appendChild(rightSphere);
+        this.gameElements2D.appendChild(leftSphere);
+    }
 
     clearScene() {
         // Limpar elementos 3D
@@ -1156,6 +1216,8 @@ class GameScreen extends BaseScreen {
             while (this.gameElements.children.length > 0) {
                 this.gameElements.removeChild(this.gameElements.children[0]);
             }
+            // GARANTIR QUE ELEMENTOS 3D PERMANEÇAM OCULTOS
+            this.gameElements.setAttribute('visible', false);
         }
         
         // Limpar elementos 2D
