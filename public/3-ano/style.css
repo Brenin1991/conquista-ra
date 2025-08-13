@@ -599,7 +599,7 @@ input, textarea {
 #estrela-progresso {
     position: absolute;
     right: -15px;
-    top: 0px;
+    top: -50px;
     width: 60px;
     height: 60px;
     z-index: 1001;
