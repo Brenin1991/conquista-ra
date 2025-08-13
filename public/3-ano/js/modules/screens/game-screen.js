@@ -19,15 +19,15 @@ class GameScreen extends BaseScreen {
         this.gameState = 'waiting'; // waiting, question, answer, feedback
         this.faceTrackingActive = false;
         this.headPosition = { x: 0, y: 0, z: 0 };
-        this.headThreshold = 0.3; // Sensibilidade para detecção de rotação da cabeça
+        this.headThreshold = 0.15; // Sensibilidade para detecção de rotação da cabeça (reduzido de 0.3 para 0.15)
         this.lastAnswerTime = 0; // Evitar múltiplas respostas
         this.answerCooldown = 2000; // 2 segundos entre respostas (menor = mais sensível)
 
         // Sistema de seleção progressiva
         this.selectionProgress = { left: 0, right: 0 }; // Progresso da seleção (0-100)
-        this.selectionThreshold = 60; // Progresso necessário para confirmar (mais rápido)
-        this.selectionSpeed = 3; // Velocidade de progresso por frame (mais rápido)
-        this.selectionDecay = 2; // Velocidade de decaimento quando não está na posição (mais responsivo)
+        this.selectionThreshold = 50; // Progresso necessário para confirmar (reduzido de 60 para 50)
+        this.selectionSpeed = 4; // Velocidade de progresso por frame (aumentado de 3 para 4)
+        this.selectionDecay = 3; // Velocidade de decaimento quando não está na posição (aumentado de 2 para 3)
         this.isSelecting = false; // Se está atualmente selecionando
         this.currentSelectionSide = null; // Lado atual da seleção
         
@@ -848,28 +848,28 @@ class GameScreen extends BaseScreen {
             boxShadow = 'none';
             backgroundColor = 'transparent';
             opacity = 1;
-        } else if (progress < 30) {
-            scale = 1.05;
+        } else if (progress < 20) {
+            scale = 1.03;
             borderColor = '#E6B3FF';
-            boxShadow = `0 0 15px rgba(230, 179, 255, 0.8)`;
+            boxShadow = `0 0 10px rgba(230, 179, 255, 0.6)`;
             backgroundColor = 'rgba(230, 179, 255, 0.1)';
             opacity = 1;
-        } else if (progress < 60) {
-            scale = 1.1;
+        } else if (progress < 40) {
+            scale = 1.06;
             borderColor = '#CC99FF';
-            boxShadow = `0 0 20px rgba(204, 153, 255, 0.9)`;
+            boxShadow = `0 0 15px rgba(204, 153, 255, 0.8)`;
             backgroundColor = 'rgba(204, 153, 255, 0.2)';
             opacity = 1;
         } else {
-            scale = 1.15;
+            scale = 1.1;
             borderColor = '#B366FF';
-            boxShadow = `0 0 25px rgba(179, 102, 255, 1)`;
+            boxShadow = `0 0 20px rgba(179, 102, 255, 1)`;
             backgroundColor = 'rgba(179, 102, 255, 0.3)';
             opacity = 1;
         }
 
-        // Aplicar mudanças visuais na opção com transições rápidas
-        option.style.transition = 'all 0.1s ease-out'; // Transição mais rápida
+        // Aplicar mudanças visuais na opção com transições mais rápidas
+        option.style.transition = 'all 0.08s ease-out'; // Transição mais rápida
         option.style.transform = `translate(-50%, -50%) scale(${scale})`;
         option.style.border = `4px solid ${borderColor}`;
         option.style.boxShadow = boxShadow;
@@ -877,12 +877,12 @@ class GameScreen extends BaseScreen {
         option.style.opacity = opacity;
         
         // Animar barra de preenchimento de baixo para cima (mais responsiva)
-        const fillHeight = (progress / 60) * 200; // Converter progresso para porcentagem de altura
+        const fillHeight = (progress / 50) * 200; // Converter progresso para porcentagem de altura (ajustado para threshold 50)
         fillBar.style.height = `${fillHeight}%`;
         
         // Adicionar efeito de pulso mais rápido quando selecionando
-        if (progress > 0 && progress < 60) {
-            option.style.animation = 'pulse 0.6s ease-in-out infinite alternate';
+        if (progress > 0 && progress < 50) {
+            option.style.animation = 'pulse 0.5s ease-in-out infinite alternate';
         } else {
             option.style.animation = 'none';
         }
