@@ -23,6 +23,14 @@ class GameScreen extends BaseScreen {
         this.lastAnswerTime = 0; // Evitar múltiplas respostas
         this.answerCooldown = 2000; // 2 segundos entre respostas (menor = mais sensível)
 
+        // Sistema de seleção progressiva
+        this.selectionProgress = { left: 0, right: 0 }; // Progresso da seleção (0-100)
+        this.selectionThreshold = 60; // Progresso necessário para confirmar (mais rápido)
+        this.selectionSpeed = 3; // Velocidade de progresso por frame (mais rápido)
+        this.selectionDecay = 2; // Velocidade de decaimento quando não está na posição (mais responsivo)
+        this.isSelecting = false; // Se está atualmente selecionando
+        this.currentSelectionSide = null; // Lado atual da seleção
+
         // Elementos A-Frame
         this.scene = null;
         this.camera = null;
@@ -185,9 +193,9 @@ class GameScreen extends BaseScreen {
                 console.log(`${detections.length} rosto(s) detectado(s)`);
                 this.faceDetected = true;
                 
-                // Desenhar rosto no canvas
-                this.drawFaceBox(detections[0].detection.box);
-                this.drawLandmarks(detections[0].landmarks);
+                // DEBUG VISUAL DESABILITADO - APENAS LOG
+                // this.drawFaceBox(detections[0].detection.box);
+                // this.drawLandmarks(detections[0].landmarks);
                 
                 // FIXAR CUBO NO ROSTO COM PROFUNDIDADE
                 this.fixCubeOnFace(detections[0].detection.box, detections[0].landmarks);
@@ -204,6 +212,12 @@ class GameScreen extends BaseScreen {
     }
 
     drawFaceBox(box) {
+        // DEBUG VISUAL DESABILITADO - APENAS LOG
+        console.log('🚫 Debug visual do face tracking desabilitado');
+        return;
+        
+        // CÓDIGO COMENTADO - DEBUG VISUAL NÃO É MAIS EXIBIDO
+        /*
         const { x, y, width, height } = box;
 
         // Scale coordinates to match canvas dimensions
@@ -218,9 +232,16 @@ class GameScreen extends BaseScreen {
         this.ctx.strokeStyle = '#FF6B6B';
         this.ctx.lineWidth = 4;
         this.ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+        */
     }
 
     drawLandmarks(landmarks) {
+        // DEBUG VISUAL DESABILITADO - APENAS LOG
+        console.log('🚫 Debug visual dos landmarks desabilitado');
+        return;
+        
+        // CÓDIGO COMENTADO - DEBUG VISUAL NÃO É MAIS EXIBIDO
+        /*
         this.ctx.fillStyle = '#4ECDC4';
 
         // Scale coordinates to match canvas dimensions
@@ -235,6 +256,7 @@ class GameScreen extends BaseScreen {
             this.ctx.arc(scaledX, scaledY, 3, 0, 2 * Math.PI);
             this.ctx.fill();
         });
+        */
     }
     
     fixCubeOnFace(faceBox, landmarks) {
@@ -367,20 +389,7 @@ class GameScreen extends BaseScreen {
             this.option2Bg2D.style.opacity = opacity;
         }
         
-        // Posicionar indicadores CENTRADOS
-        if (this.leftIndicator2D) {
-            this.leftIndicator2D.style.left = `${faceX - 140}px`; // Esquerda
-            this.leftIndicator2D.style.top = `${faceY + 80}px`; // MAIS ACIMA (era +120)
-            this.leftIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            this.leftIndicator2D.style.opacity = opacity;
-        }
-        
-        if (this.rightIndicator2D) {
-            this.rightIndicator2D.style.left = `${faceX + 140}px`; // Direita
-            this.rightIndicator2D.style.top = `${faceY + 80}px`; // MAIS ACIMA (era +120)
-            this.rightIndicator2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            this.rightIndicator2D.style.opacity = opacity;
-        }
+
         
         console.log(`🎯 Elementos centralizados no rosto: ${faceX}px, ${faceY}px, Escala: ${scale.toFixed(2)}x`);
     }
@@ -454,10 +463,179 @@ class GameScreen extends BaseScreen {
         // Atualizar indicador visual da rotação
         this.updateHeadPositionIndicator(normalizedRotation);
         
-        // Detectar rotação significativa
-        if (Math.abs(normalizedRotation) > this.headThreshold) {
-            this.handleHeadMovement(normalizedRotation);
+        // Processar seleção progressiva
+        this.processProgressiveSelection(normalizedRotation);
+    }
+
+    processProgressiveSelection(normalizedRotation) {
+        if (this.gameState !== 'question') return;
+
+        // Verificar se está olhando para algum lado
+        if (normalizedRotation < -this.headThreshold) {
+            // Olhando para esquerda
+            this.updateSelectionProgress('left', normalizedRotation);
+        } else if (normalizedRotation > this.headThreshold) {
+            // Olhando para direita
+            this.updateSelectionProgress('right', normalizedRotation);
+        } else {
+            // Olhando para o centro - decair progresso
+            this.decaySelectionProgress();
         }
+
+        // Atualizar indicadores visuais de progresso
+        this.updateSelectionProgressIndicators();
+    }
+
+    updateSelectionProgressIndicators() {
+        if (!this.gameElements2D) return;
+
+        // Atualizar indicadores de progresso
+        this.updateProgressBar('left', this.selectionProgress.left);
+        this.updateProgressBar('right', this.selectionProgress.right);
+        
+        // Atualizar indicadores de seleção ativa
+        this.updateSelectionIndicators();
+    }
+
+    updateProgressBar(side, progress) {
+        const option = side === 'left' ? this.option1Bg2D : this.option2Bg2D;
+        const fillBar = side === 'left' ? this.option1Fill2D : this.option2Fill2D;
+        if (!option || !fillBar) return;
+
+        // Calcular escala e efeitos baseados no progresso
+        let scale, borderColor, boxShadow, backgroundColor, opacity;
+        
+        if (progress === 0) {
+            scale = 1;
+            borderColor = 'transparent';
+            boxShadow = 'none';
+            backgroundColor = 'transparent';
+            opacity = 1;
+        } else if (progress < 30) {
+            scale = 1.05;
+            borderColor = '#E6B3FF';
+            boxShadow = `0 0 15px rgba(230, 179, 255, 0.8)`;
+            backgroundColor = 'rgba(230, 179, 255, 0.1)';
+            opacity = 1;
+        } else if (progress < 60) {
+            scale = 1.1;
+            borderColor = '#CC99FF';
+            boxShadow = `0 0 20px rgba(204, 153, 255, 0.9)`;
+            backgroundColor = 'rgba(204, 153, 255, 0.2)';
+            opacity = 1;
+        } else {
+            scale = 1.15;
+            borderColor = '#B366FF';
+            boxShadow = `0 0 25px rgba(179, 102, 255, 1)`;
+            backgroundColor = 'rgba(179, 102, 255, 0.3)';
+            opacity = 1;
+        }
+
+        // Aplicar mudanças visuais na opção com transições rápidas
+        option.style.transition = 'all 0.1s ease-out'; // Transição mais rápida
+        option.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        option.style.border = `4px solid ${borderColor}`;
+        option.style.boxShadow = boxShadow;
+        option.style.backgroundColor = backgroundColor;
+        option.style.opacity = opacity;
+        
+        // Animar barra de preenchimento de baixo para cima (mais responsiva)
+        const fillHeight = (progress / 60) * 200; // Converter progresso para porcentagem de altura
+        fillBar.style.height = `${fillHeight}%`;
+        
+        // Adicionar efeito de pulso mais rápido quando selecionando
+        if (progress > 0 && progress < 60) {
+            option.style.animation = 'pulse 0.6s ease-in-out infinite alternate';
+        } else {
+            option.style.animation = 'none';
+        }
+    }
+
+    updateSelectionIndicators() {
+        // Mostrar/esconder indicadores de seleção ativa nas opções
+        if (this.option1Bg2D) {
+            if (this.currentSelectionSide === 'left' && this.isSelecting) {
+                // Opção esquerda ativa - efeito mais dramático
+                this.option1Bg2D.style.filter = 'brightness(1.3) contrast(1.1) saturate(1.4) hue-rotate(10deg)';
+                this.option1Bg2D.style.transition = 'all 0.15s ease-out';
+                this.option1Bg2D.style.transform = this.option1Bg2D.style.transform + ' rotate(2deg)';
+            } else {
+                // Opção esquerda inativa - resetar efeitos
+                this.option1Bg2D.style.filter = 'none';
+                this.option1Bg2D.style.transition = 'all 0.15s ease-out';
+                this.option1Bg2D.style.transform = this.option1Bg2D.style.transform.replace(' rotate(2deg)', '');
+            }
+        }
+
+        if (this.option2Bg2D) {
+            if (this.currentSelectionSide === 'right' && this.isSelecting) {
+                // Opção direita ativa - efeito mais dramático
+                this.option2Bg2D.style.filter = 'brightness(1.3) contrast(1.1) saturate(1.4) hue-rotate(10deg)';
+                this.option2Bg2D.style.transition = 'all 0.15s ease-out';
+                this.option2Bg2D.style.transform = this.option2Bg2D.style.transform + ' rotate(-2deg)';
+            } else {
+                // Opção direita inativa - resetar efeitos
+                this.option2Bg2D.style.filter = 'none';
+                this.option2Bg2D.style.transition = 'all 0.15s ease-out';
+                this.option2Bg2D.style.transform = this.option2Bg2D.style.transform.replace(' rotate(-2deg)', '');
+            }
+        }
+    }
+
+    updateSelectionProgress(side, intensity) {
+        // Aumentar progresso do lado atual
+        this.selectionProgress[side] += this.selectionSpeed;
+        
+        // Limitar ao máximo
+        this.selectionProgress[side] = Math.min(this.selectionProgress[side], this.selectionThreshold);
+        
+        // Decair progresso do outro lado
+        const otherSide = side === 'left' ? 'right' : 'left';
+        this.selectionProgress[otherSide] = Math.max(0, this.selectionProgress[otherSide] - this.selectionDecay * 2);
+        
+        // Atualizar estado de seleção
+        this.currentSelectionSide = side;
+        this.isSelecting = true;
+        
+        // Verificar se atingiu o threshold
+        if (this.selectionProgress[side] >= this.selectionThreshold) {
+            this.confirmSelection(side);
+        }
+        
+        console.log(`🎯 Progresso ${side}: ${this.selectionProgress[side].toFixed(1)}%`);
+    }
+
+    decaySelectionProgress() {
+        // Decair progresso de ambos os lados quando olhando para o centro
+        this.selectionProgress.left = Math.max(0, this.selectionProgress.left - this.selectionDecay);
+        this.selectionProgress.right = Math.max(0, this.selectionProgress.right - this.selectionDecay);
+        
+        // Se ambos chegarem a 0, não está mais selecionando
+        if (this.selectionProgress.left <= 0 && this.selectionProgress.right <= 0) {
+            this.isSelecting = false;
+            this.currentSelectionSide = null;
+        }
+    }
+
+    confirmSelection(side) {
+        // Verificar cooldown para evitar múltiplas respostas
+        const now = Date.now();
+        if (now - this.lastAnswerTime < this.answerCooldown) {
+            console.log('⏰ Cooldown ativo, aguardando...');
+            return;
+        }
+
+        console.log(`🎯 Seleção confirmada: ${side}`);
+        this.lastAnswerTime = now;
+        
+        // Resetar progresso
+        this.selectionProgress.left = 0;
+        this.selectionProgress.right = 0;
+        this.isSelecting = false;
+        this.currentSelectionSide = null;
+        
+        // Selecionar resposta
+        this.selectAnswer(side);
     }
 
     updateHeadPositionIndicator(headX) {
@@ -478,8 +656,8 @@ class GameScreen extends BaseScreen {
             headPositionIndicator.style.color = color;
         }
 
-        // Atualizar elementos 3D de debug
-        this.update3DDebugElements(headX);
+        // Atualizar elementos 3D de debug (desabilitados)
+        // this.update3DDebugElements(headX);
     }
 
     update3DDebugElements(headX) {
@@ -552,29 +730,6 @@ class GameScreen extends BaseScreen {
         */
     }
 
-    handleHeadMovement(headX) {
-        if (this.gameState !== 'question') return;
-
-        // Verificar cooldown para evitar múltiplas respostas
-        const now = Date.now();
-        if (now - this.lastAnswerTime < this.answerCooldown) {
-            console.log('⏰ Cooldown ativo, aguardando...');
-            return;
-        }
-
-        console.log(`🎯 ROTAÇÃO detectada: ${headX.toFixed(3)} (threshold: ${this.headThreshold})`);
-
-        // Olhar para esquerda = Opção 1, Olhar para direita = Opção 2
-        if (headX < -this.headThreshold) {
-            console.log('⬅️ Olhando para ESQUERDA - Selecionando Opção 1');
-            this.lastAnswerTime = now;
-            this.selectAnswer('left'); // Esquerda
-        } else if (headX > this.headThreshold) {
-            console.log('➡️ Olhando para DIREITA - Selecionando Opção 2');
-            this.lastAnswerTime = now;
-            this.selectAnswer('right'); // Direita
-        }
-    }
      
     handleEnter() {
         console.log('🎮 Entrou na tela do jogo');
@@ -731,9 +886,6 @@ class GameScreen extends BaseScreen {
         // Criar elementos 2D que seguem o rosto (como face tracking)
         this.create2DQuestionElements();
         
-        // Sempre resposta correta à direita para simplificar
-        this.correctSide = 'right';
-        
         // Elementos criados com sucesso
         console.log('✅ Perguntas e respostas 2D criadas!');
     }
@@ -809,6 +961,23 @@ class GameScreen extends BaseScreen {
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 1001;
+            border-radius: 20px;
+            overflow: hidden;
+        `;
+        
+        // Criar barra de preenchimento para opção 1
+        const option1Fill = document.createElement('div');
+        option1Fill.id = 'option1-fill-2d';
+        option1Fill.style.cssText = `
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, rgba(179, 102, 255, 0.8), rgba(230, 179, 255, 0.4));
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1000;
         `;
         
         // Criar texto da opção 1
@@ -828,6 +997,7 @@ class GameScreen extends BaseScreen {
             width: 50px;
             pointer-events: none;
             user-select: none;
+            z-index: 1002;
         `;
         
         // Criar fundo da opção 2 (direita)
@@ -844,6 +1014,23 @@ class GameScreen extends BaseScreen {
             pointer-events: none;
             transform: translate(-50%, -50%);
             z-index: 1001;
+            border-radius: 20px;
+            overflow: hidden;
+        `;
+        
+        // Criar barra de preenchimento para opção 2
+        const option2Fill = document.createElement('div');
+        option2Fill.id = 'option2-fill-2d';
+        option2Fill.style.cssText = `
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, rgba(179, 102, 255, 0.8), rgba(230, 179, 255, 0.4));
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1000;
         `;
         
         // Criar texto da opção 2
@@ -863,52 +1050,26 @@ class GameScreen extends BaseScreen {
             width: 50px;
             pointer-events: none;
             user-select: none;
-        `;
-        
-        // Criar indicadores coloridos
-        const leftIndicator = document.createElement('div');
-        leftIndicator.id = 'left-indicator-2d';
-        leftIndicator.style.cssText = `
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #4ECDC4;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
             z-index: 1002;
         `;
         
-        const rightIndicator = document.createElement('div');
-        rightIndicator.id = 'right-indicator-2d';
-        rightIndicator.style.cssText = `
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #FF6B6B;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 1002;
-        `;
-        
-        // Adicionar elementos ao container
+        // Adicionar elementos ao container (barras de preenchimento DENTRO das opções)
         questionBg.appendChild(questionText);
+        option1Bg.appendChild(option1Fill); // Barra de preenchimento DENTRO da opção 1
         option1Bg.appendChild(option1Text);
-        option2Bg.appendChild(option2Text); // Apenas o texto da opção 2
+        option2Bg.appendChild(option2Fill); // Barra de preenchimento DENTRO da opção 2
+        option2Bg.appendChild(option2Text);
         
         this.gameElements2D.appendChild(questionBg);
         this.gameElements2D.appendChild(option1Bg);
         this.gameElements2D.appendChild(option2Bg);
-        this.gameElements2D.appendChild(leftIndicator);
-        this.gameElements2D.appendChild(rightIndicator);
         
         // Guardar referências para posicionamento
         this.questionBg2D = questionBg;
         this.option1Bg2D = option1Bg;
         this.option2Bg2D = option2Bg;
-        this.leftIndicator2D = leftIndicator;
-        this.rightIndicator2D = rightIndicator;
+        this.option1Fill2D = option1Fill;
+        this.option2Fill2D = option2Fill;
     }
     
     positionElementsOnFace() {
@@ -963,70 +1124,52 @@ class GameScreen extends BaseScreen {
 
         console.log(`✅ Resposta selecionada: ${side}`);
 
-        // Mostrar feedback
-        this.showFeedback();
+        // Ir direto ao feedback da escolha
+        this.showFallbackMessage(side);
     }
 
-        showFeedback() {
-        const isCorrect = this.selectedAnswer === this.correctSide;
-        
-        // Mostrar feedback 2D
-        this.show2DFeedback(isCorrect);
-    }
-    
-    show2DFeedback(isCorrect) {
-        if (!this.gameElements2D) return;
-        
-        // Limpar elementos anteriores
-        this.gameElements2D.innerHTML = '';
-        
-        // Criar mensagem de feedback
-        const feedbackText = document.createElement('div');
-        feedbackText.textContent = isCorrect ? '✅ Correto!' : '❌ Tente novamente!';
-        feedbackText.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: ${isCorrect ? '#4ECDC4' : '#FF6B6B'};
-            font-family: Arial, sans-serif;
-            font-size: 24px;
-            font-weight: normal;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            pointer-events: none;
-            user-select: none;
-            z-index: 1001;
-        `;
-        
-        this.gameElements2D.appendChild(feedbackText);
-        
-        // Mostrar por 2 segundos e ir para fallback
-        setTimeout(() => {
-            this.showFallbackMessage(isCorrect);
-        }, 2000);
-    }
-
-        showFallbackMessage(isCorrect) {
-        // Mostrar mensagem de fallback apropriada
+        showFallbackMessage(side) {
+        // Mostrar mensagem de fallback baseada na escolha
         let fallbackMessage;
-        if (isCorrect) {
-            // Resposta correta - mostrar fallback da resposta 00
-            const correctOption = this.currentQuestion.respostas['00'][0];
-            fallbackMessage = correctOption.fallback;
+        if (side === 'right') {
+            // Opção direita selecionada - mostrar fallback da resposta 00
+            const rightOption = this.currentQuestion.respostas['00'][0];
+            fallbackMessage = rightOption.fallback;
         } else {
-            // Resposta incorreta - mostrar fallback da opção incorreta
-            const wrongOption = this.getRandomWrongOption();
-            fallbackMessage = wrongOption.fallback;
+            // Opção esquerda selecionada - mostrar fallback da opção incorreta
+            const leftOption = this.getRandomWrongOption();
+            fallbackMessage = leftOption.fallback;
         }
         
         // Mostrar mensagem 2D fixa no rosto
-        this.show2DFallbackMessage(fallbackMessage, isCorrect);
+        this.show2DFallbackMessage(fallbackMessage, side);
     }
     
-    show2DFallbackMessage(fallbackMessage, isCorrect) {
+    show2DFallbackMessage(fallbackMessage, side) {
+        if (!this.gameElements2D) return;
+        
+        // Limpar elementos anteriores com fade-out
+        this.fadeOutCurrentElements();
+        
+        // Aguardar fade-out antes de mostrar nova mensagem
+        setTimeout(() => {
+            this.createFallbackMessage(fallbackMessage);
+        }, 300);
+    }
+    
+    fadeOutCurrentElements() {
+        if (!this.gameElements2D) return;
+        
+        const elements = this.gameElements2D.children;
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements[i];
+            element.style.transition = 'all 0.3s ease-out';
+            element.style.opacity = '0';
+            element.style.transform = element.style.transform + ' scale(0.8)';
+        }
+    }
+    
+    createFallbackMessage(fallbackMessage) {
         if (!this.gameElements2D) return;
         
         // Limpar elementos anteriores
@@ -1043,9 +1186,11 @@ class GameScreen extends BaseScreen {
             background-repeat: no-repeat;
             background-position: center;
             pointer-events: none;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.5);
             top: 50%;
             left: 50%;
+            opacity: 0;
+            transition: all 0.4s ease-out;
         `;
         
         // Criar texto da mensagem
@@ -1064,6 +1209,8 @@ class GameScreen extends BaseScreen {
             width: 280px;
             pointer-events: none;
             user-select: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-out 0.2s;
         `;
         
         // Criar esfera decorativa
@@ -1075,20 +1222,29 @@ class GameScreen extends BaseScreen {
             background-color: #FFD93D;
             border-radius: 50%;
             pointer-events: none;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0);
             top: 60%;
             left: 50%;
-            animation: spin 2s linear infinite;
+            opacity: 0;
+            transition: all 0.5s ease-out 0.3s;
         `;
         
-        // Adicionar CSS para animação
-        if (!document.getElementById('fallback-animations')) {
+        // Adicionar CSS para animações
+        if (!document.getElementById('game-animations')) {
             const style = document.createElement('style');
-            style.id = 'fallback-animations';
+            style.id = 'game-animations';
             style.textContent = `
                 @keyframes spin {
                     from { transform: translate(-50%, -50%) rotate(0deg); }
                     to { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+                @keyframes pulse {
+                    from { transform: translate(-50%, -50%) scale(1); }
+                    to { transform: translate(-50%, -50%) scale(1.05); }
+                }
+                @keyframes bounce {
+                    from { transform: translate(-50%, -50%) scale(1); }
+                    to { transform: translate(-50%, -50%) scale(1.2); }
                 }
             `;
             document.head.appendChild(style);
@@ -1098,14 +1254,26 @@ class GameScreen extends BaseScreen {
         this.gameElements2D.appendChild(fallbackBg);
         this.gameElements2D.appendChild(decorativeSphere);
         
-        // Próxima pergunta ou finalizar
+        // Animar entrada dos elementos
+        requestAnimationFrame(() => {
+            fallbackBg.style.transform = 'translate(-50%, -50%) scale(1)';
+            fallbackBg.style.opacity = '1';
+            
+            fallbackText.style.opacity = '1';
+            
+            decorativeSphere.style.transform = 'translate(-50%, -50%) scale(1)';
+            decorativeSphere.style.opacity = '1';
+        });
+        
+        // Adicionar animação de rotação após entrada
         setTimeout(() => {
-            if (isCorrect) {
-                this.nextQuestion();
-            } else {
-                this.showQuestion(); // Mostrar a mesma pergunta
-            }
-        }, 3000);
+            decorativeSphere.style.animation = 'spin 2s linear infinite';
+        }, 800);
+        
+        // Sempre ir para próxima pergunta após mostrar o feedback
+        setTimeout(() => {
+            this.nextQuestion();
+        }, 4000); // Aumentado para dar tempo da animação
     }
 
     nextQuestion() {
