@@ -35,6 +35,12 @@ class GameScreen extends BaseScreen {
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         this.detectionInterval = this.isMobile ? 50 : 100; // 50ms para mobile (20fps), 100ms para desktop (10fps)
         this.lastDetectionTime = 0;
+        
+        // Controle da barra de progresso
+        this.totalQuestions = 0;
+        this.correctAnswers = 0;
+        this.progressBar = null;
+        this.progressFill = null;
 
         // Elementos A-Frame
         this.scene = null;
@@ -58,6 +64,18 @@ class GameScreen extends BaseScreen {
     onInit() {
         this.loadGameData();
         this.setupFaceTracking();
+        this.initProgressBar();
+    }
+    
+    initProgressBar() {
+        this.progressBar = document.getElementById('progress-bar');
+        this.progressFill = document.getElementById('progress-fill');
+        
+        if (this.progressBar && this.progressFill) {
+            console.log('✅ Barra de progresso inicializada');
+        } else {
+            console.error('❌ Elementos da barra de progresso não encontrados');
+        }
     }
     
     async loadGameData() {
@@ -76,6 +94,7 @@ class GameScreen extends BaseScreen {
                 };
             });
 
+            this.totalQuestions = this.questions.length;
             console.log(`📊 ${this.questions.length} perguntas carregadas`);
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
@@ -698,6 +717,17 @@ class GameScreen extends BaseScreen {
         setTimeout(() => {
             this.startGame();
         }, 1000);
+        
+        // Mostrar barra de progresso
+        if (this.progressBar) {
+            this.progressBar.style.display = 'block';
+            // Resetar progresso
+            if (this.progressFill) {
+                this.progressFill.style.width = '0%';
+                this.progressFill.style.background = 'linear-gradient(90deg, #90EE90, #32CD32)';
+            }
+            this.correctAnswers = 0;
+        }
     }
     
     handleExit() {
@@ -1012,21 +1042,25 @@ class GameScreen extends BaseScreen {
         showFallbackMessage(side) {
         // Mostrar mensagem de fallback baseada na escolha
         let fallbackMessage;
+        let isCorrect = false;
+        
         if (side === 'right') {
-            // Opção direita selecionada - mostrar fallback da resposta 00
+            // Opção direita selecionada - resposta correta (00)
             const rightOption = this.currentQuestion.respostas['00'][0];
             fallbackMessage = rightOption.fallback;
+            isCorrect = true;
         } else {
-            // Opção esquerda selecionada - mostrar fallback da opção incorreta
+            // Opção esquerda selecionada - resposta incorreta
             const leftOption = this.getRandomWrongOption();
             fallbackMessage = leftOption.fallback;
+            isCorrect = false;
         }
         
         // Mostrar mensagem 2D fixa no rosto
-        this.show2DFallbackMessage(fallbackMessage, side);
+        this.show2DFallbackMessage(fallbackMessage, isCorrect);
     }
     
-    show2DFallbackMessage(fallbackMessage, side) {
+    show2DFallbackMessage(fallbackMessage, isCorrect) {
         if (!this.gameElements2D) return;
         
         // Limpar elementos anteriores com fade-out
@@ -1034,7 +1068,7 @@ class GameScreen extends BaseScreen {
         
         // Aguardar fade-out antes de mostrar nova mensagem
         setTimeout(() => {
-            this.createFallbackMessage(fallbackMessage);
+            this.createFallbackMessage(fallbackMessage, isCorrect);
         }, 300);
     }
     
@@ -1050,7 +1084,7 @@ class GameScreen extends BaseScreen {
         }
     }
     
-    createFallbackMessage(fallbackMessage) {
+    createFallbackMessage(fallbackMessage, isCorrect) {
         if (!this.gameElements2D) return;
         
         // Limpar elementos anteriores
@@ -1151,9 +1185,16 @@ class GameScreen extends BaseScreen {
             decorativeSphere.style.animation = 'spin 2s linear infinite';
         }, 800);
         
-        // Sempre ir para próxima pergunta após mostrar o feedback
+        // Controlar fluxo baseado na resposta
         setTimeout(() => {
-            this.nextQuestion();
+            if (isCorrect) {
+                // Resposta correta - atualizar progresso e ir para próxima pergunta
+                this.updateProgress();
+                this.nextQuestion();
+            } else {
+                // Resposta incorreta - mostrar a mesma pergunta novamente
+                this.showQuestion();
+            }
         }, 4000); // Aumentado para dar tempo da animação
     }
 
@@ -1273,6 +1314,29 @@ class GameScreen extends BaseScreen {
         if (this.gameElements2D) {
             this.gameElements2D.style.display = 'none';
             this.gameElements2D.innerHTML = '';
+        }
+    }
+    
+    updateProgress() {
+        if (!this.progressBar || !this.progressFill) return;
+        
+        this.correctAnswers++;
+        const progressPercentage = (this.correctAnswers / this.totalQuestions) * 100;
+        
+        // Mostrar barra de progresso se ainda não estiver visível
+        if (this.progressBar.style.display === 'none') {
+            this.progressBar.style.display = 'block';
+        }
+        
+        // Atualizar preenchimento da barra
+        this.progressFill.style.width = `${progressPercentage}%`;
+        
+        console.log(`🎯 Progresso: ${this.correctAnswers}/${this.totalQuestions} (${progressPercentage.toFixed(1)}%)`);
+        
+        // Adicionar efeito visual quando completar
+        if (this.correctAnswers === this.totalQuestions) {
+            this.progressFill.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
+            console.log('🏆 Todas as perguntas respondidas corretamente!');
         }
     }
 }
