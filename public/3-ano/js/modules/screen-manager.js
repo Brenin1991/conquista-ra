@@ -44,6 +44,13 @@ class ScreenManager {
         } else {
             console.error('❌ GameScreen não encontrada');
         }
+
+        if (window.FinalScreen) {
+            this.registerScreen('final', new FinalScreen());
+            console.log('✅ FinalScreen disponível');
+        } else {
+            console.error('❌ FinalScreen não encontrada');
+        }
         console.log('📋 Telas registradas:', Object.keys(this.screens));
     }
     

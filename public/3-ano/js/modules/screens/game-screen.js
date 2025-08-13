@@ -6,7 +6,7 @@
 class GameScreen extends BaseScreen {
     constructor() {
         super('game', { 
-            next: 'selfie',
+            next: 'final',
             onEnter: () => this.handleEnter(),
             onExit: () => this.handleExit()
         });
@@ -58,6 +58,13 @@ class GameScreen extends BaseScreen {
         this.isModelLoaded = false;
         this.detectionActive = false;
 
+        // Overlay de carregamento e status
+        this.loadingOverlay = null;
+        this.faceStatusOverlay = null;
+        this.silhouetteOverlay = null;
+        this.isFaceVisible = false;
+        this.faceLostTimeout = null;
+
         this.onInit();
     }
     
@@ -65,6 +72,167 @@ class GameScreen extends BaseScreen {
         this.loadGameData();
         this.setupFaceTracking();
         this.initProgressBar();
+        this.createLoadingOverlay();
+        this.createFaceStatusOverlay();
+        this.createSilhouetteOverlay();
+    }
+    
+    createLoadingOverlay() {
+        // Criar overlay de carregamento
+        this.loadingOverlay = document.createElement('div');
+        this.loadingOverlay.id = 'loading-overlay';
+        this.loadingOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        `;
+        
+        // Spinner de carregamento
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4ECDC4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        `;
+        
+        // Texto de carregamento
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Carregando modelos de IA...';
+        loadingText.style.cssText = `
+            color: white;
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        `;
+        
+        // Texto de instrução
+        const instructionText = document.createElement('div');
+        instructionText.textContent = 'Aguarde enquanto carregamos os modelos de detecção facial';
+        instructionText.style.cssText = `
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+        `;
+        
+        // Adicionar CSS para animação
+        if (!document.getElementById('loading-animations')) {
+            const style = document.createElement('style');
+            style.id = 'loading-animations';
+            style.textContent = `
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        this.loadingOverlay.appendChild(spinner);
+        this.loadingOverlay.appendChild(loadingText);
+        this.loadingOverlay.appendChild(instructionText);
+        document.body.appendChild(this.loadingOverlay);
+        
+        console.log('✅ Overlay de carregamento criado');
+    }
+    
+    createFaceStatusOverlay() {
+        // Criar overlay de status do rosto
+        this.faceStatusOverlay = document.createElement('div');
+        this.faceStatusOverlay.id = 'face-status-overlay';
+        this.faceStatusOverlay.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+        `;
+        
+        document.body.appendChild(this.faceStatusOverlay);
+        console.log('✅ Overlay de status do rosto criado');
+    }
+    
+    createSilhouetteOverlay() {
+        // Criar overlay da silhueta (tela inteira)
+        this.silhouetteOverlay = document.createElement('div');
+        this.silhouetteOverlay.id = 'silhouette-overlay';
+        this.silhouetteOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9997;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        `;
+        
+        // Criar imagem da silhueta
+        const silhouetteImg = document.createElement('img');
+        silhouetteImg.src = 'assets/textures/silhueta.png';
+        silhouetteImg.alt = 'Silhueta';
+        silhouetteImg.style.cssText = `
+            width: 90%;
+            height: auto;
+            opacity: 0.8;
+            position: absolute;
+            bottom: 0%;
+            left: 50%;
+            transform: translate(-50%, 0%);
+        `;
+        
+        // Criar texto de instrução
+        const instructionText = document.createElement('div');
+        instructionText.textContent = 'Posicione seu rosto na câmera';
+        instructionText.style.cssText = `
+            position: absolute;
+            bottom: 100px;
+            color: white;
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            width: 100%;
+        `;
+        
+        this.silhouetteOverlay.appendChild(silhouetteImg);
+        this.silhouetteOverlay.appendChild(instructionText);
+        document.body.appendChild(this.silhouetteOverlay);
+        
+        console.log('✅ Overlay da silhueta criado');
     }
     
     initProgressBar() {
@@ -84,7 +252,7 @@ class GameScreen extends BaseScreen {
             this.gameData = await response.json();
 
             // Converter dados para array de perguntas
-            this.questions = Object.keys(this.gameData).map(key => {
+            const allQuestions = Object.keys(this.gameData).map(key => {
                 const questionData = this.gameData[key];
                 return {
                     id: key,
@@ -94,11 +262,22 @@ class GameScreen extends BaseScreen {
                 };
             });
 
+            // Selecionar apenas 3 perguntas aleatórias
+            this.questions = this.getRandomQuestions(allQuestions, 3);
             this.totalQuestions = this.questions.length;
-            console.log(`📊 ${this.questions.length} perguntas carregadas`);
+            
+            console.log(`📊 ${this.questions.length} perguntas aleatórias selecionadas de ${allQuestions.length} disponíveis`);
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
         }
+    }
+    
+    getRandomQuestions(allQuestions, count) {
+        // Embaralhar array de perguntas
+        const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        
+        // Retornar apenas as primeiras 'count' perguntas
+        return shuffled.slice(0, count);
     }
 
     async setupFaceTracking() {
@@ -151,9 +330,39 @@ class GameScreen extends BaseScreen {
 
             this.isModelLoaded = true;
             console.log('Modelos carregados com sucesso!');
+            
+            // Esconder overlay de carregamento com fade-out
+            this.hideLoadingOverlay();
+            
         } catch (error) {
             console.error('Erro ao carregar modelos:', error);
             this.isModelLoaded = false;
+            
+            // Mostrar erro no overlay
+            this.showLoadingError('Erro ao carregar modelos de IA');
+        }
+    }
+    
+    hideLoadingOverlay() {
+        if (this.loadingOverlay) {
+            this.loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                if (this.loadingOverlay && this.loadingOverlay.parentNode) {
+                    this.loadingOverlay.parentNode.removeChild(this.loadingOverlay);
+                    this.loadingOverlay = null;
+                }
+            }, 500);
+            console.log('✅ Overlay de carregamento escondido');
+        }
+    }
+    
+    showLoadingError(message) {
+        if (this.loadingOverlay) {
+            const errorText = this.loadingOverlay.querySelector('div:nth-child(2)');
+            if (errorText) {
+                errorText.textContent = message;
+                errorText.style.color = '#FF6B6B';
+            }
         }
     }
 
@@ -213,14 +422,17 @@ class GameScreen extends BaseScreen {
 
             // Clear previous drawings apenas se necessário
             if (this.ctx && this.canvas) {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             }
 
             if (detections.length > 0) {
                 if (!this.isMobile) {
-                    console.log(`${detections.length} rosto(s) detectado(s)`);
+                console.log(`${detections.length} rosto(s) detectado(s)`);
                 }
                 this.faceDetected = true;
+                
+                // Mostrar status de rosto detectado
+                this.showFaceStatus('Rosto detectado', '#4ECDC4');
                 
                 // FIXAR CUBO NO ROSTO COM PROFUNDIDADE
                 this.fixCubeOnFace(detections[0].detection.box, detections[0].landmarks);
@@ -230,14 +442,56 @@ class GameScreen extends BaseScreen {
             } else {
                 this.faceDetected = false;
                 if (!this.isMobile) {
-                    console.log('Nenhum rosto detectado');
+                console.log('Nenhum rosto detectado');
                 }
+                
+                // Mostrar status de rosto perdido
+                this.showFaceStatus('Rosto não detectado', '#FF6B6B');
             }
         } catch (error) {
             if (!this.isMobile) {
-                console.error('Erro na detecção:', error);
+            console.error('Erro na detecção:', error);
             }
+            
+            // Mostrar erro de detecção
+            this.showFaceStatus('Erro na detecção', '#FF6B6B');
         }
+    }
+    
+    showFaceStatus(message, color) {
+        if (!this.faceStatusOverlay) return;
+        
+        // Limpar timeout anterior
+        if (this.faceLostTimeout) {
+            clearTimeout(this.faceLostTimeout);
+        }
+        
+        // Se for rosto detectado, esconder silhueta e não mostrar status
+        if (color === '#4ECDC4') {
+            this.faceStatusOverlay.style.opacity = '0';
+            if (this.silhouetteOverlay) {
+                this.silhouetteOverlay.style.opacity = '0';
+            }
+            return;
+        }
+        
+        // Para rosto não detectado ou erro, mostrar silhueta e status
+        if (this.silhouetteOverlay) {
+            this.silhouetteOverlay.style.opacity = '1';
+        }
+        
+        // Mostrar mensagem de status simples
+        this.faceStatusOverlay.textContent = message;
+        this.faceStatusOverlay.style.background = `rgba(0, 0, 0, 0.8)`;
+        this.faceStatusOverlay.style.border = `2px solid ${color}`;
+        
+        // Mostrar overlay de status
+        this.faceStatusOverlay.style.opacity = '1';
+        
+        // Esconder após 2 segundos
+        this.faceLostTimeout = setTimeout(() => {
+            this.faceStatusOverlay.style.opacity = '0';
+        }, 2000);
     }
 
     drawFaceBox(box) {
@@ -443,12 +697,12 @@ class GameScreen extends BaseScreen {
             // Controlar taxa de atualização para otimizar performance
             if (now - this.lastDetectionTime >= this.detectionInterval) {
                 this.lastDetectionTime = now;
-                this.detectFaces().then(() => {
+            this.detectFaces().then(() => {
                     // Usar setTimeout para controle mais preciso em mobile
                     if (this.isMobile) {
                         setTimeout(() => this.detectLoop(), this.detectionInterval);
                     } else {
-                        requestAnimationFrame(() => this.detectLoop());
+                requestAnimationFrame(() => this.detectLoop());
                     }
                 });
             } else {
@@ -483,10 +737,10 @@ class GameScreen extends BaseScreen {
         
         // Debug: mostrar rotação da cabeça (apenas em desktop)
         if (!this.isMobile) {
-            console.log(`🔄 ROTAÇÃO da cabeça: ${normalizedRotation.toFixed(3)} (threshold: ±${this.headThreshold})`);
-            console.log(`📊 Valores - Eye Distance: ${eyeDistance.toFixed(3)}, Nose Offset: ${noseOffset.toFixed(3)}`);
-            console.log(`👁️ Olhos - Left: ${leftEye.x.toFixed(3)}, Right: ${rightEye.x.toFixed(3)}, Center: ${eyeCenter.toFixed(3)}`);
-            console.log(`👃 Nariz: ${nose.x.toFixed(3)}`);
+        console.log(`🔄 ROTAÇÃO da cabeça: ${normalizedRotation.toFixed(3)} (threshold: ±${this.headThreshold})`);
+        console.log(`📊 Valores - Eye Distance: ${eyeDistance.toFixed(3)}, Nose Offset: ${noseOffset.toFixed(3)}`);
+        console.log(`👁️ Olhos - Left: ${leftEye.x.toFixed(3)}, Right: ${rightEye.x.toFixed(3)}, Center: ${eyeCenter.toFixed(3)}`);
+        console.log(`👃 Nariz: ${nose.x.toFixed(3)}`);
         }
 
         // Processar seleção progressiva
@@ -599,7 +853,7 @@ class GameScreen extends BaseScreen {
                 this.option2Bg2D.style.filter = 'brightness(1.3) contrast(1.1) saturate(1.4) hue-rotate(10deg)';
                 this.option2Bg2D.style.transition = 'all 0.15s ease-out';
                 this.option2Bg2D.style.transform = this.option2Bg2D.style.transform + ' rotate(-2deg)';
-            } else {
+        } else {
                 // Opção direita inativa - resetar efeitos
                 this.option2Bg2D.style.filter = 'none';
                 this.option2Bg2D.style.transition = 'all 0.15s ease-out';
@@ -654,7 +908,7 @@ class GameScreen extends BaseScreen {
         }
 
         console.log(`🎯 Seleção confirmada: ${side}`);
-        this.lastAnswerTime = now;
+            this.lastAnswerTime = now;
         
         // Resetar progresso
         this.selectionProgress.left = 0;
@@ -679,20 +933,6 @@ class GameScreen extends BaseScreen {
      
     handleEnter() {
         console.log('🎮 Entrou na tela do jogo');
-
-        // Mostrar botão voltar
-        const backButton = document.getElementById('game-back-button');
-
-        if (backButton) backButton.style.display = 'block';
-
-        // Configurar botão voltar
-        if (backButton) {
-            backButton.addEventListener('click', () => {
-                if (window.screenManager) {
-                    window.screenManager.showScreen('main');
-                }
-            });
-        }
 
         // Inicializar cena A-Frame
         this.initAFrameScene();
@@ -736,10 +976,27 @@ class GameScreen extends BaseScreen {
         // Parar face tracking
         this.detectionActive = false;
 
-        // Esconder elementos
-        const backButton = document.getElementById('game-back-button');
+        // Limpar overlays
+        if (this.loadingOverlay && this.loadingOverlay.parentNode) {
+            this.loadingOverlay.parentNode.removeChild(this.loadingOverlay);
+            this.loadingOverlay = null;
+        }
+        
+        if (this.faceStatusOverlay && this.faceStatusOverlay.parentNode) {
+            this.faceStatusOverlay.parentNode.removeChild(this.faceStatusOverlay);
+            this.faceStatusOverlay = null;
+        }
+        
+        if (this.silhouetteOverlay && this.silhouetteOverlay.parentNode) {
+            this.silhouetteOverlay.parentNode.removeChild(this.silhouetteOverlay);
+            this.silhouetteOverlay = null;
+        }
 
-        if (backButton) backButton.style.display = 'none';
+        // Limpar timeout
+        if (this.faceLostTimeout) {
+            clearTimeout(this.faceLostTimeout);
+            this.faceLostTimeout = null;
+        }
 
         // Limpar cena
         this.clearScene();
@@ -875,16 +1132,26 @@ class GameScreen extends BaseScreen {
             left: 50%;
             transform: translate(-50%, -50%);
             color: #000000;
-            font-family: Arial, sans-serif;
+            font-family: 'Nunito', Arial, sans-serif;
             font-size: 9px;
-            font-weight: normal;
+            font-weight: 600;
             text-align: center;
             width: 150px;
             pointer-events: none;
             user-select: none;
         `;
         
-        // Criar fundo da opção 1 (esquerda)
+        // Determinar posições aleatórias para as opções (fixas para esta pergunta)
+        if (!this.currentQuestion.optionPositions) {
+            this.currentQuestion.optionPositions = {
+                isCorrectAnswerLeft: Math.random() < 0.5,
+                wrongOption: this.getRandomWrongOption()
+            };
+        }
+        
+        const { isCorrectAnswerLeft, wrongOption } = this.currentQuestion.optionPositions;
+        
+        // Criar opção 1 (esquerda)
         const option1Bg = document.createElement('div');
         option1Bg.id = 'option1-bg-2d';
         option1Bg.style.cssText = `
@@ -917,19 +1184,21 @@ class GameScreen extends BaseScreen {
             z-index: 1000;
         `;
         
-        // Criar texto da opção 1
+        // Criar texto da opção 1 (esquerda)
         const option1Text = document.createElement('div');
         option1Text.id = 'option1-text-2d';
-        option1Text.textContent = `1. ${this.getRandomWrongOption().resposta}`;
+        option1Text.textContent = `1. ${isCorrectAnswerLeft ? 
+            this.currentQuestion.respostas['00'][0].resposta : 
+            wrongOption.resposta}`;
         option1Text.style.cssText = `
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #000000;
-            font-family: Arial, sans-serif;
+            font-family: 'Nunito', Arial, sans-serif;
             font-size: 8px;
-            font-weight: normal;
+            font-weight: 600;
             text-align: center;
             width: 50px;
             pointer-events: none;
@@ -937,7 +1206,7 @@ class GameScreen extends BaseScreen {
             z-index: 1002;
         `;
         
-        // Criar fundo da opção 2 (direita)
+        // Criar opção 2 (direita)
         const option2Bg = document.createElement('div');
         option2Bg.id = 'option2-bg-2d';
         option2Bg.style.cssText = `
@@ -970,19 +1239,21 @@ class GameScreen extends BaseScreen {
             z-index: 1000;
         `;
         
-        // Criar texto da opção 2
+        // Criar texto da opção 2 (direita)
         const option2Text = document.createElement('div');
         option2Text.id = 'option2-text-2d';
-        option2Text.textContent = `2. ${this.currentQuestion.respostas['00'][0].resposta}`;
+        option2Text.textContent = `2. ${isCorrectAnswerLeft ? 
+            wrongOption.resposta : 
+            this.currentQuestion.respostas['00'][0].resposta}`;
         option2Text.style.cssText = `
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #000000;
-            font-family: Arial, sans-serif;
+            font-family: 'Nunito', Arial, sans-serif;
             font-size: 8px;
-            font-weight: normal;
+            font-weight: 600;
             text-align: center;
             width: 50px;
             pointer-events: none;
@@ -1007,6 +1278,12 @@ class GameScreen extends BaseScreen {
         this.option2Bg2D = option2Bg;
         this.option1Fill2D = option1Fill;
         this.option2Fill2D = option2Fill;
+        
+        // Guardar informação sobre qual lado tem a resposta correta
+        this.correctAnswerSide = isCorrectAnswerLeft ? 'left' : 'right';
+        
+        console.log(`🎯 Resposta correta (00) posicionada no lado: ${this.correctAnswerSide}`);
+        console.log(`🎯 Opção incorreta: ${wrongOption.resposta}`);
     }
     
     positionElementsOnFace() {
@@ -1044,17 +1321,20 @@ class GameScreen extends BaseScreen {
         let fallbackMessage;
         let isCorrect = false;
         
-        if (side === 'right') {
-            // Opção direita selecionada - resposta correta (00)
-            const rightOption = this.currentQuestion.respostas['00'][0];
-            fallbackMessage = rightOption.fallback;
+        // Verificar se a resposta selecionada é a correta baseada no lado
+        if (side === this.correctAnswerSide) {
+            // Resposta correta selecionada
+            const correctOption = this.currentQuestion.respostas['00'][0];
+            fallbackMessage = correctOption.fallback;
             isCorrect = true;
         } else {
-            // Opção esquerda selecionada - resposta incorreta
-            const leftOption = this.getRandomWrongOption();
-            fallbackMessage = leftOption.fallback;
+            // Resposta incorreta selecionada
+            const wrongOption = this.getRandomWrongOption();
+            fallbackMessage = wrongOption.fallback;
             isCorrect = false;
         }
+        
+        console.log(`🎯 Resposta selecionada: ${side}, Lado correto: ${this.correctAnswerSide}, É correta: ${isCorrect}`);
         
         // Mostrar mensagem 2D fixa no rosto
         this.show2DFallbackMessage(fallbackMessage, isCorrect);
@@ -1078,9 +1358,8 @@ class GameScreen extends BaseScreen {
         const elements = this.gameElements2D.children;
         for (let i = 0; i < elements.length; i++) {
             const element = elements[i];
-            element.style.transition = 'all 0.3s ease-out';
-            element.style.opacity = '0';
-            element.style.transform = element.style.transform + ' scale(0.8)';
+            element.style.animation = 'slideOutToBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+            element.style.transition = 'none';
         }
     }
     
@@ -1102,10 +1381,10 @@ class GameScreen extends BaseScreen {
             background-position: center;
             pointer-events: none;
             transform: translate(-50%, -50%) scale(0.5);
-            top: 50%;
+            top: 70%;
             left: 50%;
             opacity: 0;
-            transition: all 0.4s ease-out;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         `;
         
         // Criar texto da mensagem
@@ -1117,32 +1396,18 @@ class GameScreen extends BaseScreen {
             left: 50%;
             transform: translate(-50%, -50%);
             color: #000000;
-            font-family: Arial, sans-serif;
+            font-family: 'Nunito', Arial, sans-serif;
             font-size: 16px;
-            font-weight: normal;
+            font-weight: 700;
             text-align: center;
             width: 280px;
             pointer-events: none;
             user-select: none;
             opacity: 0;
-            transition: opacity 0.6s ease-out 0.2s;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s;
         `;
         
-        // Criar esfera decorativa
-        const decorativeSphere = document.createElement('div');
-        decorativeSphere.style.cssText = `
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #FFD93D;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%) scale(0);
-            top: 60%;
-            left: 50%;
-            opacity: 0;
-            transition: all 0.5s ease-out 0.3s;
-        `;
+        
         
         // Adicionar CSS para animações
         if (!document.getElementById('game-animations')) {
@@ -1161,29 +1426,49 @@ class GameScreen extends BaseScreen {
                     from { transform: translate(-50%, -50%) scale(1); }
                     to { transform: translate(-50%, -50%) scale(1.2); }
                 }
+                @keyframes slideInFromBottom {
+                    from { 
+                        transform: translate(-50%, -50%) scale(0.5) translateY(100px);
+                        opacity: 0;
+                    }
+                    to { 
+                        transform: translate(-50%, -50%) scale(1) translateY(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOutToBottom {
+                    from { 
+                        transform: translate(-50%, -50%) scale(1) translateY(0);
+                        opacity: 1;
+                    }
+                    to { 
+                        transform: translate(-50%, -50%) scale(0.5) translateY(100px);
+                        opacity: 0;
+                    }
+                }
             `;
             document.head.appendChild(style);
         }
         
         fallbackBg.appendChild(fallbackText);
         this.gameElements2D.appendChild(fallbackBg);
-        this.gameElements2D.appendChild(decorativeSphere);
         
-        // Animar entrada dos elementos
+        // Animar entrada dos elementos com slide in
         requestAnimationFrame(() => {
-            fallbackBg.style.transform = 'translate(-50%, -50%) scale(1)';
+            fallbackBg.style.animation = 'slideInFromBottom 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
             fallbackBg.style.opacity = '1';
             
+            fallbackText.style.animation = 'slideInFromBottom 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards';
             fallbackText.style.opacity = '1';
             
-            decorativeSphere.style.transform = 'translate(-50%, -50%) scale(1)';
+            decorativeSphere.style.animation = 'slideInFromBottom 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards';
             decorativeSphere.style.opacity = '1';
         });
         
         // Adicionar animação de rotação após entrada
         setTimeout(() => {
             decorativeSphere.style.animation = 'spin 2s linear infinite';
-        }, 800);
+        }, 1200);
         
         // Controlar fluxo baseado na resposta
         setTimeout(() => {
@@ -1217,87 +1502,17 @@ class GameScreen extends BaseScreen {
         // Mostrar mensagem de conclusão 2D
         this.show2DGameCompleted();
         
-        // Botão para continuar
+        // Ir para tela final após 3 segundos
         setTimeout(() => {
             if (window.screenManager) {
-                window.screenManager.showScreen('selfie');
+                window.screenManager.showScreen('final');
             }
         }, 3000);
     }
     
     show2DGameCompleted() {
-        if (!this.gameElements2D) return;
         
-        this.gameElements2D.style.display = 'block';
-        this.gameElements2D.innerHTML = '';
-        
-        // Mensagem de parabéns
-        const congratsText = document.createElement('div');
-        congratsText.textContent = '🎉 Parabéns! Você completou todas as perguntas!';
-        congratsText.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #4ECDC4;
-            font-family: Arial, sans-serif;
-            font-size: 24px;
-            font-weight: normal;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            pointer-events: none;
-            z-index: 1003;
-        `;
-        
-        // Esferas de celebração
-        const leftSphere = document.createElement('div');
-        leftSphere.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 30%;
-            width: 30px;
-            height: 30px;
-            background-color: #FFD93D;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 1003;
-            animation: bounce 1s infinite alternate;
-        `;
-        
-        const rightSphere = document.createElement('div');
-        rightSphere.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 70%;
-            width: 30px;
-            height: 30px;
-            background-color: #FF6B6B;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 1003;
-            animation: bounce 1s infinite alternate;
-        `;
-        
-        // Adicionar animação CSS
-        if (!document.getElementById('bounce-animation')) {
-            const style = document.createElement('style');
-            style.id = 'bounce-animation';
-            style.textContent = `
-                @keyframes bounce {
-                    from { transform: translate(-50%, -50%) scale(1); }
-                    to { transform: translate(-50%, -50%) scale(1.2); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        this.gameElements2D.appendChild(congratsText);
-        this.gameElements2D.appendChild(rightSphere);
-        this.gameElements2D.appendChild(leftSphere);
+      
     }
 
     clearScene() {
