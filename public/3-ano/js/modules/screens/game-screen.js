@@ -72,7 +72,6 @@ class GameScreen extends BaseScreen {
         this.loadGameData();
         this.setupFaceTracking();
         this.initProgressBar();
-        this.createLoadingOverlay();
         this.createFaceStatusOverlay();
         this.createSilhouetteOverlay();
     }
@@ -106,30 +105,6 @@ class GameScreen extends BaseScreen {
             border-top: 4px solid #4ECDC4;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        `;
-        
-        // Texto de carregamento
-        const loadingText = document.createElement('div');
-        loadingText.textContent = 'Carregando modelos de IA...';
-        loadingText.style.cssText = `
-            color: white;
-            font-family: 'Nunito', Arial, sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 10px;
-        `;
-        
-        // Texto de instrução
-        const instructionText = document.createElement('div');
-        instructionText.textContent = 'Aguarde enquanto carregamos os modelos de detecção facial';
-        instructionText.style.cssText = `
-            color: rgba(255, 255, 255, 0.7);
-            font-family: 'Nunito', Arial, sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            text-align: center;
         `;
         
         // Adicionar CSS para animação
@@ -146,8 +121,6 @@ class GameScreen extends BaseScreen {
         }
         
         this.loadingOverlay.appendChild(spinner);
-        this.loadingOverlay.appendChild(loadingText);
-        this.loadingOverlay.appendChild(instructionText);
         document.body.appendChild(this.loadingOverlay);
         
         console.log('✅ Overlay de carregamento criado');
@@ -320,26 +293,48 @@ class GameScreen extends BaseScreen {
         // Usar diretamente o CDN que funciona
         const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
 
-        console.log('Carregando modelos de IA...');
+        console.log('🔄 Carregando modelos de IA...');
 
         try {
-            await Promise.all([
+            // Verificar se faceapi está disponível
+            if (typeof faceapi === 'undefined') {
+                throw new Error('Face API não está disponível');
+            }
+
+            // Carregar modelos com timeout
+            const modelLoadPromise = Promise.all([
                 faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
                 faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
             ]);
 
+            // Timeout de 30 segundos para carregamento
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Timeout: modelos demoraram muito para carregar')), 30000);
+            });
+
+            // Aguardar carregamento ou timeout
+            await Promise.race([modelLoadPromise, timeoutPromise]);
+
+            // Verificar se os modelos foram realmente carregados
+            if (!faceapi.nets.tinyFaceDetector.isLoaded || !faceapi.nets.faceLandmark68Net.isLoaded) {
+                throw new Error('Modelos não foram carregados completamente');
+            }
+
             this.isModelLoaded = true;
-            console.log('Modelos carregados com sucesso!');
+            console.log('✅ Modelos carregados com sucesso!');
+            console.log('🔍 Verificação dos modelos:');
+            console.log('- TinyFaceDetector:', faceapi.nets.tinyFaceDetector.isLoaded);
+            console.log('- FaceLandmark68Net:', faceapi.nets.faceLandmark68Net.isLoaded);
             
             // Esconder overlay de carregamento com fade-out
             this.hideLoadingOverlay();
             
         } catch (error) {
-            console.error('Erro ao carregar modelos:', error);
+            console.error('❌ Erro ao carregar modelos:', error);
             this.isModelLoaded = false;
             
             // Mostrar erro no overlay
-            this.showLoadingError('Erro ao carregar modelos de IA');
+            this.showLoadingError(`Erro: ${error.message}`);
         }
     }
     
@@ -358,11 +353,73 @@ class GameScreen extends BaseScreen {
     
     showLoadingError(message) {
         if (this.loadingOverlay) {
-            const errorText = this.loadingOverlay.querySelector('div:nth-child(2)');
-            if (errorText) {
-                errorText.textContent = message;
-                errorText.style.color = '#FF6B6B';
+            // Atualizar texto principal
+            const loadingText = this.loadingOverlay.querySelector('div:nth-child(2)');
+            if (loadingText) {
+                loadingText.textContent = 'Erro ao carregar modelos';
+                loadingText.style.color = '#FF6B6B';
             }
+            
+            // Atualizar texto de instrução
+            const instructionText = this.loadingOverlay.querySelector('div:nth-child(3)');
+            if (instructionText) {
+                instructionText.textContent = message;
+                instructionText.style.color = '#FF6B6B';
+                instructionText.style.fontSize = '12px';
+            }
+            
+            // Adicionar botão de retry
+            if (!this.loadingOverlay.querySelector('#retry-button')) {
+                const retryButton = document.createElement('button');
+                retryButton.id = 'retry-button';
+                retryButton.textContent = 'Tentar Novamente';
+                retryButton.style.cssText = `
+                    background: #4ECDC4;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    font-family: 'Nunito', Arial, sans-serif;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-top: 15px;
+                    transition: background 0.3s ease;
+                `;
+                
+                retryButton.addEventListener('mouseenter', () => {
+                    retryButton.style.background = '#45B7AA';
+                });
+                
+                retryButton.addEventListener('mouseleave', () => {
+                    retryButton.style.background = '#4ECDC4';
+                });
+                
+                retryButton.addEventListener('click', () => {
+                    console.log('🔄 Tentando carregar modelos novamente...');
+                    this.retryLoadModels();
+                });
+                
+                this.loadingOverlay.appendChild(retryButton);
+            }
+        }
+    }
+    
+    async retryLoadModels() {
+        // Resetar estado
+        this.isModelLoaded = false;
+        
+        // Limpar botão de retry
+        const retryButton = this.loadingOverlay.querySelector('#retry-button');
+        if (retryButton) {
+            retryButton.remove();
+        }
+        
+        // Tentar carregar novamente
+        try {
+            await this.loadModels();
+        } catch (error) {
+            console.error('❌ Falha na segunda tentativa:', error);
         }
     }
 
@@ -940,7 +997,8 @@ class GameScreen extends BaseScreen {
         // Iniciar face tracking
         this.setupCanvas();
 
-
+        // Criar overlay de carregamento
+        this.createLoadingOverlay();
 
         this.loadModels().then(() => {
             if (this.isModelLoaded) {
