@@ -102,12 +102,7 @@ class GameScreen extends BaseScreen {
                     console.log(`Vídeo playing: ${!this.video.paused}`);
                     this.video.play(); // Garantir que o vídeo está reproduzindo
 
-                    // Atualizar status da câmera
-                    const status = document.getElementById('camera-status');
-                    if (status) {
-                        status.textContent = '📹 Câmera ativa';
-                        status.style.background = 'rgba(0, 128, 0, 0.8)';
-                    }
+
 
                     resolve();
                 };
@@ -236,27 +231,7 @@ class GameScreen extends BaseScreen {
     }
 
     drawLandmarks(landmarks) {
-        // DEBUG VISUAL DESABILITADO - APENAS LOG
-        console.log('🚫 Debug visual dos landmarks desabilitado');
-        return;
-        
-        // CÓDIGO COMENTADO - DEBUG VISUAL NÃO É MAIS EXIBIDO
-        /*
-        this.ctx.fillStyle = '#4ECDC4';
 
-        // Scale coordinates to match canvas dimensions
-        const scaleX = this.canvas.width / this.video.videoWidth;
-        const scaleY = this.canvas.height / this.video.videoHeight;
-
-        landmarks.positions.forEach(point => {
-            const scaledX = point.x * scaleX;
-            const scaledY = point.y * scaleY;
-
-            this.ctx.beginPath();
-            this.ctx.arc(scaledX, scaledY, 3, 0, 2 * Math.PI);
-            this.ctx.fill();
-        });
-        */
     }
     
     fixCubeOnFace(faceBox, landmarks) {
@@ -460,9 +435,6 @@ class GameScreen extends BaseScreen {
         console.log(`👁️ Olhos - Left: ${leftEye.x.toFixed(3)}, Right: ${rightEye.x.toFixed(3)}, Center: ${eyeCenter.toFixed(3)}`);
         console.log(`👃 Nariz: ${nose.x.toFixed(3)}`);
 
-        // Atualizar indicador visual da rotação
-        this.updateHeadPositionIndicator(normalizedRotation);
-        
         // Processar seleção progressiva
         this.processProgressiveSelection(normalizedRotation);
     }
@@ -638,27 +610,7 @@ class GameScreen extends BaseScreen {
         this.selectAnswer(side);
     }
 
-    updateHeadPositionIndicator(headX) {
-        const headPositionIndicator = document.getElementById('head-position');
-        if (headPositionIndicator) {
-            let rotation = 'Centro';
-            let color = '#FFFFFF';
 
-            if (headX < -this.headThreshold) {
-                rotation = '⬅️ Olhando ESQUERDA';
-                color = '#4ECDC4';
-            } else if (headX > this.headThreshold) {
-                rotation = '➡️ Olhando DIREITA';
-                color = '#FF6B6B';
-            }
-
-            headPositionIndicator.innerHTML = `🔄 ROTAÇÃO: ${rotation}<br><small>${headX.toFixed(3)}</small>`;
-            headPositionIndicator.style.color = color;
-        }
-
-        // Atualizar elementos 3D de debug (desabilitados)
-        // this.update3DDebugElements(headX);
-    }
 
     update3DDebugElements(headX) {
         if (!this.gameElements) return;
@@ -666,68 +618,6 @@ class GameScreen extends BaseScreen {
         // DESABILITAR ELEMENTOS 3D DE DEBUG - APENAS 2D AGORA
         console.log('🚫 Elementos 3D de debug desabilitados - usando apenas 2D');
         return;
-
-        // CÓDIGO COMENTADO - ELEMENTOS 3D NÃO SÃO MAIS USADOS
-        /*
-        // Remover elementos de debug anteriores
-        const existingDebug = this.gameElements.querySelectorAll('[data-debug="true"]');
-        existingDebug.forEach(el => el.remove());
-
-        // Criar indicador de posição da cabeça (esfera colorida)
-        const headIndicator = document.createElement('a-sphere');
-        headIndicator.setAttribute('data-debug', 'true');
-        headIndicator.setAttribute('position', `${headX * 2} 0.5 -1`);
-        headIndicator.setAttribute('radius', '0.1');
-
-        // Cor baseada na posição
-        if (headX < -this.headThreshold) {
-            headIndicator.setAttribute('color', '#4ECDC4'); // Azul para esquerda
-            headIndicator.setAttribute('scale', '1.5 1.5 1.5');
-        } else if (headX > this.headThreshold) {
-            headIndicator.setAttribute('color', '#FF6B6B'); // Vermelho para direita
-            headIndicator.setAttribute('scale', '1.5 1.5 1.5');
-        } else {
-            headIndicator.setAttribute('color', '#FFFFFF'); // Branco para centro
-            headIndicator.setAttribute('scale', '1 1 1');
-        }
-
-        // Adicionar animação de pulso
-        headIndicator.setAttribute('animation', 'property: scale; to: 1.2 1.2 1.2; loop: true; dir: alternate; dur: 500');
-
-        this.gameElements.appendChild(headIndicator);
-
-        // Criar linha de direção
-        const directionLine = document.createElement('a-cylinder');
-        directionLine.setAttribute('data-debug', 'true');
-        directionLine.setAttribute('position', '0 0.5 -1');
-        directionLine.setAttribute('rotation', '0 0 90');
-        directionLine.setAttribute('height', '4');
-        directionLine.setAttribute('radius', '0.02');
-        directionLine.setAttribute('color', '#666666');
-        directionLine.setAttribute('opacity', '0.5');
-        this.gameElements.appendChild(directionLine);
-
-        // Criar marcadores de threshold
-        const leftThreshold = document.createElement('a-box');
-        leftThreshold.setAttribute('data-debug', 'true');
-        leftThreshold.setAttribute('position', `${-this.headThreshold * 2} 0.5 -1`);
-        leftThreshold.setAttribute('width', '0.1');
-        leftThreshold.setAttribute('height', '0.1');
-        leftThreshold.setAttribute('depth', '0.1');
-        leftThreshold.setAttribute('color', '#4ECDC4');
-        leftThreshold.setAttribute('opacity', '0.7');
-        this.gameElements.appendChild(leftThreshold);
-
-        const rightThreshold = document.createElement('a-box');
-        rightThreshold.setAttribute('data-debug', 'true');
-        rightThreshold.setAttribute('position', `${this.headThreshold * 2} 0.5 -1`);
-        rightThreshold.setAttribute('width', '0.1');
-        rightThreshold.setAttribute('height', '0.1');
-        rightThreshold.setAttribute('depth', '0.1');
-        rightThreshold.setAttribute('color', '#FF6B6B');
-        rightThreshold.setAttribute('opacity', '0.7');
-        this.gameElements.appendChild(rightThreshold);
-        */
     }
 
      
@@ -754,33 +644,17 @@ class GameScreen extends BaseScreen {
         // Iniciar face tracking
         this.setupCanvas();
 
-        // Mostrar status do face tracking
-        const faceStatus = document.getElementById('face-status');
-        const headPosition = document.getElementById('head-position');
-        if (faceStatus) faceStatus.style.display = 'block';
-        if (headPosition) headPosition.style.display = 'block';
+
 
         this.loadModels().then(() => {
             if (this.isModelLoaded) {
                 this.startFaceDetection();
                 console.log('✅ Face tracking iniciado');
-                if (faceStatus) {
-                    faceStatus.textContent = '✅ IA carregada';
-                    faceStatus.style.background = 'rgba(0, 128, 0, 0.8)';
-                }
             } else {
                 console.error('❌ Falha ao carregar modelos de IA');
-                if (faceStatus) {
-                    faceStatus.textContent = '❌ Erro ao carregar IA';
-                    faceStatus.style.background = 'rgba(255, 0, 0, 0.8)';
-                }
             }
         }).catch(error => {
             console.error('❌ Erro ao inicializar face tracking:', error);
-            if (faceStatus) {
-                faceStatus.textContent = '❌ Erro na inicialização';
-                faceStatus.style.background = 'rgba(255, 0, 0, 0.8)';
-            }
         });
 
         // Iniciar jogo
@@ -797,12 +671,8 @@ class GameScreen extends BaseScreen {
 
         // Esconder elementos
         const backButton = document.getElementById('game-back-button');
-        const faceStatus = document.getElementById('face-status');
-        const headPosition = document.getElementById('head-position');
 
         if (backButton) backButton.style.display = 'none';
-        if (faceStatus) faceStatus.style.display = 'none';
-        if (headPosition) headPosition.style.display = 'none';
 
         // Limpar cena
         this.clearScene();
