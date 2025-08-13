@@ -30,6 +30,11 @@ class GameScreen extends BaseScreen {
         this.selectionDecay = 2; // Velocidade de decaimento quando não está na posição (mais responsivo)
         this.isSelecting = false; // Se está atualmente selecionando
         this.currentSelectionSide = null; // Lado atual da seleção
+        
+        // Otimizações para mobile
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        this.detectionInterval = this.isMobile ? 50 : 100; // 50ms para mobile (20fps), 100ms para desktop (10fps)
+        this.lastDetectionTime = 0;
 
         // Elementos A-Frame
         this.scene = null;
@@ -177,20 +182,26 @@ class GameScreen extends BaseScreen {
         }
 
         try {
+            // Otimizações para mobile
+            const options = new faceapi.TinyFaceDetectorOptions({
+                inputSize: this.isMobile ? 160 : 224, // Resolução menor para mobile
+                scoreThreshold: this.isMobile ? 0.3 : 0.5 // Threshold mais baixo para mobile
+            });
+
             const detections = await faceapi
-                .detectAllFaces(this.video, new faceapi.TinyFaceDetectorOptions())
+                .detectAllFaces(this.video, options)
                 .withFaceLandmarks();
 
-            // Clear previous drawings
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            // Clear previous drawings apenas se necessário
+            if (this.ctx && this.canvas) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
 
             if (detections.length > 0) {
-                console.log(`${detections.length} rosto(s) detectado(s)`);
+                if (!this.isMobile) {
+                    console.log(`${detections.length} rosto(s) detectado(s)`);
+                }
                 this.faceDetected = true;
-                
-                // DEBUG VISUAL DESABILITADO - APENAS LOG
-                // this.drawFaceBox(detections[0].detection.box);
-                // this.drawLandmarks(detections[0].landmarks);
                 
                 // FIXAR CUBO NO ROSTO COM PROFUNDIDADE
                 this.fixCubeOnFace(detections[0].detection.box, detections[0].landmarks);
@@ -199,10 +210,14 @@ class GameScreen extends BaseScreen {
                 this.processHeadMovement(detections[0].landmarks);
             } else {
                 this.faceDetected = false;
-                console.log('Nenhum rosto detectado');
+                if (!this.isMobile) {
+                    console.log('Nenhum rosto detectado');
+                }
             }
         } catch (error) {
-            console.error('Erro na detecção:', error);
+            if (!this.isMobile) {
+                console.error('Erro na detecção:', error);
+            }
         }
     }
 
@@ -404,9 +419,27 @@ class GameScreen extends BaseScreen {
 
     detectLoop() {
         if (this.detectionActive) {
-            this.detectFaces().then(() => {
-                requestAnimationFrame(() => this.detectLoop());
-            });
+            const now = Date.now();
+            
+            // Controlar taxa de atualização para otimizar performance
+            if (now - this.lastDetectionTime >= this.detectionInterval) {
+                this.lastDetectionTime = now;
+                this.detectFaces().then(() => {
+                    // Usar setTimeout para controle mais preciso em mobile
+                    if (this.isMobile) {
+                        setTimeout(() => this.detectLoop(), this.detectionInterval);
+                    } else {
+                        requestAnimationFrame(() => this.detectLoop());
+                    }
+                });
+            } else {
+                // Aguardar próximo intervalo
+                if (this.isMobile) {
+                    setTimeout(() => this.detectLoop(), this.detectionInterval - (now - this.lastDetectionTime));
+                } else {
+                    requestAnimationFrame(() => this.detectLoop());
+                }
+            }
         }
     }
 
@@ -429,11 +462,13 @@ class GameScreen extends BaseScreen {
         
         this.headPosition.x = normalizedRotation;
         
-        // Debug: mostrar rotação da cabeça
-        console.log(`🔄 ROTAÇÃO da cabeça: ${normalizedRotation.toFixed(3)} (threshold: ±${this.headThreshold})`);
-        console.log(`📊 Valores - Eye Distance: ${eyeDistance.toFixed(3)}, Nose Offset: ${noseOffset.toFixed(3)}`);
-        console.log(`👁️ Olhos - Left: ${leftEye.x.toFixed(3)}, Right: ${rightEye.x.toFixed(3)}, Center: ${eyeCenter.toFixed(3)}`);
-        console.log(`👃 Nariz: ${nose.x.toFixed(3)}`);
+        // Debug: mostrar rotação da cabeça (apenas em desktop)
+        if (!this.isMobile) {
+            console.log(`🔄 ROTAÇÃO da cabeça: ${normalizedRotation.toFixed(3)} (threshold: ±${this.headThreshold})`);
+            console.log(`📊 Valores - Eye Distance: ${eyeDistance.toFixed(3)}, Nose Offset: ${noseOffset.toFixed(3)}`);
+            console.log(`👁️ Olhos - Left: ${leftEye.x.toFixed(3)}, Right: ${rightEye.x.toFixed(3)}, Center: ${eyeCenter.toFixed(3)}`);
+            console.log(`👃 Nariz: ${nose.x.toFixed(3)}`);
+        }
 
         // Processar seleção progressiva
         this.processProgressiveSelection(normalizedRotation);
@@ -574,7 +609,9 @@ class GameScreen extends BaseScreen {
             this.confirmSelection(side);
         }
         
-        console.log(`🎯 Progresso ${side}: ${this.selectionProgress[side].toFixed(1)}%`);
+        if (!this.isMobile) {
+            console.log(`🎯 Progresso ${side}: ${this.selectionProgress[side].toFixed(1)}%`);
+        }
     }
 
     decaySelectionProgress() {
@@ -943,33 +980,7 @@ class GameScreen extends BaseScreen {
     }
     
     positionElementsOnFace() {
-        // FUNÇÃO DESABILITADA - ELEMENTOS 3D NÃO SÃO MAIS USADOS
-        console.log('🚫 positionElementsOnFace desabilitada - usando apenas 2D');
-        return;
         
-        // CÓDIGO COMENTADO - ELEMENTOS 3D NÃO SÃO MAIS USADOS
-        /*
-        // Posicionar elementos 3D no rosto quando detectado
-        if (this.faceDetected && this.gameElements) {
-            // Ajustar posição baseada na posição da câmera
-            const camera = document.getElementById('main-camera');
-            if (camera) {
-                const cameraPos = camera.getAttribute('position');
-                const cameraRot = camera.getAttribute('rotation');
-                
-                // Calcular posição relativa ao rosto
-                const faceOffset = { x: 0, y: 0.8, z: -0.5 };
-                
-                // Aplicar offset baseado na posição da câmera
-                this.gameElements.setAttribute('position', 
-                    `${cameraPos.x + faceOffset.x} ${cameraPos.y + faceOffset.y} ${cameraPos.z + faceOffset.z}`);
-                
-                // Fazer elementos sempre olharem para a câmera
-                this.gameElements.setAttribute('rotation', 
-                    `${cameraRot.x} ${cameraRot.y} ${cameraRot.z}`);
-            }
-        }
-        */
     }
     
     getRandomWrongOption() {
