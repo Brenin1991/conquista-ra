@@ -78,6 +78,13 @@
         
     </div>
 
+    <div id="selfie" class="selfie-screen">
+        <video id="selfie-camera" autoplay muted playsinline></video>
+        <canvas id="selfie-canvas" style="display: none;"></canvas>
+        <img id="camera-icon-selfie" class="camera-icon" src="assets/textures/bt_camera.png" alt="Camera">
+        <!-- Glass Blur UI Elements -->
+    </div>
+
     <!-- Cena A-Frame AR -->
     <a-scene 
         id="main-scene"
@@ -131,6 +138,7 @@
     <script src="js/modules/screens/tutorial-screen.js"></script>
     <script src="js/modules/screens/game-screen.js"></script>
     <script src="js/modules/screens/final-screen.js"></script>
+    <script src="js/modules/screens/selfie-screen.js"></script>
     <script src="js/modules/screen-manager.js"></script>    
     
     <!-- Landscape Blocker -->

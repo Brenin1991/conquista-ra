@@ -6,7 +6,7 @@
 class FinalScreen extends BaseScreen {
     constructor() {
         super('final', {
-            next: 'main',
+            next: 'selfie',
             onEnter: () => this.handleEnter(),
             onExit: () => this.handleExit()
         });
@@ -81,8 +81,13 @@ class FinalScreen extends BaseScreen {
         // Adicionar evento de clique no botão final
         if (finalButton) {
             finalButton.addEventListener('click', () => {
-                // Reload da página
-                window.location.reload();
+                // Ir para a próxima tela usando o screen manager
+                if (window.screenManager) {
+                    window.screenManager.showScreen('selfie');
+                } else {
+                    console.warn('⚠️ Screen manager não encontrado, recarregando página');
+                    window.location.reload();
+                }
             });
         }
     }

@@ -51,6 +51,13 @@ class ScreenManager {
         } else {
             console.error('❌ FinalScreen não encontrada');
         }
+
+        if (window.SelfieScreen) {
+            this.registerScreen('selfie', new SelfieScreen());
+            console.log('✅ SelfieScreen disponível');
+        } else {
+            console.error('❌ SelfieScreen não encontrada');
+        }
         console.log('📋 Telas registradas:', Object.keys(this.screens));
     }
     

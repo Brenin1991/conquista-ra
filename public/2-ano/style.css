@@ -685,3 +685,70 @@ input, textarea {
     object-fit: cover;
     z-index: 10000;
 }
+
+/* ===== TELA DE SELFIE ===== */
+.selfie-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 16000;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    background: #000;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+#certificado-top {
+    position: fixed;
+    top: 0%;
+    left: 5%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+#certificado-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.selfie-screen.ativo {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#selfie-camera {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Espelhar para selfie */
+}
+
+#camera-icon-selfie {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    z-index: 16001;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+#camera-icon-selfie:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+#camera-icon-selfie:active {
+    transform: scale(0.95);
+} 
