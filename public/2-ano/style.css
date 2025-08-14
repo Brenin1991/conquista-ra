@@ -572,38 +572,32 @@ input, textarea {
     z-index: 3;
 } 
 
-/* Barra de Progresso */
-#progress-bar {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.3);
-    border: 2px solid #000;
-    border-radius: 10px;
-    overflow: visible;
-    z-index: 1000;
-    display: none;
-}
-
-#progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #90EE90, #32CD32);
-    width: 0%;
-    transition: width 0.8s ease-out;
-    border-radius: 8px;
-}
-
-#estrela-progresso {
+/* contador */
+#contador-tempo{
     position: absolute;
-    right: -15px;
-    top: -25px;
-    width: 60px;
-    height: 60px;
-    z-index: 1001;
-} 
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 40%;
+    height: 100px;
+    object-fit: cover;
+    z-index: 10000;
+    background-image: url(assets/textures/contador.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#contador-tempo-text{
+    position: absolute;
+    top: 45%;
+    right: 15%;
+    transform: translate(-50%, -50%);
+    /* width: 100%; */
+    /* height: auto; */
+    object-fit: cover;
+    z-index: 10000;
+}
 
 #final {
     position: fixed;

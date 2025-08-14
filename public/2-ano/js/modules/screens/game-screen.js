@@ -46,18 +46,55 @@ class GameScreen extends BaseScreen {
         // Sistema de emojis
         this.emojis = [];
         this.emojiSpawnInterval = null;
-        this.emojiSpawnRate = 2000; // 2 segundos entre emojis
+        this.baseSpawnRate = 2000; // 2 segundos entre emojis (base)
+        this.emojiSpawnRate = 2000; // Taxa atual de spawn
         this.score = 0;
         this.scoreElement = null;
         this.emojiTypes = ['01', '02', '03', '04', '05', '06', '07', '08'];
 
+        // Sistema de regras do jogo
+        this.gameData = null;
+        this.correctEmojis = 0;
+        this.incorrectEmojis = 0;
+        this.gameTime = 60; // 60 segundos
+        this.gameTimer = null;
+        this.timerElement = null;
+        this.plantLevel = 1;
+        this.maxPlantLevel = 5;
+        this.plantGrowthThreshold = 3; // Emojis corretos para crescer
+        this.vasoTypes = ['vaso_1', 'vaso_2', 'vaso_3', 'vaso_4', 'vaso_5'];
+
         this.onInit();
     }
     
+    async loadGameData() {
+        try {
+            const response = await fetch('assets/data/data.json');
+            this.gameData = await response.json();
+            console.log('✅ Dados do jogo carregados:', this.gameData);
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados do jogo:', error);
+            // Usar dados padrão se falhar
+            this.gameData = {
+                emojis: [
+                    { id: "01", nome: "calma", url: "assets/textures/emojis/01.png", acerto: "sim" },
+                    { id: "02", nome: "triste", url: "assets/textures/emojis/02.png", acerto: "nao" },
+                    { id: "03", nome: "sorrindo", url: "assets/textures/emojis/03.png", acerto: "sim" },
+                    { id: "04", nome: "angustia", url: "assets/textures/emojis/04.png", acerto: "nao" },
+                    { id: "05", nome: "triste", url: "assets/textures/emojis/05.png", acerto: "nao" },
+                    { id: "06", nome: "entediado", url: "assets/textures/emojis/06.png", acerto: "nao" },
+                    { id: "07", nome: "alegre", url: "assets/textures/emojis/07.png", acerto: "sim" }
+                ]
+            };
+        }
+    }
+    
     onInit() {
+        this.loadGameData();
         this.setupFaceTracking();
         this.createFaceStatusOverlay();
         this.createSilhouetteOverlay();
+        this.createTimerElement(); // Configurar contador existente
     }
     
     createLoadingOverlay() {
@@ -283,6 +320,47 @@ class GameScreen extends BaseScreen {
                         opacity: 0;
                     }
                 }
+                
+                @keyframes feedbackPop {
+                    0% { 
+                        transform: scale(0) rotate(0deg);
+                        opacity: 0;
+                    }
+                    50% { 
+                        transform: scale(1.2) rotate(10deg);
+                        opacity: 1;
+                    }
+                    100% { 
+                        transform: scale(1) rotate(0deg);
+                        opacity: 1;
+                    }
+                }
+                
+                @keyframes growthPulse {
+                    0% { 
+                        transform: translate(-50%, -50%) scale(0);
+                        opacity: 1;
+                    }
+                    50% { 
+                        transform: translate(-50%, -50%) scale(1.5);
+                        opacity: 0.8;
+                    }
+                    100% { 
+                        transform: translate(-50%, -50%) scale(2);
+                        opacity: 0;
+                    }
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { 
+                        opacity: 1;
+                        filter: brightness(1);
+                    }
+                    50% { 
+                        opacity: 0.8;
+                        filter: brightness(1.3);
+                    }
+                }
             `;
             document.head.appendChild(style);
         }
@@ -291,6 +369,7 @@ class GameScreen extends BaseScreen {
         console.log('✅ Elemento do vaso criado');
     }
 
+    /*
     createScoreElement() {
         // Criar elemento de pontuação
         this.scoreElement = document.createElement('div');
@@ -309,26 +388,30 @@ class GameScreen extends BaseScreen {
             text-align: center;
             z-index: 9999;
             border: 2px solid #4ECDC4;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.0);
         `;
         
         this.updateScore();
         document.body.appendChild(this.scoreElement);
         console.log('✅ Elemento de pontuação criado');
     }
+    */
 
     spawnEmoji() {
-        // Criar novo emoji
+        // Criar novo emoji baseado nos dados do JSON
         const emoji = document.createElement('div');
-        const randomType = this.emojiTypes[Math.floor(Math.random() * this.emojiTypes.length)];
+        const randomEmojiData = this.gameData.emojis[Math.floor(Math.random() * this.gameData.emojis.length)];
         
         emoji.className = 'emoji';
-        emoji.dataset.type = randomType;
+        emoji.dataset.type = randomEmojiData.id;
+        emoji.dataset.acerto = randomEmojiData.acerto;
+        emoji.dataset.nome = randomEmojiData.nome;
+        
         emoji.style.cssText = `
             position: fixed;
             width: 60px;
             height: 60px;
-            background-image: url('assets/textures/emojis/${randomType}.png');
+            background-image: url('${randomEmojiData.url}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -350,11 +433,11 @@ class GameScreen extends BaseScreen {
         setTimeout(() => {
             if (emoji.parentNode) {
                 emoji.parentNode.removeChild(emoji);
-                this.emojis = this.emojis.filter(e => e !== emoji);
             }
+            this.emojis = this.emojis.filter(e => e !== emoji);
         }, 3000);
         
-        console.log(`🎯 Emoji ${randomType} spawnado em ${emoji.style.left}`);
+        console.log(`🎯 Emoji ${randomEmojiData.nome} (${randomEmojiData.acerto}) spawnado em ${emoji.style.left}`);
     }
 
     startEmojiSpawning() {
@@ -403,12 +486,31 @@ class GameScreen extends BaseScreen {
     }
 
     collectEmoji(emoji, index, collisionX, collisionY) {
-        // Aumentar pontuação
-        this.score += 10;
-        this.updateScore();
+        // Verificar se o emoji é correto ou não
+        const isCorrect = emoji.dataset.acerto === 'sim';
+        const emojiType = emoji.dataset.type || '01';
+        const emojiNome = emoji.dataset.nome || 'emoji';
+        
+        // Atualizar contadores
+        if (isCorrect) {
+            this.correctEmojis++;
+            this.score += 20; // Mais pontos para emojis corretos
+            console.log(`✅ Emoji correto coletado: ${emojiNome}`);
+            
+            // Verificar se a planta deve crescer
+            if (this.correctEmojis % this.plantGrowthThreshold === 0) {
+                this.growPlant();
+            }
+        } else {
+            this.incorrectEmojis++;
+            this.score += 5; // Menos pontos para emojis incorretos
+            console.log(`❌ Emoji incorreto coletado: ${emojiNome}`);
+        }
+        
+        // Mostrar indicador visual
+        this.showFeedbackIndicator(isCorrect);
         
         // Criar efeito de escala na posição exata da colisão
-        const emojiType = emoji.dataset.type || '01';
         this.createScaleEffect(collisionX, collisionY, emojiType);
         
         // Efeito de partículas explosivas na posição da colisão
@@ -501,11 +603,13 @@ class GameScreen extends BaseScreen {
         }
     }
 
+    /*
     updateScore() {
         if (this.scoreElement) {
             this.scoreElement.textContent = `🌱 ${this.score}`;
         }
     }
+    */
 
     async setupFaceTracking() {
         try {
@@ -851,8 +955,9 @@ class GameScreen extends BaseScreen {
         this.setupCanvas();
         this.createLoadingOverlay();
         this.createVasoElement();
-        this.createScoreElement(); // Adicionado para criar o elemento de pontuação
+        // this.createScoreElement(); // Removido - contador de pontos não será exibido
         this.startEmojiSpawning(); // Adicionado para iniciar o spawn de emojis
+        this.startGameTimer(); // Adicionado para iniciar o cronômetro
 
         this.loadModels().then(() => {
             if (this.isModelLoaded) {
@@ -949,14 +1054,33 @@ class GameScreen extends BaseScreen {
         });
         this.emojis = [];
         
-        // Limpar elemento de pontuação
-        if (this.scoreElement && this.scoreElement.parentNode) {
-            this.scoreElement.parentNode.removeChild(this.scoreElement);
-            this.scoreElement = null;
+        // Elemento de pontuação não é mais criado
+        // this.scoreElement = null;
+        
+        // Resetar contador de tempo existente
+        if (this.timerElement) {
+            this.timerElement.textContent = '00:00';
+            this.timerElement = null;
         }
         
-        // Resetar pontuação
+        // Resetar estilos do container do contador
+        const timerContainer = document.getElementById('contador-tempo');
+        if (timerContainer) {
+            timerContainer.style.animation = '';
+        }
+        
+        // Parar cronômetro
+        if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+        }
+        
+        // Resetar variáveis do jogo
         this.score = 0;
+        this.correctEmojis = 0;
+        this.incorrectEmojis = 0;
+        this.gameTime = 60;
+        this.plantLevel = 1;
     }
 
     createScaleEffect(collisionX, collisionY, emojiType) {
@@ -987,6 +1111,242 @@ class GameScreen extends BaseScreen {
                 scaleEffect.parentNode.removeChild(scaleEffect);
             }
         }, 800);
+    }
+
+    createTimerElement() {
+        // Usar o contador de tempo existente na tela
+        this.timerElement = document.getElementById('contador-tempo-text-value');
+        
+        if (this.timerElement) {
+            // Aplicar estilos ao contador existente
+            this.timerElement.style.cssText = `
+                color: white;
+                font-family: 'Nunito', Arial, sans-serif;
+                font-size: 18px;
+                font-weight: 700;
+                text-align: center;
+            `;
+            
+            this.updateTimer();
+            console.log('✅ Contador de tempo existente encontrado e configurado');
+        } else {
+            console.error('❌ Elemento contador-tempo-text-value não encontrado');
+        }
+    }
+
+    startGameTimer() {
+        this.gameTimer = setInterval(() => {
+            this.gameTime--;
+            this.updateTimer();
+            
+            if (this.gameTime <= 0) {
+                this.gameOver();
+            }
+        }, 1000);
+        
+        console.log('⏰ Cronômetro iniciado: 60 segundos');
+    }
+
+    updateTimer() {
+        if (this.timerElement) {
+            const minutes = Math.floor(this.gameTime / 60);
+            const seconds = this.gameTime % 60;
+            this.timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Ajustar taxa de spawn baseada no tempo restante
+            this.adjustSpawnRate();
+            
+            // Aplicar estilos ao container pai (contador-tempo)
+            const timerContainer = document.getElementById('contador-tempo');
+            if (timerContainer) {
+                // Mudar cor baseado no tempo restante
+                if (this.gameTime <= 10) {
+                    // Aplicar animação de pulso sem interferir no posicionamento
+                    timerContainer.style.animation = 'pulse 1s infinite';
+                } else {
+                    // Remover animação quando não estiver nos últimos 10 segundos
+                    timerContainer.style.animation = '';
+                }
+            }
+        }
+    }
+
+    showFeedbackIndicator(isCorrect) {
+        // Criar indicador visual (acerto.png ou erro.png)
+        const indicator = document.createElement('div');
+        const imagePath = isCorrect ? 'assets/textures/acerto.png' : 'assets/textures/erro.png';
+        
+        indicator.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background-image: url('${imagePath}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 15px;
+            pointer-events: none;
+            z-index: 9998;
+            transform: scale(0);
+            animation: feedbackPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        `;
+        
+        document.body.appendChild(indicator);
+        
+        // Remover indicador após animação
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.parentNode.removeChild(indicator);
+            }
+        }, 2000);
+    }
+
+    growPlant() {
+        if (this.plantLevel < this.maxPlantLevel) {
+            this.plantLevel++;
+            console.log(`🌱 Planta cresceu para o nível ${this.plantLevel}!`);
+            
+            // Atualizar sprite do vaso
+            this.updateVasoSprite();
+            
+            // Mostrar efeito de crescimento
+            this.showGrowthEffect();
+        }
+    }
+
+    updateVasoSprite() {
+        if (this.vasoElement) {
+            const newVasoType = this.vasoTypes[this.plantLevel - 1];
+            this.vasoElement.style.backgroundImage = `url('assets/textures/vasos/${newVasoType}.png')`;
+            console.log(`🔄 Vaso atualizado para: ${newVasoType}`);
+        }
+    }
+
+    showGrowthEffect() {
+        // Criar efeito de crescimento
+        const growthEffect = document.createElement('div');
+        growthEffect.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #4ECDC4, #45B7AA, transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%) scale(0);
+            animation: growthPulse 1.5s ease-out forwards;
+        `;
+        
+        document.body.appendChild(growthEffect);
+        
+        // Remover efeito após animação
+        setTimeout(() => {
+            if (growthEffect.parentNode) {
+                growthEffect.parentNode.removeChild(growthEffect);
+            }
+        }, 1500);
+    }
+
+    gameOver() {
+        console.log('🏁 Tempo esgotado! Jogo finalizado!');
+        
+        // Parar cronômetro
+        if (this.gameTimer) {
+            clearInterval(this.gameTimer);
+            this.gameTimer = null;
+        }
+        
+        // Parar spawn de emojis
+        this.stopEmojiSpawning();
+        
+        // Mostrar tela de game over
+        this.showGameOverScreen();
+    }
+
+    showGameOverScreen() {
+        // Criar overlay de game over
+        const gameOverOverlay = document.createElement('div');
+        gameOverOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-family: 'Nunito', Arial, sans-serif;
+        `;
+        
+        const title = document.createElement('h1');
+        title.textContent = '🏁 Tempo Esgotado!';
+        title.style.cssText = `
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #FF6B6B;
+        `;
+        
+        const stats = document.createElement('div');
+        stats.innerHTML = `
+            <p style="font-size: 24px; margin: 10px 0;">✅ Emojis Corretos: ${this.correctEmojis}</p>
+            <p style="font-size: 24px; margin: 10px 0;">❌ Emojis Incorretos: ${this.incorrectEmojis}</p>
+            <p style="font-size: 24px; margin: 10px 0;">🏆 Pontuação Final: ${this.score}</p>
+            <p style="font-size: 24px; margin: 10px 0;">🌱 Nível da Planta: ${this.plantLevel}</p>
+        `;
+        
+        gameOverOverlay.appendChild(title);
+        gameOverOverlay.appendChild(stats);
+        document.body.appendChild(gameOverOverlay);
+        
+        // Ir para tela final após 5 segundos
+        setTimeout(() => {
+            if (window.screenManager) {
+                window.screenManager.showScreen('final');
+            }
+        }, 5000);
+    }
+
+    adjustSpawnRate() {
+        // Ajustar taxa de spawn baseada no tempo restante
+        let newSpawnRate = this.baseSpawnRate;
+        
+        if (this.gameTime <= 10) {
+            // Últimos 10 segundos: spawn muito rápido (0.5 segundos)
+            newSpawnRate = 500;
+        } else if (this.gameTime <= 20) {
+            // 11-20 segundos: spawn rápido (1 segundo)
+            newSpawnRate = 1000;
+        } else if (this.gameTime <= 30) {
+            // 21-30 segundos: spawn médio-rápido (1.5 segundos)
+            newSpawnRate = 1500;
+        } else if (this.gameTime <= 45) {
+            // 31-45 segundos: spawn médio (1.8 segundos)
+            newSpawnRate = 1800;
+        }
+        // 46-60 segundos: spawn normal (2 segundos)
+        
+        // Aplicar nova taxa de spawn se mudou
+        if (newSpawnRate !== this.emojiSpawnRate) {
+            this.emojiSpawnRate = newSpawnRate;
+            this.restartEmojiSpawning();
+            console.log(`🚀 Taxa de spawn ajustada para: ${newSpawnRate}ms (${this.gameTime}s restantes)`);
+        }
+    }
+
+    restartEmojiSpawning() {
+        // Parar spawn atual
+        this.stopEmojiSpawning();
+        
+        // Iniciar spawn com nova taxa
+        this.startEmojiSpawning();
     }
 }
 
