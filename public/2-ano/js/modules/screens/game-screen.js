@@ -1416,19 +1416,19 @@ class GameScreen extends BaseScreen {
             }
                         @keyframes reaction-text-float {
                 0% { 
-                    opacity: 0;
+                        opacity: 0;
                     transform: translateX(-50%) translateY(0px) scale(0.8);
-                }
+                    }
                 20% { 
-                    opacity: 1; 
+                        opacity: 1;
                     transform: translateX(-50%) translateY(-10px) scale(1.1);
-                }
+                    }
                 80% { 
-                    opacity: 1; 
+                        opacity: 1;
                     transform: translateX(-50%) translateY(-30px) scale(1);
-                }
+                    }
                 100% { 
-                    opacity: 0; 
+                        opacity: 0;
                     transform: translateX(-50%) translateY(-50px) scale(0.9);
                 }
             }
@@ -1440,8 +1440,8 @@ class GameScreen extends BaseScreen {
                 50% { 
                     transform: translate(-50%, 0%) scale(1.1);
                     opacity: 0.9;
+                    }
                 }
-            }
             `;
             document.head.appendChild(style);
         }

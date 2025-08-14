@@ -25,6 +25,7 @@ class SelfieScreen extends BaseScreen {
         this.motionThreshold = 15; // Sensibilidade do movimento
         this.petalasElements = [];
         this.isMotionEnabled = false;
+        this.motionHandler = null;
     }
     
     onInit() {
@@ -861,11 +862,24 @@ class SelfieScreen extends BaseScreen {
             this.isMotionEnabled = true;
             
             // Configurar listener para movimento do dispositivo
-            window.addEventListener('devicemotion', (event) => {
+            const motionHandler = (event) => {
                 this.handleDeviceMotion(event);
-            });
+            };
+            
+            // Adicionar listener com opções
+            window.addEventListener('devicemotion', motionHandler, { passive: true });
+            
+            // Guardar referência para remoção posterior
+            this.motionHandler = motionHandler;
             
             console.log('📱 Detecção de movimento ativada');
+            
+            // Testar se está funcionando
+            setTimeout(() => {
+                console.log('🔍 Testando detecção de movimento...');
+                console.log('📱 DeviceMotionEvent disponível:', !!window.DeviceMotionEvent);
+                console.log('📱 Listener ativo:', this.isMotionEnabled);
+            }, 1000);
         } else {
             console.warn('⚠️ Dispositivo não suporta detecção de movimento');
         }
@@ -879,22 +893,33 @@ class SelfieScreen extends BaseScreen {
         // Evitar múltiplas detecções em sequência
         if (currentTime - this.lastMotionTime < 1000) return;
         
-        // Obter dados de aceleração
-        const acceleration = event.accelerationIncludingGravity;
-        if (!acceleration) return;
+        // Obter dados de aceleração (tentar diferentes propriedades)
+        let acceleration = event.accelerationIncludingGravity;
+        if (!acceleration) {
+            acceleration = event.acceleration;
+        }
+        if (!acceleration) {
+            console.log('⚠️ Nenhum dado de aceleração disponível');
+            return;
+        }
         
         // Calcular magnitude do movimento
-        const magnitude = Math.sqrt(
-            Math.pow(acceleration.x || 0, 2) + 
-            Math.pow(acceleration.y || 0, 2) + 
-            Math.pow(acceleration.z || 0, 2)
-        );
+        const x = acceleration.x || 0;
+        const y = acceleration.y || 0;
+        const z = acceleration.z || 0;
+        
+        const magnitude = Math.sqrt(x * x + y * y + z * z);
+        
+        // Log para debug (apenas a cada 2 segundos)
+        if (currentTime - this.lastMotionTime > 2000) {
+            console.log('📱 Dados de movimento:', { x, y, z, magnitude, threshold: this.motionThreshold });
+        }
         
         // Verificar se o movimento é forte o suficiente
         if (magnitude > this.motionThreshold) {
             this.blowDenteLeao();
             this.lastMotionTime = currentTime;
-            console.log('💨 Movimento detectado! Magnitude:', magnitude);
+            console.log('💨 Movimento detectado! Magnitude:', magnitude, 'X:', x, 'Y:', y, 'Z:', z);
         }
     }
     
@@ -1035,9 +1060,10 @@ class SelfieScreen extends BaseScreen {
         this.petalasElements = [];
         
         // Remover listener de movimento
-        if (this.isMotionEnabled) {
-            window.removeEventListener('devicemotion', this.handleDeviceMotion);
+        if (this.isMotionEnabled && this.motionHandler) {
+            window.removeEventListener('devicemotion', this.motionHandler);
             this.isMotionEnabled = false;
+            this.motionHandler = null;
         }
         
         // Remover animações CSS
