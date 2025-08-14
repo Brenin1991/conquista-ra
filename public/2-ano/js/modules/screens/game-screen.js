@@ -1178,7 +1178,7 @@ class GameScreen extends BaseScreen {
         
         indicator.style.cssText = `
             position: fixed;
-            top: 80px;
+            top: 40px;
             left: 20px;
             width: 60px;
             height: 60px;
@@ -1268,43 +1268,7 @@ class GameScreen extends BaseScreen {
     }
 
     showGameOverScreen() {
-        // Criar overlay de game over
-        const gameOverOverlay = document.createElement('div');
-        gameOverOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            color: white;
-            font-family: 'Nunito', Arial, sans-serif;
-        `;
         
-        const title = document.createElement('h1');
-        title.textContent = '🏁 Tempo Esgotado!';
-        title.style.cssText = `
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #FF6B6B;
-        `;
-        
-        const stats = document.createElement('div');
-        stats.innerHTML = `
-            <p style="font-size: 24px; margin: 10px 0;">✅ Emojis Corretos: ${this.correctEmojis}</p>
-            <p style="font-size: 24px; margin: 10px 0;">❌ Emojis Incorretos: ${this.incorrectEmojis}</p>
-            <p style="font-size: 24px; margin: 10px 0;">🏆 Pontuação Final: ${this.score}</p>
-            <p style="font-size: 24px; margin: 10px 0;">🌱 Nível da Planta: ${this.plantLevel}</p>
-        `;
-        
-        gameOverOverlay.appendChild(title);
-        gameOverOverlay.appendChild(stats);
-        document.body.appendChild(gameOverOverlay);
         
         // Ir para tela final após 5 segundos
         setTimeout(() => {
