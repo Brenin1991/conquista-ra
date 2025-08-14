@@ -38,9 +38,6 @@ class SelfieScreen extends BaseScreen {
         this.isMobile = this.detectMobile();
         console.log('📱 Dispositivo móvel:', this.isMobile);
         console.log('🍎 iOS detectado:', this.isIOS);
-        
-        // Inicializar sistema de dente de leão interativo
-        this.setupDenteLeaoSystem();
     }
     
     setupSelfieElements() {
@@ -121,6 +118,10 @@ class SelfieScreen extends BaseScreen {
         
         // Configurar animações de entrada
         this.setupSelfieAnimations();
+        
+        // Inicializar sistema de dente de leão quando a tela estiver ativa
+        console.log('🌼 Inicializando dente de leão na entrada da tela...');
+        this.setupDenteLeaoSystem();
     }
     
     setCurrentFase(fase) {
@@ -816,6 +817,9 @@ class SelfieScreen extends BaseScreen {
     }
     
     setupDenteLeaoSystem() {
+        // Injetar animações CSS primeiro
+        this.injectDenteLeaoAnimations();
+        
         // Criar elemento do dente de leão
         this.createDenteLeaoElement();
         
@@ -826,12 +830,12 @@ class SelfieScreen extends BaseScreen {
         } else {
             console.log('💻 Dispositivo desktop - movimento desabilitado');
         }
-        
-        // Injetar animações CSS
-        this.injectDenteLeaoAnimations();
     }
     
     createDenteLeaoElement() {
+        console.log('🌼 Criando elemento do dente de leão...');
+        console.log('🌼 Elemento da tela existe:', !!this.element);
+        
         // Criar elemento do dente de leão central
         this.denteLeaoElement = document.createElement('div');
         this.denteLeaoElement.id = 'dente-leao-interactive';
@@ -852,8 +856,63 @@ class SelfieScreen extends BaseScreen {
         `;
         
         // Adicionar apenas na tela de selfie
-        this.element.appendChild(this.denteLeaoElement);
-        console.log('🌼 Elemento do dente de leão criado');
+        if (this.element) {
+            this.element.appendChild(this.denteLeaoElement);
+            console.log('🌼 Elemento do dente de leão criado e adicionado à tela');
+            
+            // Adicionar botão de simulação para PC
+            this.createSimulateButton();
+        } else {
+            console.error('❌ Elemento da tela não existe!');
+        }
+    }
+    
+    createSimulateButton() {
+        // Criar botão de simulação para PC
+        const simulateButton = document.createElement('button');
+        simulateButton.id = 'simulate-motion-btn';
+        simulateButton.textContent = '💨 Soprar Dente de Leão';
+        simulateButton.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 2000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        `;
+        
+        // Efeitos hover
+        simulateButton.addEventListener('mouseenter', () => {
+            simulateButton.style.background = '#45B7AA';
+            simulateButton.style.transform = 'scale(1.05)';
+        });
+        
+        simulateButton.addEventListener('mouseleave', () => {
+            simulateButton.style.background = '#4ECDC4';
+            simulateButton.style.transform = 'scale(1)';
+        });
+        
+        // Simular sopro
+        simulateButton.addEventListener('click', () => {
+            console.log('💨 Botão de simulação clicado!');
+            if (this.denteLeaoElement) {
+                this.blowDenteLeao();
+            } else {
+                console.error('❌ Elemento do dente de leão não encontrado');
+            }
+        });
+        
+        this.element.appendChild(simulateButton);
+        console.log('🎮 Botão de simulação criado');
     }
     
     setupMotionDetection() {
@@ -924,7 +983,10 @@ class SelfieScreen extends BaseScreen {
     }
     
     blowDenteLeao() {
-        if (this.isDenteLeaoBlown) return;
+        if (this.isDenteLeaoBlown || !this.denteLeaoElement) {
+            console.warn('⚠️ Dente de leão já soprado ou elemento não existe');
+            return;
+        }
         
         this.isDenteLeaoBlown = true;
         
@@ -942,10 +1004,10 @@ class SelfieScreen extends BaseScreen {
     
     createPetalasEffect() {
         // Criar múltiplas pétalas voando
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 20; i++) {
             setTimeout(() => {
                 this.createPetala();
-            }, i * 100); // Delay escalonado
+            }, i * 80); // Delay escalonado mais rápido
         }
     }
     
@@ -958,28 +1020,35 @@ class SelfieScreen extends BaseScreen {
         const startX = this.element.offsetWidth / 2;
         const startY = this.element.offsetHeight / 2;
         
-        // Direção aleatória
+        // Direção aleatória mais espalhada
         const angle = Math.random() * Math.PI * 2;
-        const distance = 200 + Math.random() * 300;
+        const distance = 150 + Math.random() * 400; // Mais variação na distância
         const endX = startX + Math.cos(angle) * distance;
         const endY = startY + Math.sin(angle) * distance;
+        
+        // Tamanho aleatório da pétala
+        const size = 25 + Math.random() * 30; // 25-55px
+        
+        // Rotação inicial aleatória
+        const initialRotation = Math.random() * 360;
         
         petala.style.cssText = `
             position: absolute;
             top: ${startY}px;
             left: ${startX}px;
-            width: 40px;
-            height: 40px;
+            width: ${size}px;
+            height: ${size}px;
             background-image: url('${petalaSrc}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             z-index: 999;
             pointer-events: none;
-            transform: translate(-50%, -50%) rotate(${Math.random() * 360}deg);
-            animation: petala-float 3s ease-out forwards;
+            transform: translate(-50%, -50%) rotate(${initialRotation}deg);
+            animation: petala-float 4s ease-out forwards;
             --end-x: ${endX}px;
             --end-y: ${endY}px;
+            --rotation: ${initialRotation + 720 + Math.random() * 360}deg;
         `;
         
         // Adicionar apenas na tela de selfie
@@ -992,7 +1061,7 @@ class SelfieScreen extends BaseScreen {
                 petala.parentNode.removeChild(petala);
             }
             this.petalasElements = this.petalasElements.filter(p => p !== petala);
-        }, 3000);
+        }, 4000);
     }
     
     injectDenteLeaoAnimations() {
@@ -1016,11 +1085,23 @@ class SelfieScreen extends BaseScreen {
             
             @keyframes petala-float {
                 0% { 
-                    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+                    transform: translate(-50%, -50%) rotate(var(--rotation, 0deg)) scale(1);
                     opacity: 1;
                 }
+                25% {
+                    transform: translate(calc(var(--end-x, 100px) * 0.25 - 50%), calc(var(--end-y, 100px) * 0.25 - 50%)) rotate(calc(var(--rotation, 0deg) * 0.25)) scale(0.9);
+                    opacity: 1;
+                }
+                50% {
+                    transform: translate(calc(var(--end-x, 100px) * 0.5 - 50%), calc(var(--end-y, 100px) * 0.5 - 50%)) rotate(calc(var(--rotation, 0deg) * 0.5)) scale(0.8);
+                    opacity: 0.8;
+                }
+                75% {
+                    transform: translate(calc(var(--end-x, 100px) * 0.75 - 50%), calc(var(--end-y, 100px) * 0.75 - 50%)) rotate(calc(var(--rotation, 0deg) * 0.75)) scale(0.6);
+                    opacity: 0.5;
+                }
                 100% { 
-                    transform: translate(calc(var(--end-x, 100px) - 50%), calc(var(--end-y, 100px) - 50%)) rotate(720deg) scale(0.3);
+                    transform: translate(calc(var(--end-x, 100px) - 50%), calc(var(--end-y, 100px) - 50%)) rotate(var(--rotation, 0deg)) scale(0.3);
                     opacity: 0;
                 }
             }
@@ -1051,6 +1132,12 @@ class SelfieScreen extends BaseScreen {
         if (this.denteLeaoElement) {
             this.denteLeaoElement.remove();
             this.denteLeaoElement = null;
+        }
+        
+        // Remover botão de simulação
+        const simulateButton = document.getElementById('simulate-motion-btn');
+        if (simulateButton) {
+            simulateButton.remove();
         }
         
         // Remover todas as pétalas
