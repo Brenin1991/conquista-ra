@@ -65,7 +65,7 @@ class GameScreen extends BaseScreen {
         this.vasoTypes = ['vaso_1', 'vaso_2', 'vaso_3', 'vaso_4', 'vaso_5'];
         
         // Sistema de reações/combo
-        this.currentReactionLevel = 1;
+        this.currentReactionLevel = 3; // Começar no nível 3 (tranquilo)
         this.comboCount = 0;
         this.reactionElement = null;
         
@@ -579,19 +579,19 @@ class GameScreen extends BaseScreen {
     }
 
     updateReactionFromCombo() {
-        let newLevel = 1; // Padrão: alegre
+        let newLevel = 3; // Padrão: tranquilo (nível 3)
         
-        if (this.comboCount >= 8) {
-            // Combo muito alto: tranquilo (nível 3)
-            newLevel = 3;
-        } else if (this.comboCount >= 5) {
+        if (this.comboCount >= 6) {
+            // Combo muito alto: alegre (nível 1)
+            newLevel = 1;
+        } else if (this.comboCount >= 4) {
             // Combo alto: sorrindo (nível 2)
             newLevel = 2;
         } else if (this.comboCount >= 2) {
-            // Combo médio: alegre (nível 1)
-            newLevel = 1;
+            // Combo médio: tranquilo (nível 3)
+            newLevel = 3;
         }
-        // Combo baixo (0-1): mantém alegre (nível 1)
+        // Combo baixo (0-1): mantém tranquilo (nível 3)
         
         // Atualizar reação se o nível mudou
         if (newLevel !== this.currentReactionLevel) {
@@ -1121,11 +1121,11 @@ class GameScreen extends BaseScreen {
         this.plantLevel = 1;
         
         // Resetar sistema de reações
-        this.currentReactionLevel = 1;
+        this.currentReactionLevel = 3;
         this.comboCount = 0;
         if (this.reactionElement) {
             this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
-            this.updateReaction(1); // Voltar para reação alegre (nível 1)
+            this.updateReaction(3); // Voltar para reação tranquila (nível 3)
         }
     }
 
@@ -1367,8 +1367,8 @@ class GameScreen extends BaseScreen {
             // Aplicar animações CSS mantendo posição original
             this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
             
-            // Definir reação inicial (nível 1 - alegre)
-            this.updateReaction(1);
+            // Definir reação inicial (nível 3 - tranquilo)
+            this.updateReaction(3);
             console.log('😊 Sistema de reações inicializado');
         } else {
             console.warn('⚠️ Elemento de reação não encontrado');
