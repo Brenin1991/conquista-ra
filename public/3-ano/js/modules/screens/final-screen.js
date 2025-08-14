@@ -69,7 +69,8 @@ class FinalScreen extends BaseScreen {
         // Adicionar evento de clique no botão final
         if (finalButton) {
             finalButton.addEventListener('click', () => {
-                this.nextScreen();
+                // Reload da página
+                window.location.reload();
             });
         }
     }

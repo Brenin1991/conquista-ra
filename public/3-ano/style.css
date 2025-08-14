@@ -619,6 +619,7 @@ input, textarea {
     display: none;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
+    z-index: 10000;
 }
 
 #final-top {
@@ -631,6 +632,7 @@ input, textarea {
     transform: translate(-50%, 0%);
     opacity: 0;
     transition: all 0.8s ease-out;
+    z-index: 10000;
 }
 
 #final-button {
@@ -644,6 +646,7 @@ input, textarea {
     opacity: 0;
     transition: all 0.8s ease-out;
     cursor: pointer;
+    z-index: 10000;
 }
 
 #final-button:hover {
