@@ -1,69 +1,99 @@
 {
-    "emojis": [{
-        "id": "01",
-        "nome": "calma",
-        "url": "assets/textures/emojis/01.png",
-        "acerto": "sim"
-    },
-    {
-        "id": "02",
-        "nome": "triste",
-        "url": "assets/textures/emojis/02.png",
-        "acerto": "nao"
-    },
-    {
-        "id": "03",
-        "nome": "sorrindo",
-        "url": "assets/textures/emojis/03.png",
-        "acerto": "sim"
-    },
-    {
-        "id": "04",
-        "nome": "angustia",
-        "url": "assets/textures/emojis/04.png",
-        "acerto": "nao"
-    },
-    {
-        "id": "05",
-        "nome": "triste",
-        "url": "assets/textures/emojis/05.png",
-        "acerto": "nao"
-    },
-    {
-        "id": "feliz",
-        "nome": "entediado",
-        "url": "assets/textures/emojis/06.png",
-        "acerto": "sim"
-    },
-    {
-        "id": "07",
-        "nome": "alegre",
-        "url": "assets/textures/emojis/07.png",
-        "acerto": "sim"
-    }],
-    "vasos": [{
-        "id": "01",
-        "nome": "vaso_1",
-        "url": "assets/textures/vasos/vaso_1.png"
-    },
-    {
-        "id": "02",
-        "nome": "vaso_2",
-        "url": "assets/textures/vasos/vaso_2.png"
-    },
-    {
-        "id": "03",
-        "nome": "vaso_3",
-        "url": "assets/textures/vasos/vaso_3.png"
-    },  
-    {
-        "id": "04",
-        "nome": "vaso_4",
-        "url": "assets/textures/vasos/vaso_4.png"
-    },
-    {
-        "id": "05",
-        "nome": "vaso_5",
-        "url": "assets/textures/vasos/vaso_5.png"
-    }]      
+    "emojis": [
+        {
+            "id": "01",
+            "nome": "calma",
+            "url": "assets/textures/emojis/01.png",
+            "acerto": "sim"
+        },
+        {
+            "id": "02",
+            "nome": "triste",
+            "url": "assets/textures/emojis/02.png",
+            "acerto": "nao"
+        },
+        {
+            "id": "03",
+            "nome": "sorrindo",
+            "url": "assets/textures/emojis/03.png",
+            "acerto": "sim"
+        },
+        {
+            "id": "04",
+            "nome": "angustia",
+            "url": "assets/textures/emojis/04.png",
+            "acerto": "nao"
+        },
+        {
+            "id": "05",
+            "nome": "triste",
+            "url": "assets/textures/emojis/05.png",
+            "acerto": "nao"
+        },
+        {
+            "id": "feliz",
+            "nome": "entediado",
+            "url": "assets/textures/emojis/06.png",
+            "acerto": "sim"
+        },
+        {
+            "id": "07",
+            "nome": "alegre",
+            "url": "assets/textures/emojis/07.png",
+            "acerto": "sim"
+        }
+    ],
+    "vasos": [
+        {
+            "id": "01",
+            "nome": "vaso_1",
+            "url": "assets/textures/vasos/vaso_1.png"
+        },
+        {
+            "id": "02",
+            "nome": "vaso_2",
+            "url": "assets/textures/vasos/vaso_2.png"
+        },
+        {
+            "id": "03",
+            "nome": "vaso_3",
+            "url": "assets/textures/vasos/vaso_3.png"
+        },
+        {
+            "id": "04",
+            "nome": "vaso_4",
+            "url": "assets/textures/vasos/vaso_4.png"
+        },
+        {
+            "id": "05",
+            "nome": "vaso_5",
+            "url": "assets/textures/vasos/vaso_5.png"
+        }
+    ],
+    "reacoes": [
+        {
+            "id": "01",
+            "nome": "alegre",
+            "url": "assets/textures/reacoes/alegre.png",
+            "nivel": "1"
+        },
+        {
+            "id": "02",
+            "nome": "sorrindo",
+            "url": "assets/textures/reacoes/sorrindo.png",
+            "nivel": "2"
+        },
+        {
+            "id": "03",
+            "nome": "tranquilo",
+            "url": "assets/textures/reacoes/tranquilo.png",
+            "nivel": "3"
+        },
+        {
+            "id": "04",
+            "nome": "triste",
+            "url": "assets/textures/reacoes/triste.png",
+            "nivel": "4"
+        }
+    ]
 }

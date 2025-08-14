@@ -599,6 +599,33 @@ input, textarea {
     z-index: 10000;
 }
 
+/* reação */
+#reacao-container{
+    position: absolute;
+    bottom: 0%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 60%;
+    height: 100px;
+    object-fit: cover;
+    z-index: 10000;
+    background-image: url(assets/textures/modal-reacao.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#reacao-image{
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+    z-index: 10000;
+}
+
 #final {
     position: fixed;
     top: 0;

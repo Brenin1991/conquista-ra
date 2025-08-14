@@ -63,6 +63,14 @@ class GameScreen extends BaseScreen {
         this.maxPlantLevel = 5;
         this.plantGrowthThreshold = 3; // Emojis corretos para crescer
         this.vasoTypes = ['vaso_1', 'vaso_2', 'vaso_3', 'vaso_4', 'vaso_5'];
+        
+        // Sistema de reações/combo
+        this.currentReactionLevel = 1;
+        this.comboCount = 0;
+        this.reactionElement = null;
+        
+        // Injetar animações CSS para reações
+        this.injectReactionAnimations();
 
         this.onInit();
     }
@@ -491,11 +499,15 @@ class GameScreen extends BaseScreen {
         const emojiType = emoji.dataset.type || '01';
         const emojiNome = emoji.dataset.nome || 'emoji';
         
-        // Atualizar contadores
+        // Atualizar contadores e sistema de combo
         if (isCorrect) {
             this.correctEmojis++;
             this.score += 20; // Mais pontos para emojis corretos
-            console.log(`✅ Emoji correto coletado: ${emojiNome}`);
+            this.comboCount++; // Aumentar combo
+            console.log(`✅ Emoji correto coletado: ${emojiNome} - Combo: ${this.comboCount}`);
+            
+            // Atualizar reação baseada no combo
+            this.updateReactionFromCombo();
             
             // Verificar se a planta deve crescer
             if (this.correctEmojis % this.plantGrowthThreshold === 0) {
@@ -504,7 +516,11 @@ class GameScreen extends BaseScreen {
         } else {
             this.incorrectEmojis++;
             this.score += 5; // Menos pontos para emojis incorretos
-            console.log(`❌ Emoji incorreto coletado: ${emojiNome}`);
+            this.comboCount = 0; // Resetar combo
+            console.log(`❌ Emoji incorreto coletado: ${emojiNome} - Combo resetado`);
+            
+            // Ir para reação triste (nível 4)
+            this.updateReaction(4);
         }
         
         // Mostrar indicador visual
@@ -559,6 +575,27 @@ class GameScreen extends BaseScreen {
                     effect.parentNode.removeChild(effect);
                 }
             }, 800 + (delay * 1000));
+        }
+    }
+
+    updateReactionFromCombo() {
+        let newLevel = 1; // Padrão: alegre
+        
+        if (this.comboCount >= 8) {
+            // Combo muito alto: tranquilo (nível 3)
+            newLevel = 3;
+        } else if (this.comboCount >= 5) {
+            // Combo alto: sorrindo (nível 2)
+            newLevel = 2;
+        } else if (this.comboCount >= 2) {
+            // Combo médio: alegre (nível 1)
+            newLevel = 1;
+        }
+        // Combo baixo (0-1): mantém alegre (nível 1)
+        
+        // Atualizar reação se o nível mudou
+        if (newLevel !== this.currentReactionLevel) {
+            this.updateReaction(newLevel);
         }
     }
 
@@ -956,6 +993,7 @@ class GameScreen extends BaseScreen {
         this.createLoadingOverlay();
         this.createVasoElement();
         // this.createScoreElement(); // Removido - contador de pontos não será exibido
+        this.initReactionSystem();
         this.startEmojiSpawning(); // Adicionado para iniciar o spawn de emojis
         this.startGameTimer(); // Adicionado para iniciar o cronômetro
 
@@ -1081,6 +1119,14 @@ class GameScreen extends BaseScreen {
         this.incorrectEmojis = 0;
         this.gameTime = 60;
         this.plantLevel = 1;
+        
+        // Resetar sistema de reações
+        this.currentReactionLevel = 1;
+        this.comboCount = 0;
+        if (this.reactionElement) {
+            this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
+            this.updateReaction(1); // Voltar para reação alegre (nível 1)
+        }
     }
 
     createScaleEffect(collisionX, collisionY, emojiType) {
@@ -1121,10 +1167,10 @@ class GameScreen extends BaseScreen {
             // Aplicar estilos ao contador existente
             this.timerElement.style.cssText = `
                 color: white;
-                font-family: 'Nunito', Arial, sans-serif;
+            font-family: 'Nunito', Arial, sans-serif;
                 font-size: 18px;
                 font-weight: 700;
-                text-align: center;
+            text-align: center;
             `;
             
             this.updateTimer();
@@ -1161,8 +1207,8 @@ class GameScreen extends BaseScreen {
             if (timerContainer) {
                 // Mudar cor baseado no tempo restante
                 if (this.gameTime <= 10) {
-                    // Aplicar animação de pulso sem interferir no posicionamento
-                    timerContainer.style.animation = 'pulse 1s infinite';
+                    // Aplicar animação de pulso com escala mantendo posição original
+                    timerContainer.style.animation = 'timer-pulse 1s infinite';
                 } else {
                     // Remover animação quando não estiver nos últimos 10 segundos
                     timerContainer.style.animation = '';
@@ -1311,6 +1357,134 @@ class GameScreen extends BaseScreen {
         
         // Iniciar spawn com nova taxa
         this.startEmojiSpawning();
+    }
+
+    initReactionSystem() {
+        // Pegar o elemento de reação existente no HTML
+        this.reactionElement = document.getElementById('reacao-image');
+        
+        if (this.reactionElement) {
+            // Aplicar animações CSS mantendo posição original
+            this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
+            
+            // Definir reação inicial (nível 1 - alegre)
+            this.updateReaction(1);
+            console.log('😊 Sistema de reações inicializado');
+        } else {
+            console.warn('⚠️ Elemento de reação não encontrado');
+        }
+    }
+
+    updateReaction(level) {
+        if (!this.reactionElement || !this.gameData || !this.gameData.reacoes) return;
+        
+        // Encontrar a reação correspondente ao nível
+        const reaction = this.gameData.reacoes.find(r => r.nivel === level.toString());
+        
+        if (reaction) {
+            // Aplicar efeito de transição
+            this.reactionElement.style.animation = 'reaction-pulse 0.5s ease-in-out';
+            
+            // Atualizar imagem após pequeno delay para o efeito
+            setTimeout(() => {
+                this.reactionElement.src = reaction.url;
+                this.currentReactionLevel = level;
+                
+                // Restaurar animação flutuante mantendo posição original
+                this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
+                
+                // Mostrar texto flutuante com o nome da reação
+                this.showReactionText(reaction.nome, level);
+                
+                console.log(`😊 Reação atualizada para: ${reaction.nome} (nível ${level})`);
+            }, 250);
+        }
+    }
+
+    injectReactionAnimations() {
+            const style = document.createElement('style');
+        style.id = 'reaction-animations';
+            style.textContent = `
+            @keyframes reaction-float {
+                0% { transform: translate(-50%, -50%); opacity: 0.8; }
+                50% { transform: translate(-50%, calc(-50% - 10px)); opacity: 1; }
+                100% { transform: translate(-50%, -50%); opacity: 0.8; }
+            }
+            @keyframes reaction-pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.8; }
+            }
+                        @keyframes reaction-text-float {
+                0% { 
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(0px) scale(0.8);
+                }
+                20% { 
+                    opacity: 1; 
+                    transform: translateX(-50%) translateY(-10px) scale(1.1);
+                }
+                80% { 
+                    opacity: 1; 
+                    transform: translateX(-50%) translateY(-30px) scale(1);
+                }
+                100% { 
+                    opacity: 0; 
+                    transform: translateX(-50%) translateY(-50px) scale(0.9);
+                }
+            }
+            @keyframes timer-pulse {
+                0%, 100% { 
+                    transform: translate(-50%, 0%) scale(1);
+                    opacity: 1;
+                }
+                50% { 
+                    transform: translate(-50%, 0%) scale(1.1);
+                    opacity: 0.9;
+                }
+            }
+            `;
+            document.head.appendChild(style);
+        }
+        
+    showReactionText(reactionName, level) {
+        // Criar texto flutuante com o nome da reação
+        const reactionText = document.createElement('div');
+        
+        // Definir cor baseada no nível
+        let textColor = '#4ECDC4'; // Verde para reações positivas
+        if (level === 4) {
+            textColor = '#FF6B6B'; // Vermelho para triste
+        }
+        
+        reactionText.style.cssText = `
+            position: fixed;
+            top: 70%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: ${textColor};
+            font-family: 'Nunito', Arial, sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            animation: reaction-text-float 2s ease-out forwards;
+        `;
+        
+        // Capitalizar primeira letra
+        const capitalizedName = reactionName.charAt(0).toUpperCase() + reactionName.slice(1);
+        reactionText.textContent = capitalizedName;
+        
+        document.body.appendChild(reactionText);
+        
+        // Remover texto após animação
+        setTimeout(() => {
+            if (reactionText.parentNode) {
+                reactionText.parentNode.removeChild(reactionText);
+            }
+        }, 2000);
     }
 }
 
