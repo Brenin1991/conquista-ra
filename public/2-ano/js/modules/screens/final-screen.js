@@ -26,9 +26,10 @@ class FinalScreen extends BaseScreen {
     
     animateFinalElements() {
         // Elementos principais da tela final
-        const finalTop = document.getElementById('final-top');
+        const finalTop = document.getElementById('final-container');
         const finalButton = document.getElementById('final-button');
         const finalBackground = document.getElementById('final');
+        const mascote = document.getElementById('mascote');
         
         // Animar fundo primeiro
         if (finalBackground) {
@@ -43,16 +44,27 @@ class FinalScreen extends BaseScreen {
         if (finalTop) {
             // Reset inicial
             finalTop.style.opacity = '0';
-            finalTop.style.transform = 'translate(-50%, 0%) scale(0.7)';
+            finalTop.style.transform = 'translate(-50%, -300%) scale(0.7)';
             finalTop.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             
             // Animar entrada com delay
             setTimeout(() => {
                 finalTop.style.opacity = '1';
-                finalTop.style.transform = 'translate(-50%, 0%) scale(1)';
+                finalTop.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 200);
         }
-        
+
+        if (mascote) {
+            mascote.style.opacity = '0';
+            mascote.style.transform = 'translate(-200%, 0%) scale(0.7)';
+            mascote.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+            setTimeout(() => {
+                mascote.style.opacity = '1';
+                mascote.style.transform = 'translate(0%, 0%) scale(1)';
+            }, 200);
+        }
+
         if (finalButton) {
             // Reset inicial
             finalButton.style.opacity = '0';

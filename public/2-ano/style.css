@@ -643,25 +643,25 @@ input, textarea {
     z-index: 10000;
 }
 
-#final-top {
-    position: fixed;    
-    top: 10%;
+#final-container{
+    position: fixed;
+    top: 50%;
     left: 50%;
+    transform: translate(-50%, -300%);
     width: 90%;
-    height: auto;
+    height: 70%;
     object-fit: cover;
-    transform: translate(-50%, 0%);
-    opacity: 0;
-    transition: all 0.8s ease-out;
-    z-index: 10000;
+    background-image: url(assets/textures/goto-selfie.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
-
 #final-button {
     position: fixed;
-    bottom: 25%;
+    bottom: 10%;
     left: 50%;
     transform: translate(-50%, 0%);
-    width: 200px;
+    width: 100px;
     height: auto;
     object-fit: cover;
     opacity: 0;
@@ -673,4 +673,15 @@ input, textarea {
 #final-button:hover {
     transform: translate(-50%, 0%) scale(1.05);
     transition: transform 0.2s ease-in-out;
+}
+
+#mascote{
+    position: fixed;
+    bottom: 0%;
+    left: 0%;
+    transform: translate(-200%, 0%);
+    width: 60%;
+    height: auto;
+    object-fit: cover;
+    z-index: 10000;
 }
