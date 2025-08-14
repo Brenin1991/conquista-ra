@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>SAE RA - Realidade Aumentada</title>
+
+    <!-- Estilos da aplicação -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/viewport-units-buggyfill@0.6.2/viewport-units-buggyfill.js"></script>
+    
+    <!-- Face API para face tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    
+    <!-- html2canvas para captura de tela -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- FileSaver.js para melhor compatibilidade com iOS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Canvas2Image para fallback adicional -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas2image/1.0.5/canvas2image.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+</head>
+
+<body>    
+    <div class="controls" style="display: none;">
+        <button id="toggleMode" class="mode-button">🌅 Modo HDRI</button>
+        <button id="clearPecas" class="mode-button" style="background: rgba(255, 0, 0, 0.8);">🗑️ Limpar Peças</button>
+    </div>
+
+    <div id="main">
+        <img id="main-top" src="assets/textures/main-top.png" alt="Logo">
+        <img id="main-bottom" src="assets/textures/main-bottom.png" alt="Background">
+        <!-- Glass Blur UI Elements -->
+       
+        <button id="main-button"></button>
+    </div>
+
+    <div id="tutorial">
+        <img id="narracao-tutorial" class="narracao-icon" src="assets/textures/narracao-icon.png" alt="Parabéns">
+        <div id="tutorial-content">
+            <button id="tutorial-button"></button>
+        </div>
+    </div>
+
+    <div id="game">
+        <!-- Video element for camera feed -->
+        <video id="video" autoplay muted playsinline style="transform: scaleX(-1);"></video>
+        
+        <!-- Canvas for face-api.js overlay -->
+        <canvas id="overlay" style="transform: scaleX(-1);"></canvas>
+        
+        <!-- Camera status indicator -->
+
+
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
+            <img id="estrela-progresso" src="assets/textures/estrela.png" alt="Progress Bar">
+        </div>
+    </div>
+
+    <div id="final" >
+        <img id="final-top" src="assets/textures/final-top.png" alt="Final">
+        <img id="final-button" src="assets/textures/final-button.png" alt="Final">
+    </div>
+
+    <!-- Cena A-Frame AR -->
+    <a-scene 
+        id="main-scene"
+        vr-mode-ui="enabled: false" 
+        background="transparent: true" 
+        cursor="rayOrigin: mouse"
+        renderer="alpha: true; antialias: true; colorManagement: true;"
+        environment="preset: none; skyType: atmosphere; horizonColor: #212121; lightPosition: 0.5 0.8 -0.6;">
+        
+        <!-- Assets -->
+        <a-assets>
+            <!-- Fallback: Gradient Sky -->
+            <img id="gradientSky"
+                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCAxMDI0IDUxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6Izg3Q0VFQjtzdG9wLW9wYWNpdHk6MSIgLz4KPHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRkY7c3RvcC1vcGFjaXR5OjEiIC8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzQ2ODJCNDtzdG9wLW9wYWNpdHk6MSIgLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSI1MTIiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+Cjwvc3ZnPgo="
+                crossorigin="anonymous">
+        </a-assets>
+
+        <!-- Sky (Gradient como fallback) -->
+        <a-sky src="#gradientSky" rotation="0 0 0" visible="false"></a-sky>
+
+        <!-- Luzes -->
+        <a-light type="ambient" color="#FFFFFF" intensity="0.3"></a-light>
+        <a-light type="directional" position="2 4 5" color="#FFFFFF" intensity="0.4"></a-light>
+
+        <!-- Câmera principal SEM GIROSCÓPIO -->
+        <a-camera 
+            id="main-camera"
+            position="0 1.6 0" 
+            look-controls="enabled: false"
+            wasd-controls="enabled: false">
+            
+
+        </a-camera>
+
+        <!-- Container para elementos do jogo -->
+        <a-entity id="game-elements"></a-entity>
+
+        <!-- Container para elementos gerais -->
+        <a-entity id="interactive-objects"></a-entity>
+        
+    </a-scene>
+
+    <!-- Scripts da aplicação (carregados por último) -->
+    
+    <!-- Script principal (carregado primeiro para disponibilizar funções globais) -->
+    <script src="script.js"></script>
+    
+    <!-- Módulos de Tela (carregados depois do script principal) -->
+    <script src="js/modules/screens/base-screen.js"></script>
+    <script src="js/modules/screens/main-screen.js"></script>
+    <script src="js/modules/screens/tutorial-screen.js"></script>
+    <script src="js/modules/screens/game-screen.js"></script>
+    <script src="js/modules/screens/final-screen.js"></script>
+    <script src="js/modules/screen-manager.js"></script>    
+    
+    <!-- Landscape Blocker -->
+    <script src="js/modules/landscape-blocker.js"></script>
+    
+    <!-- Script para desabilitar completamente o giroscópio -->
+    <script>
+        // DESABILITAR COMPLETAMENTE O GIROSCÓPIO
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desabilitar permissões de orientação do dispositivo
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(() => {});
+            }
+            
+            // Desabilitar eventos de orientação
+            window.addEventListener('deviceorientation', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, { passive: false, capture: true });
+            
+            // Desabilitar eventos de movimento
+            window.addEventListener('devicemotion', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, { passive: false, capture: true });
+            
+            // Forçar câmera a não usar giroscópio
+            const camera = document.getElementById('main-camera');
+            if (camera) {
+                camera.setAttribute('look-controls', 'enabled: false');
+                camera.setAttribute('wasd-controls', 'enabled: false');
+                
+                // Remover qualquer componente de look-controls
+                const lookControls = camera.components['look-controls'];
+                if (lookControls) {
+                    lookControls.remove();
+                }
+            }
+            
+            // CORRIGIR ESPELHAMENTO DA CÂMERA
+            const video = document.getElementById('video');
+            const overlay = document.getElementById('overlay');
+            
+            if (video) {
+                video.style.transform = 'scaleX(-1)';
+                console.log('📹 Vídeo espelhado corrigido');
+            }
+            
+            if (overlay) {
+                overlay.style.transform = 'scaleX(-1)';
+                console.log('🎨 Canvas de overlay espelhado corrigido');
+            }
+            
+            console.log('🚫 GIROSCÓPIO COMPLETAMENTE DESABILITADO!');
+            console.log('📹 ESPELHAMENTO DA CÂMERA CORRIGIDO!');
+        });
+    </script>
+</body>
+
+</html>
