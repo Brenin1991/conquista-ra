@@ -175,6 +175,7 @@ class TutorialScreen extends BaseScreen {
     }
     
     show() {
+       
         if (this.isTransitioning) return;
         
         this.isTransitioning = true;
@@ -201,6 +202,8 @@ class TutorialScreen extends BaseScreen {
         // Animar entrada da tela com fade-in
         requestAnimationFrame(() => {
             this.element.style.opacity = '1';
+            window.SoundManager.forceAudioActivation();
+            window.SoundManager.playSoundWithControl('NA001');
         });
         
         // Executar função de entrada após a transição

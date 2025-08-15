@@ -133,6 +133,8 @@ class GameOverScreen extends BaseScreen {
         // Animar entrada da tela com fade-in
         requestAnimationFrame(() => {
             this.element.style.opacity = '1';
+            window.SoundManager.forceAudioActivation();
+            window.SoundManager.playSoundWithControl('NA002');
         });
         
         // Executar função de entrada após a transição
