@@ -838,4 +838,18 @@ input, textarea {
     border-radius: 8px;
 }
 
+#finalizar-btn{
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 200px;
+    z-index: 999999;
+}
+
+#finalizar-btn:hover {
+    transform: translate(-50%, 0%) scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
 /* Estrela removida - substituída pelo emoji de reação */ 

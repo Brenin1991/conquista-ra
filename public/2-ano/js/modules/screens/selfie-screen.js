@@ -60,13 +60,9 @@ class SelfieScreen extends BaseScreen {
         // Configurar ícone da câmera para captura da tela
         const cameraIcon = this.element.querySelector('#camera-icon-selfie');
         if (cameraIcon) {
-            // Adicionar classe para ignorar na captura
-            cameraIcon.classList.add('capture-ignore');
-            
-            cameraIcon.addEventListener('click', () => {
-                this.captureSelfieScreen();
-            });
-            console.log('📷 Ícone da câmera configurado para captura');
+            // Esconder o botão de selfie
+            cameraIcon.style.display = 'none';
+            console.log('📷 Botão de selfie escondido');
         }
     }
     
@@ -820,6 +816,9 @@ class SelfieScreen extends BaseScreen {
         // Injetar animações CSS primeiro
         this.injectDenteLeaoAnimations();
         
+        // Configurar botão finalizar (escondido inicialmente)
+        this.setupFinalizarButton();
+        
         // Criar elemento do dente de leão
         this.createDenteLeaoElement();
         
@@ -829,6 +828,27 @@ class SelfieScreen extends BaseScreen {
             console.log('🌪️ Sistema de detecção de movimento configurado');
         } else {
             console.log('💻 Dispositivo desktop - movimento desabilitado');
+        }
+    }
+    
+    setupFinalizarButton() {
+        // Configurar botão finalizar
+        const finalizarBtn = document.getElementById('finalizar-btn');
+        if (finalizarBtn) {
+            // Esconder inicialmente
+            finalizarBtn.style.display = 'none';
+            finalizarBtn.style.opacity = '0';
+            finalizarBtn.style.transition = 'opacity 0.5s ease-in-out';
+            
+            // Adicionar evento de clique para reload
+            finalizarBtn.addEventListener('click', () => {
+                console.log('🔄 Recarregando página...');
+                window.location.reload();
+            });
+            
+            console.log('✅ Botão finalizar configurado (escondido)');
+        } else {
+            console.warn('⚠️ Botão finalizar não encontrado');
         }
     }
     
@@ -999,7 +1019,27 @@ class SelfieScreen extends BaseScreen {
         // Criar efeito de pétalas
         this.createPetalasEffect();
         
+        // Mostrar botão finalizar após um delay
+        setTimeout(() => {
+            this.showFinalizarButton();
+        }, 2000); // 2 segundos após soprar
+        
         console.log('🌼 Dente de leão soprado!');
+    }
+    
+    showFinalizarButton() {
+        // Mostrar botão finalizar com animação
+        const finalizarBtn = document.getElementById('finalizar-btn');
+        if (finalizarBtn) {
+            finalizarBtn.style.display = 'block';
+            
+            // Animar entrada
+            setTimeout(() => {
+                finalizarBtn.style.opacity = '1';
+            }, 100);
+            
+            console.log('✅ Botão finalizar apareceu!');
+        }
     }
     
     createPetalasEffect() {
@@ -1145,6 +1185,13 @@ class SelfieScreen extends BaseScreen {
             petala.remove();
         });
         this.petalasElements = [];
+        
+        // Esconder botão finalizar
+        const finalizarBtn = document.getElementById('finalizar-btn');
+        if (finalizarBtn) {
+            finalizarBtn.style.display = 'none';
+            finalizarBtn.style.opacity = '0';
+        }
         
         // Remover listener de movimento
         if (this.isMotionEnabled && this.motionHandler) {
