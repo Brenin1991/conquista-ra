@@ -884,6 +884,7 @@ input, textarea {
     transform: translate(-50%, 0%);
     width: 200px;
     z-index: 999999;
+    display: none;
 }
 
 #finalizar-btn:hover {

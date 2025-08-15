@@ -1567,10 +1567,10 @@ class GameScreen extends BaseScreen {
         // Ajustar progresso baseado no resultado da coleta
         if (this.lastEmojiWasCorrect) {
             // Emoji correto: aumentar progresso
-            progress += 15; // +15% por emoji correto
+            progress += 4; // +10% por emoji correto (era 15%)
         } else {
             // Emoji incorreto: diminuir progresso
-            progress -= 20; // -20% por emoji incorreto
+            progress -= 1; // -2% por emoji incorreto (era -20%)
         }
         
         // Limitar progresso entre 0% e 100%
