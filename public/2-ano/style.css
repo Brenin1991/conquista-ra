@@ -207,7 +207,7 @@ input, textarea {
     transition: opacity 0.3s ease-in-out;
 }
 
-.narracao-icon {
+#narracao-tutorial {
     position: absolute;
     top: 5%;
     transform: translate(-50%, -50%);
@@ -673,6 +673,45 @@ input, textarea {
     transition: transform 0.2s ease-in-out;
 }
 
+#narracao-final {
+    position: absolute;
+    top: 0%;
+    transform: translate(-50%, -50%);
+    LEFT: 50%;
+    z-index: 2100;
+    width: 60px;
+    height: 60px;
+    background-image: url(assets/textures/narracao-icon.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    z-index: 9101;
+}
+
+
+#narracao-gameOver {
+    position: absolute;
+    top: 0%;
+    transform: translate(-50%, -50%);
+    LEFT: 50%;
+    z-index: 2100;
+    width: 60px;
+    height: 60px;
+    background-image: url(assets/textures/narracao-icon.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    z-index: 9101;
+}
+
 
 #mascote{
     position: fixed;
@@ -851,5 +890,8 @@ input, textarea {
     transform: translate(-50%, 0%) scale(1.05);
     transition: transform 0.2s ease-in-out;
 }
+
+
+
 
 /* Estrela removida - substituída pelo emoji de reação */ 

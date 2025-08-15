@@ -511,6 +511,21 @@ class GameScreen extends BaseScreen {
         // Definir se o último emoji foi correto para a barra de progresso
         this.lastEmojiWasCorrect = isCorrect;
         
+        // Tocar som de feedback
+        if (isCorrect) {
+            // Som de feedback positivo para acertos
+            if (window.SoundManager) {
+                window.SoundManager.playSound('feedback-positivo');
+                console.log('🔊 Som de feedback positivo tocado');
+            }
+        } else {
+            // Som de feedback negativo para erros
+            if (window.SoundManager) {
+                window.SoundManager.playSound('feedback-negativo');
+                console.log('🔊 Som de feedback negativo tocado');
+            }
+        }
+        
         // Atualizar contadores e sistema de combo
         if (isCorrect) {
             this.correctEmojis++;
@@ -1322,6 +1337,17 @@ class GameScreen extends BaseScreen {
 
     gameOver(isVictory = false) {
         console.log(`🏁 Jogo finalizado! ${isVictory ? 'VITÓRIA!' : 'DERROTA!'}`);
+        
+        // Tocar som de vitória ou derrota
+       /*  if (window.SoundManager) {
+            if (isVictory) {
+                window.SoundManager.playSound('feedback-positivo'); // Som positivo para vitória
+                console.log('🔊 Som de vitória tocado');
+            } else {
+                window.SoundManager.playSound('feedback-negativo'); // Som negativo para derrota
+                console.log('🔊 Som de derrota tocado');
+            }
+        } */
         
         // Parar cronômetro
         if (this.gameTimer) {

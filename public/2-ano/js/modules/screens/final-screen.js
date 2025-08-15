@@ -13,8 +13,18 @@ class FinalScreen extends BaseScreen {
     }
     
     onInit() {
-       
+        this.setupNarracaoButton();
     } 
+
+    setupNarracaoButton() {
+        const narracaoButton = this.element.querySelector('#narracao-final');
+        if (narracaoButton) {
+            narracaoButton.addEventListener('click', () => {
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('NA003');
+            });
+        }
+    }
     
     handleEnter() {
         // Lógica específica ao entrar na tela final
@@ -84,6 +94,7 @@ class FinalScreen extends BaseScreen {
                 // Ir para a próxima tela usando o screen manager
                 if (window.screenManager) {
                     window.screenManager.showScreen('selfie');
+                   
                 } else {
                     console.warn('⚠️ Screen manager não encontrado, recarregando página');
                     window.location.reload();
@@ -93,7 +104,7 @@ class FinalScreen extends BaseScreen {
     }
     
     handleExit() {
-               
+        window.SoundManager.stopCurrentSound();
     }
 
     show() {

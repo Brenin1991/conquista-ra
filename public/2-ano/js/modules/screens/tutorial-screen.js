@@ -24,6 +24,8 @@ class TutorialScreen extends BaseScreen {
         if (tutorialButton) {
             tutorialButton.addEventListener('click', () => {
                 this.nextScreen();
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
             });
         }
     }
@@ -32,7 +34,8 @@ class TutorialScreen extends BaseScreen {
         const narracaoButton = this.element.querySelector('#narracao-tutorial');
         if (narracaoButton) {
             narracaoButton.addEventListener('click', () => {
-                this.toggleNarracao();
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('NA001');
             });
         }
     }
@@ -61,7 +64,7 @@ class TutorialScreen extends BaseScreen {
         console.log('📖 Saiu do tutorial');
         
         // Parar narração se estiver tocando
-        this.stopNarracao();
+        window.SoundManager.stopCurrentSound();
         
         // Limpar animações
         this.cleanupTutorialAnimations();
@@ -163,47 +166,6 @@ class TutorialScreen extends BaseScreen {
         if (styleElement) {
             styleElement.remove();
         }
-    }
-    
-    toggleNarracao() {
-        if (this.isNarracaoPlaying) {
-            this.stopNarracao();
-        } else {
-            this.playNarracao();
-        }
-    }
-    
-    playNarracao() {
-        // Implementar reprodução de narração
-        console.log('🔊 Reproduzindo narração...');
-        this.isNarracaoPlaying = true;
-        
-        // Atualizar botão (mudar src da imagem)
-        const narracaoButton = this.element.querySelector('#narracao-tutorial');
-        if (narracaoButton) {
-            narracaoButton.src = 'assets/textures/narracao-icon-pause.png'; // Assumindo que existe uma imagem de pause
-        }
-    }
-    
-    stopNarracao() {
-        // Parar narração
-        console.log('🔇 Narração pausada');
-        this.isNarracaoPlaying = false;
-        
-        // Atualizar botão (voltar para imagem original)
-        const narracaoButton = this.element.querySelector('#narracao-tutorial');
-        if (narracaoButton) {
-            narracaoButton.src = 'assets/textures/narracao-icon.png';
-        }
-    }
-    
-    startAutoNarracao() {
-        // Iniciar narração automaticamente após um delay
-        setTimeout(() => {
-            if (this.isScreenActive()) {
-                this.playNarracao();
-            }
-        }, 1000);
     }
     
     skipTutorial() {

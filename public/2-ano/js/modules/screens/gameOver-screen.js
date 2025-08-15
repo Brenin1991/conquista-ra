@@ -13,8 +13,18 @@ class GameOverScreen extends BaseScreen {
     }
     
     onInit() {
-       
+        this.setupNarracaoButton();
     } 
+
+    setupNarracaoButton() {
+        const narracaoButton = this.element.querySelector('#narracao-gameOver');
+        if (narracaoButton) {
+            narracaoButton.addEventListener('click', () => {
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('NA002');
+            });
+        }
+    }
     
     handleEnter() {
         // Lógica específica ao entrar na tela de game over

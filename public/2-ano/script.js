@@ -10,10 +10,31 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Mostrar overlay de carregamento
     showLoadingOverlay();
+
+    initializeSoundManager();
     
     // Inicializar aplicação
     initializeApp();
 });
+
+async function initializeSoundManager() {
+    try {
+        await window.SoundManager.initialize();
+        console.log('SoundManager inicializado com sucesso');
+        
+        // Ativar áudio em qualquer clique
+        document.addEventListener('click', async () => {
+            await window.SoundManager.forceAudioActivation();
+        });
+        
+        document.addEventListener('touchstart', async () => {
+            await window.SoundManager.forceAudioActivation();
+        });
+      
+    } catch (error) {
+        console.error('Erro ao inicializar SoundManager:', error);
+    }
+}
 
 // Função para mostrar overlay de carregamento
 function showLoadingOverlay() {

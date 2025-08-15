@@ -22,6 +22,8 @@ class MainScreen extends BaseScreen {
         if (mainButton) {
             mainButton.addEventListener('click', () => {
                 this.nextScreen();
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
             });
         }
     }
