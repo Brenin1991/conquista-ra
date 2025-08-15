@@ -841,11 +841,11 @@ class SelfieScreen extends BaseScreen {
         this.denteLeaoElement.id = 'dente-leao-interactive';
         this.denteLeaoElement.style.cssText = `
             position: absolute;
-            top: 50%;
+            bottom: 0%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
+            transform: translate(-50%, 0%);
+            width: 300px;
+            height: 300px;
             background-image: url('assets/textures/selfie/dente_de_leao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -1070,15 +1070,15 @@ class SelfieScreen extends BaseScreen {
         style.textContent = `
             @keyframes dente-leao-blow {
                 0% { 
-                    transform: translate(-50%, -50%) scale(1);
+                    transform: translate(-50%, 0%) scale(1);
                     opacity: 1;
                 }
                 50% { 
-                    transform: translate(-50%, -50%) scale(1.2);
+                    transform: translate(-50%, 0%) scale(1.2);
                     opacity: 0.8;
                 }
                 100% { 
-                    transform: translate(-50%, -50%) scale(0.8);
+                    transform: translate(-50%, 0%) scale(0.8);
                     opacity: 0.6;
                 }
             }

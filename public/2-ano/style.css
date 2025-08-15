@@ -602,14 +602,11 @@ input, textarea {
 /* reação */
 #reacao-container{
     position: absolute;
-    bottom: 0%;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    width: 60%;
-    height: 100px;
-    object-fit: cover;
-    z-index: 10000;
-    background-image: url(assets/textures/modal-reacao.png);
+    right: -30px;
+    top: -20px;
+    width: 60px;
+    height: 60px;
+    z-index: 1001;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -617,14 +614,16 @@ input, textarea {
 
 #reacao-image{
     position: absolute;
-    top: 30%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50%;
-    height: auto;
-    object-fit: cover;
-    z-index: 10000;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1001;
 }
+
+/* final */
 
 #final {
     position: fixed;
@@ -675,7 +674,70 @@ input, textarea {
     transition: transform 0.2s ease-in-out;
 }
 
+
 #mascote{
+    position: fixed;
+    bottom: 0%;
+    left: 0%;
+    transform: translate(-200%, 0%);
+    width: 60%;
+    height: auto;
+    object-fit: cover;
+    z-index: 10000;
+}
+
+
+/* gameOver */
+#gameOver {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-image: url(assets/textures/final-bg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 10000;
+}
+
+#gameOver-container{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -300%);
+    width: 90%;
+    height: 70%;
+    object-fit: cover;
+    background-image: url(assets/textures/gameOver.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+#gameOver-button {
+    position: fixed;
+    bottom: 10%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 100px;
+    height: auto;
+    object-fit: cover;
+    opacity: 0;
+    transition: all 0.8s ease-out;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+#gameOver-button:hover {
+    transform: translate(-50%, 0%) scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+#mascote-gameOver{
     position: fixed;
     bottom: 0%;
     left: 0%;
@@ -752,3 +814,27 @@ input, textarea {
 #camera-icon-selfie:active {
     transform: scale(0.95);
 } 
+
+#progress-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid #000;
+    border-radius: 10px;
+    overflow: visible;
+    z-index: 1000;
+}
+
+#progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #90EE90, #32CD32);
+    width: 0%;
+    transition: width 0.8s ease-out;
+    border-radius: 8px;
+}
+
+/* Estrela removida - substituída pelo emoji de reação */ 

@@ -69,6 +69,14 @@ class GameScreen extends BaseScreen {
         this.comboCount = 0;
         this.reactionElement = null;
         
+        // Sistema de barra de progresso
+        this.progressBar = null;
+        this.progressFill = null;
+        this.currentProgress = 50; // Começar na metade
+        this.maxProgress = 100;
+        this.minProgress = 0; // Progresso mínimo para não perder
+        this.lastEmojiWasCorrect = false; // Controlar se o último emoji coletado foi correto
+        
         // Injetar animações CSS para reações
         this.injectReactionAnimations();
 
@@ -103,6 +111,7 @@ class GameScreen extends BaseScreen {
         this.createFaceStatusOverlay();
         this.createSilhouetteOverlay();
         this.createTimerElement(); // Configurar contador existente
+        this.initProgressBar(); // Inicializar barra de progresso
     }
     
     createLoadingOverlay() {
@@ -499,6 +508,9 @@ class GameScreen extends BaseScreen {
         const emojiType = emoji.dataset.type || '01';
         const emojiNome = emoji.dataset.nome || 'emoji';
         
+        // Definir se o último emoji foi correto para a barra de progresso
+        this.lastEmojiWasCorrect = isCorrect;
+        
         // Atualizar contadores e sistema de combo
         if (isCorrect) {
             this.correctEmojis++;
@@ -522,6 +534,9 @@ class GameScreen extends BaseScreen {
             // Ir para reação triste (nível 4)
             this.updateReaction(4);
         }
+        
+        // Atualizar barra de progresso (sempre chamar após definir lastEmojiWasCorrect)
+        this.updateProgressBar();
         
         // Mostrar indicador visual
         this.showFeedbackIndicator(isCorrect);
@@ -1127,6 +1142,14 @@ class GameScreen extends BaseScreen {
             this.reactionElement.style.animation = 'reaction-float 3s ease-in-out infinite';
             this.updateReaction(3); // Voltar para reação tranquila (nível 3)
         }
+        
+        // Resetar barra de progresso para 50%
+        this.currentProgress = 50;
+        this.lastEmojiWasCorrect = false;
+        if (this.progressFill) {
+            this.progressFill.style.width = '50%';
+            this.progressFill.style.backgroundColor = '#FFD700'; // Dourado para progresso médio
+        }
     }
 
     createScaleEffect(collisionX, collisionY, emojiType) {
@@ -1186,7 +1209,7 @@ class GameScreen extends BaseScreen {
             this.updateTimer();
             
             if (this.gameTime <= 0) {
-                this.gameOver();
+                this.gameOver(false); // Derrota por tempo
             }
         }, 1000);
         
@@ -1297,8 +1320,8 @@ class GameScreen extends BaseScreen {
         }, 1500);
     }
 
-    gameOver() {
-        console.log('🏁 Tempo esgotado! Jogo finalizado!');
+    gameOver(isVictory = false) {
+        console.log(`🏁 Jogo finalizado! ${isVictory ? 'VITÓRIA!' : 'DERROTA!'}`);
         
         // Parar cronômetro
         if (this.gameTimer) {
@@ -1309,20 +1332,25 @@ class GameScreen extends BaseScreen {
         // Parar spawn de emojis
         this.stopEmojiSpawning();
         
-        // Mostrar tela de game over
-        this.showGameOverScreen();
+        // Navegar para a tela apropriada
+        if (isVictory) {
+            // Vitória: ir para tela final
+            setTimeout(() => {
+                if (window.screenManager) {
+                    window.screenManager.showScreen('final');
+                }
+            }, 2000);
+        } else {
+            // Derrota: ir para tela de game over
+            setTimeout(() => {
+                if (window.screenManager) {
+                    window.screenManager.showScreen('gameOver');
+                }
+            }, 2000);
+        }
     }
 
-    showGameOverScreen() {
-        
-        
-        // Ir para tela final após 5 segundos
-        setTimeout(() => {
-            if (window.screenManager) {
-                window.screenManager.showScreen('final');
-            }
-        }, 5000);
-    }
+    // Função removida - agora usa gameOver() com parâmetro de vitória/derrota
 
     adjustSpawnRate() {
         // Ajustar taxa de spawn baseada no tempo restante
@@ -1485,6 +1513,78 @@ class GameScreen extends BaseScreen {
                 reactionText.parentNode.removeChild(reactionText);
             }
         }, 2000);
+    }
+    
+    initProgressBar() {
+        // Pegar elementos da barra de progresso
+        this.progressBar = document.getElementById('progress-bar');
+        this.progressFill = document.getElementById('progress-fill');
+        
+        if (this.progressBar && this.progressFill) {
+            // Configurar estilos iniciais - começar na metade
+            this.progressFill.style.width = '50%';
+            this.progressFill.style.transition = 'width 0.5s ease-in-out';
+            this.progressFill.style.backgroundColor = '#FFD700'; // Dourado para progresso médio
+            
+            console.log('✅ Barra de progresso inicializada em 50%');
+        } else {
+            console.warn('⚠️ Elementos da barra de progresso não encontrados');
+        }
+    }
+    
+    updateProgressBar() {
+        if (!this.progressFill) return;
+        
+        // Calcular progresso baseado no combo e emojis corretos
+        let progress = this.currentProgress; // Começar do progresso atual
+        
+        // Ajustar progresso baseado no resultado da coleta
+        if (this.lastEmojiWasCorrect) {
+            // Emoji correto: aumentar progresso
+            progress += 15; // +15% por emoji correto
+        } else {
+            // Emoji incorreto: diminuir progresso
+            progress -= 20; // -20% por emoji incorreto
+        }
+        
+        // Limitar progresso entre 0% e 100%
+        progress = Math.max(this.minProgress, Math.min(progress, this.maxProgress));
+        
+        // Atualizar barra de progresso
+        this.progressFill.style.width = `${progress}%`;
+        this.currentProgress = progress;
+        
+        // Mudar cor baseada no progresso
+        if (progress >= 80) {
+            this.progressFill.style.backgroundColor = '#4ECDC4'; // Verde para alto progresso
+        } else if (progress >= 50) {
+            this.progressFill.style.backgroundColor = '#FFD700'; // Dourado para médio progresso
+        } else if (progress >= 25) {
+            this.progressFill.style.backgroundColor = '#FFA500'; // Laranja para baixo progresso
+        } else {
+            this.progressFill.style.backgroundColor = '#FF6B6B'; // Vermelho para muito baixo progresso
+        }
+        
+        console.log(`📊 Progresso atualizado: ${progress}% (Último emoji: ${this.lastEmojiWasCorrect ? 'correto' : 'incorreto'})`);
+        
+        // Verificar condições de vitória/derrota
+        this.checkGameEndConditions();
+    }
+    
+    checkGameEndConditions() {
+        // Verificar vitória (100%)
+        if (this.currentProgress >= 100) {
+            console.log('🏆 VITÓRIA! Barra de progresso completada!');
+            this.gameOver(true); // true = vitória
+            return;
+        }
+        
+        // Verificar derrota (0%)
+        if (this.currentProgress <= 0) {
+            console.log('💀 DERROTA! Barra de progresso zerada!');
+            this.gameOver(false); // false = derrota
+            return;
+        }
     }
 }
 

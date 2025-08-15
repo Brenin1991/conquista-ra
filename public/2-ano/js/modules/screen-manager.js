@@ -58,6 +58,13 @@ class ScreenManager {
         } else {
             console.error('❌ SelfieScreen não encontrada');
         }
+
+        if (window.GameOverScreen) {
+            this.registerScreen('gameOver', new GameOverScreen());
+            console.log('✅ GameOverScreen disponível');
+        } else {
+            console.error('❌ GameOverScreen não encontrada');
+        }
         console.log('📋 Telas registradas:', Object.keys(this.screens));
     }
     
