@@ -155,7 +155,7 @@ input, textarea {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -300%);
     z-index: 2100;
     width: 80vw;
     height: 80vh;
@@ -207,14 +207,13 @@ input, textarea {
     transition: opacity 0.3s ease-in-out;
 }
 
-#narracao-button {
-    position: fixed;
-    top: 0%;
-    left: 11%;
+.narracao-icon {
+    position: absolute;
+    top: 5%;
     transform: translate(-50%, -50%);
     z-index: 2100;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background-image: url(assets/textures/narracao-icon.png);
     background-size: contain;
     background-position: center;
@@ -684,6 +683,7 @@ input, textarea {
     height: auto;
     object-fit: cover;
     z-index: 10000;
+    pointer-events: none;
 }
 
 
@@ -746,6 +746,7 @@ input, textarea {
     height: auto;
     object-fit: cover;
     z-index: 10000;
+    pointer-events: none;
 }
 
 /* ===== TELA DE SELFIE ===== */
