@@ -340,7 +340,7 @@ class GameScreen extends BaseScreen {
         dialogContainer.id = 'dialog-container';
         dialogContainer.style.cssText = `
             position: fixed;
-            bottom: 80px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
