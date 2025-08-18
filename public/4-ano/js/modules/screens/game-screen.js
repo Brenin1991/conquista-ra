@@ -116,6 +116,8 @@ class GameScreen extends BaseScreen {
             buttonDiv.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
                 this.selectEmotion(botao.nome, index);
             });
             
@@ -123,6 +125,8 @@ class GameScreen extends BaseScreen {
             buttonDiv.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
                 this.selectEmotion(botao.nome, index);
             });
             
@@ -381,7 +385,11 @@ class GameScreen extends BaseScreen {
                 cursor: pointer;
                 transition: transform 0.2s ease;
             `;
-            backButton.addEventListener('click', () => this.previousDialog());
+            backButton.addEventListener('click', () => {
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
+                this.previousDialog();
+            });
             backButton.addEventListener('mouseenter', () => {
                 backButton.style.transform = 'scale(1.1)';
             });
@@ -403,10 +411,18 @@ class GameScreen extends BaseScreen {
         
         if (index < this.currentDialogs.length - 1) {
             // Se não for o último, avança para próximo diálogo
-            nextButton.addEventListener('click', () => this.nextDialog());
+            nextButton.addEventListener('click', () => {
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
+                this.nextDialog();
+            });
         } else {
             // Se for o último, fecha o diálogo
-            nextButton.addEventListener('click', () => this.closeDialogs());
+            nextButton.addEventListener('click', () => {
+                window.SoundManager.forceAudioActivation();
+                window.SoundManager.playSoundWithControl('click');
+                this.closeDialogs();
+            });
         }
         
         nextButton.addEventListener('mouseenter', () => {

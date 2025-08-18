@@ -31,13 +31,13 @@ class TutorialScreen extends BaseScreen {
     }
     
     setupNarracaoButton() {
-        const narracaoButton = this.element.querySelector('#narracao-tutorial');
+        /* const narracaoButton = this.element.querySelector('#narracao-tutorial');
         if (narracaoButton) {
             narracaoButton.addEventListener('click', () => {
-                window.SoundManager.forceAudioActivation();
-                window.SoundManager.playSoundWithControl('NA001');
+              //  window.SoundManager.forceAudioActivation();
+               // window.SoundManager.playSoundWithControl('NA001');
             });
-        }
+        } */
     }
     
     setupSkipButton() {
@@ -214,8 +214,8 @@ class TutorialScreen extends BaseScreen {
         // Animar entrada da tela com fade-in
         requestAnimationFrame(() => {
             this.element.style.opacity = '1';
-            window.SoundManager.forceAudioActivation();
-            window.SoundManager.playSoundWithControl('NA001');
+           /*  window.SoundManager.forceAudioActivation();
+            window.SoundManager.playSoundWithControl('NA001'); */
         });
         
         // Executar função de entrada após a transição
