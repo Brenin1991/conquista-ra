@@ -1,0 +1,126 @@
+{
+    "botoes": [
+        {
+            "id": "01",
+            "nome": "alegria",
+            "url": "assets/textures/boneco/botoes/alegria.png",
+            "selecionado": "assets/textures/boneco/botoes/alegria_sel.png"
+        },
+        {
+            "id": "02",
+            "nome": "ansiedade",
+            "url": "assets/textures/boneco/botoes/ansiedade.png",
+            "selecionado": "assets/textures/boneco/botoes/ansiedade_sel.png"
+        },
+        {
+            "id": "03",
+            "nome": "raiva",
+            "url": "assets/textures/boneco/botoes/raiva.png",
+            "selecionado": "assets/textures/boneco/botoes/raiva_sel.png"
+        },
+        {
+            "id": "04",
+            "nome": "tristeza",
+            "url": "assets/textures/boneco/botoes/tristeza.png",
+            "selecionado": "assets/textures/boneco/botoes/tristeza_sel.png"
+        },
+        {
+            "id": "05",
+            "nome": "vergonha",
+            "url": "assets/textures/boneco/botoes/vergonha.png",
+            "selecionado": "assets/textures/boneco/botoes/vergonha_sel.png"
+        }
+    ],
+    "bonecos": [
+        {
+            "id": "01",
+            "nome": "alegria",
+            "url": "assets/textures/boneco/alegria/body.png",
+            "tag": "assets/textures/boneco/alegria/tag.png",
+            "dialogo": [
+                {
+                    "id": "01",
+                    "nome": "dialogo_01",
+                    "url": "assets/textures/boneco/alegria/dialogo_01.png"
+                },
+                {
+                    "id": "02",
+                    "nome": "dialogo_02",
+                    "url": "assets/textures/boneco/alegria/dialogo_02.png"
+                }
+            ]
+        },
+        {
+            "id": "02",
+            "nome": "ansiedade",
+            "url": "assets/textures/boneco/ansiedade/body.png",
+            "tag": "assets/textures/boneco/ansiedade/tag.png",
+            "dialogo": [
+                {
+                    "id": "01",
+                    "nome": "dialogo_01",
+                    "url": "assets/textures/boneco/ansiedade/dialogo_01.png"
+                },
+                {
+                    "id": "02",
+                    "nome": "dialogo_02",
+                    "url": "assets/textures/boneco/ansiedade/dialogo_02.png"
+                }
+            ]
+        },
+        {
+            "id": "03",
+            "nome": "raiva",
+            "url": "assets/textures/boneco/raiva/body.png",
+            "tag": "assets/textures/boneco/raiva/tag.png",
+            "dialogo": [
+                {
+                    "id": "01",
+                    "nome": "dialogo_01",
+                    "url": "assets/textures/boneco/raiva/dialogo_01.png"
+                },
+                {
+                    "id": "02",
+                    "nome": "dialogo_02",
+                    "url": "assets/textures/boneco/raiva/dialogo_02.png"
+                }
+            ]
+        },
+        {
+            "id": "04",
+            "nome": "tristeza",
+            "url": "assets/textures/boneco/tristeza/body.png",
+            "tag": "assets/textures/boneco/tristeza/tag.png",
+            "dialogo": [
+                {
+                    "id": "01",
+                    "nome": "dialogo_01",
+                    "url": "assets/textures/boneco/tristeza/dialogo_01.png"
+                },
+                {
+                    "id": "02",
+                    "nome": "dialogo_02",
+                    "url": "assets/textures/boneco/tristeza/dialogo_02.png"
+                }
+            ]
+        },
+        {
+            "id": "05",
+            "nome": "vergonha",
+            "url": "assets/textures/boneco/vergonha/body.png",
+            "tag": "assets/textures/boneco/vergonha/tag.png",
+            "dialogo": [
+                {
+                    "id": "01",
+                    "nome": "dialogo_01",
+                    "url": "assets/textures/boneco/vergonha/dialogo_01.png"
+                },
+                {
+                    "id": "02",
+                    "nome": "dialogo_02",
+                    "url": "assets/textures/boneco/tristeza/dialogo_02.png"
+                }
+            ]
+        }
+    ]
+}

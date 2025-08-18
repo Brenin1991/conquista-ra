@@ -1,0 +1,32 @@
+{
+    "sounds": [
+        {
+            "id": "NA001",
+            "sound": "assets/sounds/NA001.mp3"
+        },
+        {
+            "id": "NA002",
+            "sound": "assets/sounds/NA002.mp3"
+        },
+        {
+            "id": "NA003",
+            "sound": "assets/sounds/NA003.mp3"
+        },
+        {
+            "id": "NA004",
+            "sound": "assets/sounds/NA004.mp3"
+        },
+        {
+            "id": "click",
+            "sound": "assets/sounds/FX/click.mp3"
+        },
+        {
+            "id": "feedback-negativo",
+            "sound": "assets/sounds/FX/feedback-negativo.mp3"
+        },
+        {
+            "id": "feedback-positivo",
+            "sound": "assets/sounds/FX/feedback-positivo.mp3"
+        }
+    ]
+}
