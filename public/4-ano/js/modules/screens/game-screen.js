@@ -30,6 +30,8 @@ class GameScreen extends BaseScreen {
         this.loadGameData();
         this.cameraStream = null;
         this.dialogTimeout = null;
+        this.currentDialogIndex = 0;
+        this.currentDialogs = [];
     }
 
     async initCamera() {
@@ -303,30 +305,175 @@ class GameScreen extends BaseScreen {
         // Limpar TUDO primeiro
         this.clearAllDialogs();
 
-        // Mostrar primeiro diálogo
-        this.showDialog(bonecoData.dialogo[0].url);
-        console.log(`💬 Primeiro diálogo mostrado: ${bonecoData.dialogo[0].url}`);
-        
-        // Após 2 segundos, mostrar segundo diálogo
-        this.dialogTimeout = setTimeout(() => {
-            this.showDialog(bonecoData.dialogo[1].url);
-            console.log(`💬 Segundo diálogo mostrado: ${bonecoData.dialogo[1].url}`);
-            
-            // Após mais 2 segundos, remover segundo diálogo
-            this.dialogTimeout = setTimeout(() => {
-                console.log(`⏰ Hora de remover o segundo diálogo!`);
-                this.forceRemoveDialog();
+        // Armazenar diálogos atuais
+        this.currentDialogs = bonecoData.dialogo;
+        this.currentDialogIndex = 0;
+
+        // Mostrar primeiro diálogo com navegação
+        this.showDialogWithNavigation(this.currentDialogs[0].url, 0);
+    }
+
+    showDialogWithNavigation(imageUrl, index) {
+        // Animar saída do diálogo anterior se existir
+        const existingContainer = document.getElementById('dialog-container');
+        if (existingContainer) {
+            const existingImage = existingContainer.querySelector('img');
+            if (existingImage) {
+                existingImage.style.transform = 'translateY(100px)';
+                existingImage.style.opacity = '0';
                 
-                // Timeout de segurança - se não sair em 1 segundo, força novamente
                 setTimeout(() => {
-                    const stillThere = document.getElementById('dialog-image');
-                    if (stillThere) {
-                        console.log('🚨 DIALOGO AINDA LÁ! FORÇANDO REMOÇÃO!');
-                        stillThere.remove();
-                    }
-                }, 1000);
-            }, 2000);
-        }, 2000);
+                    this.clearAllDialogs();
+                    this.createNewDialog(imageUrl, index);
+                }, 400);
+                return;
+            }
+        }
+        
+        // Se não há diálogo anterior, criar novo diretamente
+        this.createNewDialog(imageUrl, index);
+    }
+
+    createNewDialog(imageUrl, index) {
+
+        const dialogContainer = document.createElement('div');
+        dialogContainer.id = 'dialog-container';
+        dialogContainer.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        `;
+
+        // Imagem do diálogo
+        const dialogImage = document.createElement('img');
+        dialogImage.src = imageUrl;
+        dialogImage.style.cssText = `
+            width: 80%;
+            height: auto;
+            max-height: 80%;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        `;
+
+        // Container dos botões
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        `;
+
+        // Botão voltar (só se não for o primeiro)
+        if (index > 0) {
+            const backButton = document.createElement('img');
+            backButton.src = 'assets/textures/btn-voltar.png';
+            backButton.style.cssText = `
+                width: 60px;
+                height: 60px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            `;
+            backButton.addEventListener('click', () => this.previousDialog());
+            backButton.addEventListener('mouseenter', () => {
+                backButton.style.transform = 'scale(1.1)';
+            });
+            backButton.addEventListener('mouseleave', () => {
+                backButton.style.transform = 'scale(1)';
+            });
+            buttonContainer.appendChild(backButton);
+        }
+
+        // Botão avançar (sempre aparece)
+        const nextButton = document.createElement('img');
+        nextButton.src = 'assets/textures/btn-avancar.png';
+                    nextButton.style.cssText = `
+                width: 60px;
+                height: 60px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            `;
+        
+        if (index < this.currentDialogs.length - 1) {
+            // Se não for o último, avança para próximo diálogo
+            nextButton.addEventListener('click', () => this.nextDialog());
+        } else {
+            // Se for o último, fecha o diálogo
+            nextButton.addEventListener('click', () => this.closeDialogs());
+        }
+        
+        nextButton.addEventListener('mouseenter', () => {
+            nextButton.style.transform = 'scale(1.1)';
+        });
+        nextButton.addEventListener('mouseleave', () => {
+            nextButton.style.transform = 'scale(1)';
+        });
+        buttonContainer.appendChild(nextButton);
+
+        // Montar container
+        dialogContainer.appendChild(dialogImage);
+        dialogContainer.appendChild(buttonContainer);
+
+        // Adicionar ao DOM
+        document.body.appendChild(dialogContainer);
+
+        // Animar entrada
+        setTimeout(() => {
+            dialogImage.style.transform = 'translateY(0)';
+            dialogImage.style.opacity = '1';
+        }, 100);
+
+        console.log(`💬 Diálogo ${index + 1} mostrado com navegação`);
+    }
+
+    nextDialog() {
+        if (this.currentDialogIndex < this.currentDialogs.length - 1) {
+            this.currentDialogIndex++;
+            this.showDialogWithNavigation(this.currentDialogs[this.currentDialogIndex].url, this.currentDialogIndex);
+        }
+    }
+
+    previousDialog() {
+        if (this.currentDialogIndex > 0) {
+            this.currentDialogIndex--;
+            this.showDialogWithNavigation(this.currentDialogs[this.currentDialogIndex].url, this.currentDialogIndex);
+        }
+    }
+
+    closeDialogs() {
+        console.log('🚪 Fechando diálogos');
+        
+        const dialogContainer = document.getElementById('dialog-container');
+        if (dialogContainer) {
+            const dialogImage = dialogContainer.querySelector('img');
+            if (dialogImage) {
+                // Animar saída
+                dialogImage.style.transform = 'translateY(100px)';
+                dialogImage.style.opacity = '0';
+                
+                // Remover após animação
+                setTimeout(() => {
+                    this.clearAllDialogs();
+                    this.currentDialogIndex = 0;
+                    this.currentDialogs = [];
+                }, 800);
+            } else {
+                this.clearAllDialogs();
+                this.currentDialogIndex = 0;
+                this.currentDialogs = [];
+            }
+        } else {
+            this.clearAllDialogs();
+            this.currentDialogIndex = 0;
+            this.currentDialogs = [];
+        }
     }
 
     clearAllDialogs() {
@@ -340,6 +487,12 @@ class GameScreen extends BaseScreen {
         const existingDialog = document.getElementById('dialog-image');
         if (existingDialog) {
             existingDialog.remove();
+        }
+
+        // Remover container de diálogo
+        const dialogContainer = document.getElementById('dialog-container');
+        if (dialogContainer) {
+            dialogContainer.remove();
         }
     }
 
@@ -373,22 +526,22 @@ class GameScreen extends BaseScreen {
         dialogImage.src = imageUrl;
         dialogImage.style.cssText = `
             position: fixed;
-            top: -100%;
+            bottom: -100%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
             max-width: 80%;
-            max-height: 60%;
+            max-height: 40%;
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         `;
 
         document.body.appendChild(dialogImage);
         console.log(`💬 Diálogo criado: ${imageUrl}`);
 
-        // Animar entrada (desce de cima)
+        // Animar entrada (sobe de baixo)
         setTimeout(() => {
-            dialogImage.style.top = '50%';
-            dialogImage.style.transform = 'translate(-50%, -50%)';
+            dialogImage.style.bottom = '60px';
+            dialogImage.style.transform = 'translateX(-50%)';
         }, 100);
     }
 
@@ -396,8 +549,8 @@ class GameScreen extends BaseScreen {
         const dialogImage = document.getElementById('dialog-image');
         if (dialogImage) {
             // Animar saída (vai para baixo)
-            dialogImage.style.top = '100%';
-            dialogImage.style.transform = 'translate(-50%, -50%)';
+            dialogImage.style.bottom = '-100%';
+            dialogImage.style.transform = 'translateX(-50%)';
             
             // Remover após animação
             setTimeout(() => {
@@ -472,12 +625,17 @@ class GameScreen extends BaseScreen {
         this.floorPlane.setAttribute('id', 'floor-plane');
         this.floorPlane.setAttribute('position', '0 -1.5 -3');
         this.floorPlane.setAttribute('rotation', '-90 0 0');
-        this.floorPlane.setAttribute('width', '4');
-        this.floorPlane.setAttribute('height', '4');
+        this.floorPlane.setAttribute('width', '2');
+        this.floorPlane.setAttribute('height', '2');
         this.floorPlane.setAttribute('material', 'src', 'assets/textures/boneco/base.png');
         this.floorPlane.setAttribute('material', 'transparent', true);
         this.floorPlane.setAttribute('material', 'alphaTest', 0.5);
+        this.floorPlane.setAttribute('material', 'emissive', '#87CEEB');
+        this.floorPlane.setAttribute('material', 'emissiveIntensity', 0.3);
         this.floorPlane.setAttribute('visible', 'true');
+        
+        // Adicionar efeito de pulse
+        this.addPulseEffect(this.floorPlane);
         
         // Adicionar plano de chão ao container
         this.gameElements.appendChild(this.floorPlane);
@@ -486,6 +644,47 @@ class GameScreen extends BaseScreen {
         console.log('📍 Posição do plano:', this.characterPlane.getAttribute('position'));
         console.log('👁️ Visibilidade:', this.characterPlane.getAttribute('visible'));
         console.log('🏠 Plano de chão criado');
+    }
+
+    addPulseEffect(element) {
+        let scale = 1;
+        let alpha = 0.6;
+        let emissiveIntensity = 0.3;
+        let growing = true;
+        
+        const pulse = () => {
+            if (growing) {
+                scale += 0.01;
+                alpha += 0.01;
+                emissiveIntensity += 0.005;
+                if (scale >= 1.2) {
+                    growing = false;
+                }
+            } else {
+                scale -= 0.01;
+                alpha -= 0.01;
+                emissiveIntensity -= 0.005;
+                if (scale <= 0.8) {
+                    growing = true;
+                }
+            }
+            
+            // Aplicar escala
+            element.setAttribute('scale', `${scale} ${scale} ${scale}`);
+            
+            // Aplicar transparência
+            element.setAttribute('material', 'opacity', alpha);
+            
+            // Aplicar emissão
+            element.setAttribute('material', 'emissiveIntensity', emissiveIntensity);
+            
+            // Continuar animação
+            requestAnimationFrame(pulse);
+        };
+        
+        // Iniciar animação
+        pulse();
+        console.log('💓 Efeito de pulse adicionado ao chão com emissão');
     }
 
     animateGameElements() {
@@ -580,6 +779,8 @@ class GameScreen extends BaseScreen {
         this.selectedButton = null;
         this.characterPlane = null;
         this.floorPlane = null;
+        this.currentDialogIndex = 0;
+        this.currentDialogs = [];
         
         console.log('🧹 Cena limpa e câmera parada');
     }
