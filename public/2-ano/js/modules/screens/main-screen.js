@@ -15,7 +15,65 @@ class MainScreen extends BaseScreen {
     onInit() {
         // Configurações específicas da tela principal
         this.setupMainButton();
+        this.setupCreditosButton();
+        
     }
+
+    
+
+    setupCreditosButton() {
+        const creditosButton = this.element.querySelector('#creditos-button');
+        const creditosPanel = this.element.querySelector('#creditos-panel');
+        
+        if (creditosButton && creditosPanel) {
+            // Estado inicial: painel escondido
+            this.isCreditosVisible = false;
+            
+            // Configurar transição suave
+            creditosPanel.style.transition = 'transform 0.5s ease-in-out';
+            
+            // Evento de clique no botão
+            creditosButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleCreditos();
+            });
+            
+            // Evento de clique no painel para fechar
+            creditosPanel.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideCreditos();
+            });
+        }
+    }
+
+    toggleCreditos() {
+        if (this.isCreditosVisible) {
+            this.hideCreditos();
+        } else {
+            this.showCreditos();
+        }
+    }
+    
+    showCreditos() {
+        const creditosPanel = this.element.querySelector('#creditos-panel');
+        if (creditosPanel && !this.isCreditosVisible) {
+            creditosPanel.style.transform = 'translate(-50%, 50%)';
+            this.isCreditosVisible = true;
+            console.log('📋 Créditos exibidos');
+        }
+    }
+    
+    hideCreditos() {
+        const creditosPanel = this.element.querySelector('#creditos-panel');
+        if (creditosPanel && this.isCreditosVisible) {
+            creditosPanel.style.transform = 'translate(-50%, -200%)';
+            this.isCreditosVisible = false;
+            console.log('📋 Créditos ocultados');
+        }
+    }
+    
     
     setupMainButton() {
         const mainButton = this.element.querySelector('#main-button');

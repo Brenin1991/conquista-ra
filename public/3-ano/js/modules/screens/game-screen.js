@@ -74,6 +74,21 @@ class GameScreen extends BaseScreen {
         this.initProgressBar();
         this.createFaceStatusOverlay();
         this.createSilhouetteOverlay();
+        
+    }
+
+    animateUI() {
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.opacity = '0';
+        progressBar.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        progressBar.style.transform = 'translate(-50%, 300%)';
+
+        if (progressBar) {
+            setTimeout(() => {
+                progressBar.style.opacity = '1';
+                progressBar.style.transform = 'translate(-50%, 0%)';
+            }, 200);
+        }
     }
     
     createLoadingOverlay() {
@@ -695,7 +710,7 @@ class GameScreen extends BaseScreen {
         
         // Posicionar opção 1 (esquerda) - MAIS AFASTADA
         if (this.option1Bg2D) {
-            this.option1Bg2D.style.left = `${faceX - 80}px`; // Esquerda
+            this.option1Bg2D.style.left = `${faceX - 100}px`; // Esquerda
             this.option1Bg2D.style.top = `${faceY - 60}px`; // MAIS ACIMA (era +60)
             this.option1Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option1Bg2D.style.opacity = opacity;
@@ -703,7 +718,7 @@ class GameScreen extends BaseScreen {
         
         // Posicionar opção 2 (direita) - MAIS AFASTADA
         if (this.option2Bg2D) {
-            this.option2Bg2D.style.left = `${faceX + 30}px`; // Direita
+            this.option2Bg2D.style.left = `${faceX + 50}px`; // Direita
             this.option2Bg2D.style.top = `${faceY - 60}px`; // MAIS ACIMA (era +60)
             this.option2Bg2D.style.transform = `translate(-50%, -50%) scale(${scale})`;
             this.option2Bg2D.style.opacity = opacity;
@@ -839,82 +854,73 @@ class GameScreen extends BaseScreen {
         const fillBar = side === 'left' ? this.option1Fill2D : this.option2Fill2D;
         if (!option || !fillBar) return;
 
-        // Calcular escala e efeitos baseados no progresso
-        let scale, borderColor, boxShadow, backgroundColor, opacity;
+        // Calcular escala e efeitos baseados no progresso - ESTILO FLAT
+        let scale, borderColor, backgroundColor, opacity;
         
         if (progress === 0) {
             scale = 1;
             borderColor = 'transparent';
-            boxShadow = 'none';
             backgroundColor = 'transparent';
             opacity = 1;
         } else if (progress < 20) {
-            scale = 1.03;
+            scale = 1.02;
             borderColor = '#E6B3FF';
-            boxShadow = `0 0 10px rgba(230, 179, 255, 0.6)`;
             backgroundColor = 'rgba(230, 179, 255, 0.1)';
             opacity = 1;
         } else if (progress < 40) {
-            scale = 1.06;
+            scale = 1.04;
             borderColor = '#CC99FF';
-            boxShadow = `0 0 15px rgba(204, 153, 255, 0.8)`;
-            backgroundColor = 'rgba(204, 153, 255, 0.2)';
+            backgroundColor = 'rgba(204, 153, 255, 0.15)';
             opacity = 1;
         } else {
-            scale = 1.1;
+            scale = 1.06;
             borderColor = '#B366FF';
-            boxShadow = `0 0 20px rgba(179, 102, 255, 1)`;
-            backgroundColor = 'rgba(179, 102, 255, 0.3)';
+            backgroundColor = 'rgba(179, 102, 255, 0.2)';
             opacity = 1;
         }
 
-        // Aplicar mudanças visuais na opção com transições mais rápidas
-        option.style.transition = 'all 0.08s ease-out'; // Transição mais rápida
+        // Aplicar mudanças visuais na opção com estilo FLAT
+        option.style.transition = 'all 0.15s ease-out';
         option.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        option.style.border = `4px solid ${borderColor}`;
-        option.style.boxShadow = boxShadow;
+        option.style.border = `3px solid ${borderColor}`;
         option.style.backgroundColor = backgroundColor;
         option.style.opacity = opacity;
         
-        // Animar barra de preenchimento de baixo para cima (mais responsiva)
-        const fillHeight = (progress / 50) * 200; // Converter progresso para porcentagem de altura (ajustado para threshold 50)
+        // Animar barra de preenchimento de baixo para cima
+        const fillHeight = (progress / 50) * 200;
         fillBar.style.height = `${fillHeight}%`;
         
-        // Adicionar efeito de pulso mais rápido quando selecionando
+        // Efeito de pulse simples quando selecionando
         if (progress > 0 && progress < 50) {
-            option.style.animation = 'pulse 0.5s ease-in-out infinite alternate';
+            option.style.animation = 'pulse 0.8s ease-in-out infinite alternate';
         } else {
             option.style.animation = 'none';
         }
     }
 
     updateSelectionIndicators() {
-        // Mostrar/esconder indicadores de seleção ativa nas opções
+        // Mostrar/esconder indicadores de seleção ativa nas opções - ESTILO FLAT
         if (this.option1Bg2D) {
             if (this.currentSelectionSide === 'left' && this.isSelecting) {
-                // Opção esquerda ativa - efeito mais dramático
-                this.option1Bg2D.style.filter = 'brightness(1.3) contrast(1.1) saturate(1.4) hue-rotate(10deg)';
-                this.option1Bg2D.style.transition = 'all 0.15s ease-out';
-                this.option1Bg2D.style.transform = this.option1Bg2D.style.transform + ' rotate(2deg)';
+                // Opção esquerda ativa - efeito flat simples
+                this.option1Bg2D.style.filter = 'brightness(1.1)';
+                this.option1Bg2D.style.transition = 'all 0.2s ease-out';
             } else {
                 // Opção esquerda inativa - resetar efeitos
                 this.option1Bg2D.style.filter = 'none';
-                this.option1Bg2D.style.transition = 'all 0.15s ease-out';
-                this.option1Bg2D.style.transform = this.option1Bg2D.style.transform.replace(' rotate(2deg)', '');
+                this.option1Bg2D.style.transition = 'all 0.2s ease-out';
             }
         }
 
         if (this.option2Bg2D) {
             if (this.currentSelectionSide === 'right' && this.isSelecting) {
-                // Opção direita ativa - efeito mais dramático
-                this.option2Bg2D.style.filter = 'brightness(1.3) contrast(1.1) saturate(1.4) hue-rotate(10deg)';
-                this.option2Bg2D.style.transition = 'all 0.15s ease-out';
-                this.option2Bg2D.style.transform = this.option2Bg2D.style.transform + ' rotate(-2deg)';
-        } else {
+                // Opção direita ativa - efeito flat simples
+                this.option2Bg2D.style.filter = 'brightness(1.1)';
+                this.option2Bg2D.style.transition = 'all 0.2s ease-out';
+            } else {
                 // Opção direita inativa - resetar efeitos
                 this.option2Bg2D.style.filter = 'none';
-                this.option2Bg2D.style.transition = 'all 0.15s ease-out';
-                this.option2Bg2D.style.transform = this.option2Bg2D.style.transform.replace(' rotate(-2deg)', '');
+                this.option2Bg2D.style.transition = 'all 0.2s ease-out';
             }
         }
     }
@@ -999,6 +1005,8 @@ class GameScreen extends BaseScreen {
 
         // Criar overlay de carregamento
         this.createLoadingOverlay();
+
+        this.animateUI();
 
         this.loadModels().then(() => {
             if (this.isModelLoaded) {
@@ -1169,8 +1177,8 @@ class GameScreen extends BaseScreen {
         questionBg.id = 'question-bg-2d';
         questionBg.style.cssText = `
             position: absolute;
-            width: 450px;
-            height: 100px;
+            width: 470px;
+            height: 120px;
             background-image: url('assets/textures/pergunta-balao.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -1455,7 +1463,7 @@ class GameScreen extends BaseScreen {
             transform: translate(-50%, -50%);
             color: #000000;
             font-family: 'Nunito', Arial, sans-serif;
-            font-size: 16px;
+            font-size: 10px;
             font-weight: 700;
             text-align: center;
             width: 280px;

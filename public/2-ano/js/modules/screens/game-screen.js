@@ -1041,6 +1041,34 @@ class GameScreen extends BaseScreen {
         setTimeout(() => {
             this.startGame();
         }, 1000);
+
+        this.animateGameElements();
+    }
+
+    animateGameElements() {
+        const contadorTempo = document.getElementById('contador-tempo');
+        const progressBar = document.getElementById('progress-bar');
+        if (contadorTempo) {
+            contadorTempo.style.opacity = '0';
+            contadorTempo.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)' ;
+            contadorTempo.style.transform = 'translate(-50%, -200%) scale(0.7)';
+
+            setTimeout(() => {
+                contadorTempo.style.opacity = '1';
+                contadorTempo.style.transform = 'translate(-50%, 0%) scale(1)';
+            }, 1000);
+        }
+
+        if (progressBar) {
+            progressBar.style.opacity = '0';
+            progressBar.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)' ;
+            progressBar.style.transform = 'translateX(200%) scale(0.7)';
+
+            setTimeout(() => {
+                progressBar.style.opacity = '1';
+                progressBar.style.transform = 'translateX(-50%) scale(1)';
+            }, 1000);
+        }
     }
     
     handleExit() {

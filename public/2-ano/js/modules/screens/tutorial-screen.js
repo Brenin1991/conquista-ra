@@ -79,6 +79,7 @@ class TutorialScreen extends BaseScreen {
         const tutorialButton = document.getElementById('tutorial-button');
         const tutorialBackground = document.getElementById('tutorial');
         const narracaoTutorial = document.getElementById('narracao-tutorial');
+        const mascoteTutorial = document.getElementById('mascote-tutorial');
         
         // Animar fundo primeiro
         if (tutorialBackground) {
@@ -130,6 +131,17 @@ class TutorialScreen extends BaseScreen {
                     tutorialButton.style.animation = 'tutorial-button-pulse 2s ease-in-out infinite';
                 }, 1000);
             }, 500);
+        }
+
+        if (mascoteTutorial) {
+            mascoteTutorial.style.opacity = '0';
+            mascoteTutorial.style.transform = 'translate(-200%, 0%) scale(0.7)';
+            mascoteTutorial.style.transition = 'all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+            setTimeout(() => {
+                mascoteTutorial.style.opacity = '1';
+                mascoteTutorial.style.transform = 'translate(0%, 0%) scale(1)';
+            }, 300);
         }
     }
     

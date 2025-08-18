@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
         refreshDebounceWait: 250,
         hacks: viewportUnitsBuggyfill.hacks
     });
+
+    initializeSoundManager();
     
     // Prevenir zoom de pinça
     preventPinchZoom();
@@ -14,6 +16,25 @@ document.addEventListener("DOMContentLoaded", function () {
     // Inicializar aplicação
     initializeApp();
 });
+
+async function initializeSoundManager() {
+    try {
+        await window.SoundManager.initialize();
+        console.log('SoundManager inicializado com sucesso');
+        
+        // Ativar áudio em qualquer clique
+        document.addEventListener('click', async () => {
+            await window.SoundManager.forceAudioActivation();
+        });
+        
+        document.addEventListener('touchstart', async () => {
+            await window.SoundManager.forceAudioActivation();
+        });
+      
+    } catch (error) {
+        console.error('Erro ao inicializar SoundManager:', error);
+    }
+}
 
 // Função para mostrar overlay de carregamento
 function showLoadingOverlay() {

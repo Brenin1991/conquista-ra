@@ -123,6 +123,7 @@ input, textarea {
     font-size: 18px;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: pulseMain 2s ease-in-out infinite;
 }
 
 #tutorial {
@@ -155,7 +156,7 @@ input, textarea {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -200%);
     z-index: 2100;
     width: 80vw;
     height: 80vh;
@@ -182,11 +183,11 @@ input, textarea {
 
 #tutorial-button {
     z-index: 2100;
-    width: 300px;
-    height: 100px;
+    width: 200px;
+    height: 70px;
     background-image: url(assets/textures/btn-comecar.png);
     position: absolute;
-    bottom: -5%;
+    bottom: 2%;
     left: 50%;
     transform: translate(-50%, 0%);
     background-size: contain;
@@ -205,6 +206,15 @@ input, textarea {
     transform: translate(-50%, -50%);
     z-index: 2101;
     transition: opacity 0.3s ease-in-out;
+}
+
+#mascote-tutorial{
+    position: fixed;
+    bottom: 0%;
+    right: 0%;
+    transform: translate(200%, 0%);
+    z-index: 2101;
+    width: 150px;
 }
 
 #narracao-button {
@@ -577,7 +587,7 @@ input, textarea {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%, 300%);
     width: 300px;
     height: 20px;
     background: rgba(255, 255, 255, 0.3);
@@ -652,4 +662,78 @@ input, textarea {
 #final-button:hover {
     transform: translate(-50%, 0%) scale(1.05);
     transition: transform 0.2s ease-in-out;
+}
+
+/* Animação de pulse para o botão principal */
+@keyframes pulseMain {
+    0% {
+        transform: translate(-50%, 0%) scale(1);
+    }
+    50% {
+        transform: translate(-50%, 0%) scale(1.05);
+    }
+    100% {
+        transform: translate(-50%, 0%) scale(1);
+    }
+}
+
+#main-button {
+    animation: pulseMain 2s ease-in-out infinite;
+}
+
+#main-button:hover {
+    animation: none;
+    transform: translate(-50%, 0%) scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+#tutorial-sequence{
+    position: absolute;
+    bottom: 17%;
+    height: 150px;
+}
+
+#tutorial-sequence {
+    position: absolute;
+    bottom: 17%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    z-index: 2101;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#creditos-button{
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+#creditos-button:hover{
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+#creditos-panel{
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    width: 70%;
+    height: 300px;
+    background-image: url(assets/textures/feedbacks/creditos-panel.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10000;
+    transform: translate(-50%, -200%);
+    cursor: pointer;
+    transition: transform 0.5s ease-in-out;
 }

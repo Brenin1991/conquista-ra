@@ -1,0 +1,8 @@
+{
+    "sounds": [
+        {
+            "id": "click",
+            "sound": "assets/sounds/FX/click.mp3"
+        }
+    ]
+}
