@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste das Imagens dos Botões</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .image-test {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Teste das Imagens dos Botões</h1>
+    
+    <div class="test-section">
+        <h2>📋 Verificação das Imagens</h2>
+        <div id="image-check"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎮 Simulação do Jogo</h2>
+        <div id="game-simulation"></div>
+    </div>
+
+    <script>
+        // Teste 1: Verificar se as imagens carregam
+        async function checkImages() {
+            const images = [
+                'assets/textures/buttons/01.png',
+                'assets/textures/buttons/01_sel.png',
+                'assets/textures/buttons/02.png',
+                'assets/textures/buttons/02_sel.png',
+                'assets/textures/buttons/03.png',
+                'assets/textures/buttons/03_sel.png'
+            ];
+            
+            const results = [];
+            
+            for (const imageUrl of images) {
+                const img = new Image();
+                img.onload = () => {
+                    results.push(`<div class="image-test">
+                        <span class="success">✅ ${imageUrl}</span><br>
+                        <img src="${imageUrl}" alt="Teste">
+                    </div>`);
+                    updateResults();
+                };
+                img.onerror = () => {
+                    results.push(`<div class="image-test">
+                        <span class="error">❌ ${imageUrl}</span><br>
+                        <div style="width:100px;height:100px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:red;">Erro</div>
+                    </div>`);
+                    updateResults();
+                };
+                img.src = imageUrl;
+            }
+            
+            function updateResults() {
+                if (results.length === images.length) {
+                    document.getElementById('image-check').innerHTML = results.join('');
+                }
+            }
+        }
+        
+        // Teste 2: Simular o jogo
+        async function simulateGame() {
+            try {
+                const response = await fetch('assets/data/data.json');
+                const data = await response.json();
+                
+                if (data.fases && data.fases.length > 0) {
+                    const fase = data.fases[0];
+                    let html = '<h3>Simulação da Fase: ' + fase.nome + '</h3>';
+                    
+                    fase.botoes.forEach((botao, index) => {
+                        html += `
+                            <div class="image-test">
+                                <h4>Botão ${botao.id} (Ordem: ${botao.ordem})</h4>
+                                <p><strong>Normal:</strong></p>
+                                <img src="${botao.url}" alt="Botão ${botao.id} normal">
+                                <p><strong>Selecionado:</strong></p>
+                                <img src="${botao.url_selected}" alt="Botão ${botao.id} selecionado">
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('game-simulation').innerHTML = html;
+                }
+                
+            } catch (error) {
+                document.getElementById('game-simulation').innerHTML = 
+                    `<span class="error">❌ Erro ao carregar dados: ${error.message}</span>`;
+            }
+        }
+        
+        // Executar testes
+        window.addEventListener('load', () => {
+            checkImages();
+            simulateGame();
+        });
+    </script>
+</body>
+</html>

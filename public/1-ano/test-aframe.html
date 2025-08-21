@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste A-Frame</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #test-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="test-info">
+        <h3>🧪 Teste A-Frame</h3>
+        <p>Status: <span id="status">Carregando...</span></p>
+        <p>Elementos: <span id="elements">Verificando...</span></p>
+        <button onclick="testElements()">Testar Elementos</button>
+        <button onclick="addText()">Adicionar Texto</button>
+    </div>
+
+    <a-scene id="main-scene" background="color: #000000">
+        <a-camera id="main-camera" position="0 1.6 0">
+            <a-cursor></a-cursor>
+        </a-camera>
+        
+        <a-entity id="game-elements" position="0 0.8 -1"></a-entity>
+        
+        <!-- Elemento de teste -->
+        <a-box position="0 0 -2" color="#FF0000" width="1" height="1" depth="1"></a-box>
+    </a-scene>
+
+    <script>
+        let gameElements = null;
+        
+        // Aguardar A-Frame carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                gameElements = document.getElementById('game-elements');
+                const status = document.getElementById('status');
+                const elements = document.getElementById('elements');
+                
+                if (gameElements) {
+                    status.textContent = '✅ A-Frame carregado';
+                    elements.textContent = '✅ game-elements encontrado';
+                    console.log('✅ A-Frame carregado com sucesso');
+                } else {
+                    status.textContent = '❌ game-elements não encontrado';
+                    elements.textContent = '❌ Erro na inicialização';
+                    console.error('❌ game-elements não encontrado');
+                }
+            }, 1000);
+        });
+        
+        function testElements() {
+            if (gameElements) {
+                console.log('📍 Posição atual:', gameElements.getAttribute('position'));
+                console.log('🔄 Rotação atual:', gameElements.getAttribute('rotation'));
+                console.log('📝 Conteúdo HTML:', gameElements.innerHTML);
+            }
+        }
+        
+        function addText() {
+            if (gameElements) {
+                gameElements.innerHTML = `
+                    <a-text 
+                        value="TESTE A-FRAME FUNCIONANDO!"
+                        position="0 0.5 0"
+                        align="center"
+                        width="3"
+                        color="#FFFFFF"
+                        font="kelsonsans">
+                    </a-text>
+                    
+                    <a-sphere 
+                        position="0 -0.5 0"
+                        radius="0.3"
+                        color="#00FF00">
+                    </a-sphere>
+                `;
+                console.log('✨ Elementos adicionados com sucesso');
+            }
+        }
+    </script>
+</body>
+</html>

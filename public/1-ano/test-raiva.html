@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Tela de Raiva</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        
+        .test-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10000;
+        }
+        
+        .test-button {
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #45B7AA;
+        }
+        
+        #video-raiva {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        #overlay-raiva {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos de vídeo e canvas -->
+    <video id="video-raiva" autoplay muted playsinline style="transform: scaleX(-1);"></video>
+    <canvas id="overlay-raiva" style="transform: scaleX(-1);"></canvas>
+    
+    <!-- Container de teste -->
+    <div class="test-container">
+        <h2>Teste da Tela de Raiva</h2>
+        <p>Clique no botão para testar a detecção de rotação da cabeça</p>
+        <button class="test-button" onclick="testRaivaScreen()">Testar Tela de Raiva</button>
+        <button class="test-button" onclick="testFaceTracking()">Testar Face Tracking</button>
+    </div>
+    
+    <!-- Scripts necessários -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    
+    <script>
+        // Simular BaseScreen
+        class BaseScreen {
+            constructor(name, config) {
+                this.name = name;
+                this.config = config;
+            }
+            
+            nextScreen() {
+                console.log('🔄 Navegando para próxima tela...');
+            }
+        }
+        
+        // Simular RaivaScreen
+        class RaivaScreen extends BaseScreen {
+            constructor() {
+                super('raiva', {
+                    next: 'final',
+                    onEnter: () => this.handleEnter(),
+                    onExit: () => this.handleExit()
+                });
+                
+                // Estado do jogo
+                this.gameState = 'waiting';
+                this.instructions = [
+                    { direction: 'right', text: 'Vire a cabeça para a DIREITA', threshold: 0.3 },
+                    { direction: 'left', text: 'Vire a cabeça para a ESQUERDA', threshold: 0.3 },
+                    { direction: 'center', text: 'Olhe para o CENTRO', threshold: 0.15 }
+                ];
+                this.currentInstructionIndex = 0;
+                
+                // Face tracking
+                this.video = null;
+                this.canvas = null;
+                this.ctx = null;
+                this.isModelLoaded = false;
+                this.detectionActive = false;
+                
+                // Detecção de rotação da cabeça
+                this.headPosition = { x: 0, y: 0, z: 0 };
+                this.headThreshold = 0.15;
+                
+                this.onInit();
+            }
+            
+            onInit() {
+                this.setupFaceTracking();
+                this.createOverlays();
+            }
+            
+            async setupFaceTracking() {
+                try {
+                    this.video = document.getElementById('video-raiva');
+                    
+                    console.log('🎥 Solicitando acesso à câmera...');
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            facingMode: 'user'
+                        }
+                    });
+                    
+                    this.video.srcObject = stream;
+                    console.log('✅ Stream da câmera configurado');
+                    
+                    return new Promise((resolve) => {
+                        this.video.onloadedmetadata = () => {
+                            console.log(`📹 Vídeo carregado: ${this.video.videoWidth}x${this.video.videoHeight}`);
+                            this.video.play();
+                            resolve();
+                        };
+                    });
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao configurar face tracking:', error);
+                }
+            }
+            
+            createOverlays() {
+                console.log('✅ Overlays criados');
+            }
+            
+            async loadModels() {
+                const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+                
+                console.log('🔄 Carregando modelos de IA...');
+                
+                try {
+                    if (typeof faceapi === 'undefined') {
+                        throw new Error('Face API não está disponível');
+                    }
+                    
+                    const modelLoadPromise = Promise.all([
+                        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+                    ]);
+                    
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('Timeout: modelos demoraram muito para carregar')), 30000);
+                    });
+                    
+                    await Promise.race([modelLoadPromise, timeoutPromise]);
+                    
+                    if (!faceapi.nets.tinyFaceDetector.isLoaded || !faceapi.nets.faceLandmark68Net.isLoaded) {
+                        throw new Error('Modelos não foram carregados completamente');
+                    }
+                    
+                    this.isModelLoaded = true;
+                    console.log('✅ Modelos carregados com sucesso!');
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao carregar modelos:', error);
+                    this.isModelLoaded = false;
+                }
+            }
+            
+            setupCanvas() {
+                this.canvas = document.getElementById('overlay-raiva');
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                
+                console.log(`🎨 Canvas configurado: ${this.canvas.width}x${this.canvas.height}`);
+            }
+            
+            startFaceDetection() {
+                this.detectionActive = true;
+                this.startDetection();
+            }
+            
+            startDetection() {
+                this.detectionActive = true;
+                this.detectLoop();
+            }
+            
+            async detectFaces() {
+                if (!this.isModelLoaded || !this.video.videoWidth) return;
+                
+                try {
+                    const options = new faceapi.TinyFaceDetectorOptions({
+                        inputSize: 224,
+                        scoreThreshold: 0.5
+                    });
+                    
+                    const detections = await faceapi
+                        .detectAllFaces(this.video, options)
+                        .withFaceLandmarks();
+                    
+                    if (this.ctx && this.canvas) {
+                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    }
+                    
+                    if (detections.length > 0) {
+                        console.log('✅ Rosto detectado!');
+                        this.processHeadMovement(detections[0].landmarks);
+                    } else {
+                        console.log('❌ Nenhum rosto detectado');
+                    }
+                } catch (error) {
+                    console.error('Erro na detecção:', error);
+                }
+            }
+            
+            processHeadMovement(landmarks) {
+                // Calcular ROTAÇÃO da cabeça
+                const leftEye = landmarks.getLeftEye()[0];
+                const rightEye = landmarks.getRightEye()[3];
+                const nose = landmarks.getNose()[3];
+                
+                const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+                const eyeCenter = (leftEye.x + rightEye.x) / 2;
+                const noseOffset = nose.x - eyeCenter;
+                
+                const rotationX = noseOffset / (eyeDistance * 0.5);
+                const normalizedRotation = Math.max(-1, Math.min(1, rotationX));
+                
+                this.headPosition.x = normalizedRotation;
+                
+                console.log(`🔄 ROTAÇÃO da cabeça: ${normalizedRotation.toFixed(3)}`);
+                
+                // Verificar instrução atual
+                this.checkInstruction(normalizedRotation);
+            }
+            
+            checkInstruction(rotation) {
+                if (this.gameState !== 'detecting') return;
+                
+                const instruction = this.instructions[this.currentInstructionIndex];
+                let isCorrect = false;
+                
+                switch (instruction.direction) {
+                    case 'right':
+                        isCorrect = rotation > instruction.threshold;
+                        break;
+                    case 'left':
+                        isCorrect = rotation < -instruction.threshold;
+                        break;
+                    case 'center':
+                        isCorrect = Math.abs(rotation) < instruction.threshold;
+                        break;
+                }
+                
+                if (isCorrect) {
+                    console.log(`✅ Instrução completada: ${instruction.direction}`);
+                    this.instructionCompleted();
+                }
+            }
+            
+            instructionCompleted() {
+                this.currentInstructionIndex++;
+                
+                if (this.currentInstructionIndex >= this.instructions.length) {
+                    console.log('🎉 Todas as instruções completadas!');
+                    this.gameCompleted();
+                } else {
+                    console.log(`🎯 Próxima instrução: ${this.instructions[this.currentInstructionIndex].text}`);
+                }
+            }
+            
+            gameCompleted() {
+                console.log('🎉 Jogo de rotação da cabeça completado!');
+            }
+            
+            detectLoop() {
+                if (this.detectionActive) {
+                    this.detectFaces().then(() => {
+                        requestAnimationFrame(() => this.detectLoop());
+                    });
+                }
+            }
+            
+            handleEnter() {
+                console.log('😠 Entrou na tela de raiva');
+                
+                this.setupCanvas();
+                
+                this.loadModels().then(() => {
+                    if (this.isModelLoaded) {
+                        this.startFaceDetection();
+                        console.log('✅ Face tracking iniciado');
+                        
+                        // Iniciar jogo após delay
+                        setTimeout(() => {
+                            this.startGame();
+                        }, 1000);
+                    }
+                });
+            }
+            
+            startGame() {
+                console.log('🎮 Iniciando jogo de rotação da cabeça');
+                this.gameState = 'detecting';
+                console.log(`🎯 Primeira instrução: ${this.instructions[0].text}`);
+            }
+            
+            handleExit() {
+                console.log('👋 Saiu da tela de raiva');
+                this.detectionActive = false;
+            }
+        }
+        
+        // Funções de teste
+        function testRaivaScreen() {
+            console.log('🧪 Testando criação da tela de raiva...');
+            const raivaScreen = new RaivaScreen();
+            console.log('✅ RaivaScreen criada com sucesso!');
+            console.log('📊 Estado inicial:', raivaScreen.gameState);
+            console.log('📋 Instruções:', raivaScreen.instructions);
+        }
+        
+        function testFaceTracking() {
+            console.log('🧪 Testando face tracking...');
+            const raivaScreen = new RaivaScreen();
+            raivaScreen.handleEnter();
+        }
+        
+        // Inicializar quando a página carregar
+        window.addEventListener('load', () => {
+            console.log('🚀 Página carregada, pronta para testes!');
+        });
+    </script>
+</body>
+</html>

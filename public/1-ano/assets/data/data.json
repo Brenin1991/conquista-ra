@@ -1,0 +1,76 @@
+{
+    "fases": [
+        {
+            "id": "01",
+            "nome": "raiva",
+            "url": "assets/textures/reacoes/raiva/icon.png",
+            "enunciado": "assets/textures/reacoes/raiva/enunciado.png",
+            "enunciado-final": "assets/textures/reacoes/raiva/enunciado_final.png",
+            "vazo-final": "assets/textures/reacoes/raiva/vazo_final.png",
+            "vazo-final-completo": "assets/textures/reacoes/raiva/vazo_final_completo.png",
+            "botoes": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/buttons/01.png",
+                    "url_selected": "assets/textures/buttons/01_sel.png",
+                    "ordem": 1
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/buttons/02.png",
+                    "url_selected": "assets/textures/buttons/02_sel.png",
+                    "ordem": 2
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/buttons/03.png",
+                    "url_selected": "assets/textures/buttons/03_sel.png",
+                    "ordem": 3
+                }
+            ],
+            "vazos": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/raiva/vazo_01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/raiva/vazo_02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/raiva/vazo_03.png"
+                }
+            ],
+            "cena": "interacao",
+            "tipo-interacao": "detectar-sorriso",
+            "missao-dialogo": [{
+                "id": "01",
+                "url": "assets/textures/reacoes/raiva/ultima-missao/01.png"
+            },
+            {
+                "id": "02",
+                "url": "assets/textures/reacoes/raiva/ultima-missao/02.png"
+            },
+            {
+                "id": "03",
+                "url": "assets/textures/reacoes/raiva/ultima-missao/03.png"
+            }]
+        }
+    ],
+    "emojis": [
+        { "id": "01", "nome": "calma", "url": "assets/textures/emojis/01.png", "acerto": "sim" },
+        { "id": "02", "nome": "triste", "url": "assets/textures/emojis/02.png", "acerto": "nao" },
+        { "id": "03", "nome": "sorrindo", "url": "assets/textures/emojis/03.png", "acerto": "sim" },
+        { "id": "04", "nome": "angustia", "url": "assets/textures/emojis/04.png", "acerto": "nao" },
+        { "id": "05", "nome": "triste", "url": "assets/textures/emojis/05.png", "acerto": "nao" },
+        { "id": "06", "nome": "entediado", "url": "assets/textures/emojis/06.png", "acerto": "nao" },
+        { "id": "07", "nome": "alegre", "url": "assets/textures/emojis/07.png", "acerto": "sim" }
+    ],
+    "reacoes": [
+        { "nivel": "1", "nome": "alegre", "url": "assets/textures/reacoes/feliz.png" },
+        { "nivel": "2", "nome": "sorrindo", "url": "assets/textures/reacoes/feliz.png" },
+        { "nivel": "3", "nome": "tranquilo", "url": "assets/textures/reacoes/feliz.png" },
+        { "nivel": "4", "nome": "triste", "url": "assets/textures/reacoes/triste.png" }
+    ]
+}
