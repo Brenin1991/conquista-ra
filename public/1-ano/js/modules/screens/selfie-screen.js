@@ -19,6 +19,20 @@ class SelfieScreen extends BaseScreen {
         
         // Sistema do vaso final completo
         this.vasoElement = null;
+        
+        // Sistema de zoom
+        this.zoomLevel = 1.0;
+        this.minZoom = 0.5;
+        this.maxZoom = 3.0;
+        this.zoomStep = 0.2;
+        
+        // Sistema de drag (movimento da planta)
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.plantOffsetX = 0;
+        this.plantOffsetY = 0;
+        this.screenBounds = { width: 0, height: 0 };
     }
     
     onInit() {
@@ -47,6 +61,7 @@ class SelfieScreen extends BaseScreen {
         this.setupRetakeSelfieButton();
         this.setupSaveSelfieButton();
         this.setupBackButton();
+        this.setupZoomControls();
     }
     
     setupCameraIcon() {
@@ -101,6 +116,139 @@ class SelfieScreen extends BaseScreen {
         }
     }
     
+    setupZoomControls() {
+        // Criar botões de zoom
+        this.createZoomButtons();
+        
+        console.log('🔍 Controles de zoom configurados');
+    }
+    
+    createZoomButtons() {
+        // Criar container para os botões de zoom
+        const zoomContainer = document.createElement('div');
+        zoomContainer.id = 'zoom-controls';
+        zoomContainer.style.cssText = `
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1500;
+        `;
+        
+        // Botão zoom-in
+        const zoomInBtn = document.createElement('div');
+        zoomInBtn.id = 'zoom-in-btn';
+        zoomInBtn.style.cssText = `
+            width: 60px;
+            height: 60px;
+            background-image: url('assets/textures/zoom-in.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        `;
+        
+        // Botão zoom-out
+        const zoomOutBtn = document.createElement('div');
+        zoomOutBtn.id = 'zoom-out-btn';
+        zoomOutBtn.style.cssText = `
+            width: 60px;
+            height: 60px;
+            background-image: url('assets/textures/zoom-out.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        `;
+        
+        // Adicionar eventos de clique
+        zoomInBtn.addEventListener('click', () => {
+            this.zoomIn();
+        });
+        
+        zoomOutBtn.addEventListener('click', () => {
+            this.zoomOut();
+        });
+        
+        // Adicionar efeitos de hover
+        zoomInBtn.addEventListener('mouseenter', () => {
+            zoomInBtn.style.transform = 'scale(1.1)';
+        });
+        
+        zoomInBtn.addEventListener('mouseleave', () => {
+            zoomInBtn.style.transform = 'scale(1)';
+        });
+        
+        zoomOutBtn.addEventListener('mouseenter', () => {
+            zoomOutBtn.style.transform = 'scale(1.1)';
+        });
+        
+        zoomOutBtn.addEventListener('mouseleave', () => {
+            zoomOutBtn.style.transform = 'scale(1)';
+        });
+        
+        // Adicionar botões ao container
+        zoomContainer.appendChild(zoomInBtn);
+        zoomContainer.appendChild(zoomOutBtn);
+        
+        // Adicionar à tela
+        if (this.element) {
+            this.element.appendChild(zoomContainer);
+            console.log('🔍 Botões de zoom criados e adicionados');
+        }
+    }
+    
+    zoomIn() {
+        if (this.zoomLevel < this.maxZoom) {
+            this.zoomLevel += this.zoomStep;
+            this.applyZoom();
+            console.log('🔍 Zoom in:', this.zoomLevel);
+        }
+    }
+    
+    zoomOut() {
+        if (this.zoomLevel > this.minZoom) {
+            this.zoomLevel -= this.zoomStep;
+            this.applyZoom();
+            console.log('🔍 Zoom out:', this.zoomLevel);
+        }
+    }
+    
+    applyZoom() {
+        if (this.vasoElement) {
+            // Atualizar dimensões da tela para recalcular limites
+            this.updateScreenBounds();
+            
+            // Aplicar zoom e posição atual
+            this.updatePlantPosition();
+            
+            // Atualizar tamanho base para manter proporções
+            const baseWidth = 350;
+            const baseHeight = 350;
+            this.vasoElement.style.width = `${baseWidth * this.zoomLevel}px`;
+            this.vasoElement.style.height = `${baseHeight * this.zoomLevel}px`;
+            
+            console.log('🔍 Zoom aplicado ao vaso:', this.zoomLevel);
+        }
+    }
+    
+    resetZoom() {
+        this.zoomLevel = 1.0;
+        this.plantOffsetX = 0;
+        this.plantOffsetY = 0;
+        
+        if (this.vasoElement) {
+            this.vasoElement.style.transform = 'translate(-50%, 0%) scale(1)';
+            this.vasoElement.style.width = '350px';
+            this.vasoElement.style.height = '350px';
+        }
+        console.log('🔍 Zoom resetado');
+    }
+    
     handleEnter() {
         // Lógica específica ao entrar na tela de selfie
         console.log('📸 Entrou na tela de selfie');
@@ -142,6 +290,9 @@ class SelfieScreen extends BaseScreen {
         
         // Limpar animações
         this.cleanupAnimations();
+        
+        // Resetar zoom
+        this.resetZoom();
         
         // Limpar sistema do vaso
         this.cleanupVasoSystem();
@@ -818,6 +969,9 @@ class SelfieScreen extends BaseScreen {
         // Criar elemento do vaso final completo
         this.createVasoElement();
         
+        // Configurar sistema de drag para a planta
+        this.setupPlantDrag();
+        
         console.log('🌱 Sistema do vaso final configurado');
     }
     
@@ -868,9 +1022,13 @@ class SelfieScreen extends BaseScreen {
             background-repeat: no-repeat;
             background-position: center;
             z-index: 1000;
-            pointer-events: none;
-            transition: all 0.5s ease-in-out;
+            transition: all 0.3s ease-in-out;
             opacity: 0;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         `;
         
         // Adicionar apenas na tela de selfie
@@ -890,6 +1048,108 @@ class SelfieScreen extends BaseScreen {
         } else {
             console.error('❌ Elemento da tela não existe!');
         }
+    }
+    
+    setupPlantDrag() {
+        if (!this.vasoElement) return;
+        
+        // Atualizar dimensões da tela
+        this.updateScreenBounds();
+        
+        // Adicionar eventos de mouse/touch para desktop
+        this.vasoElement.addEventListener('mousedown', (e) => this.startDrag(e));
+        document.addEventListener('mousemove', (e) => this.drag(e));
+        document.addEventListener('mouseup', () => this.stopDrag());
+        
+        // Adicionar eventos de touch para mobile
+        this.vasoElement.addEventListener('touchstart', (e) => this.startDrag(e));
+        document.addEventListener('touchmove', (e) => this.drag(e));
+        document.addEventListener('touchend', () => this.stopDrag());
+        
+        // Prevenir comportamento padrão do touch
+        this.vasoElement.addEventListener('touchstart', (e) => e.preventDefault());
+        this.vasoElement.addEventListener('touchmove', (e) => e.preventDefault());
+        
+        // Adicionar listener para redimensionamento da janela
+        this.resizeListener = () => this.updateScreenBounds();
+        window.addEventListener('resize', this.resizeListener);
+        
+        console.log('🖱️ Sistema de drag configurado para a planta');
+    }
+    
+    updateScreenBounds() {
+        this.screenBounds.width = window.innerWidth;
+        this.screenBounds.height = window.innerHeight;
+    }
+    
+    startDrag(e) {
+        this.isDragging = true;
+        
+        // Obter coordenadas do evento (mouse ou touch)
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        
+        this.dragStartX = clientX - this.plantOffsetX;
+        this.dragStartY = clientY - this.plantOffsetY;
+        
+        // Adicionar cursor de arrastar
+        if (this.vasoElement) {
+            this.vasoElement.style.cursor = 'grabbing';
+        }
+        
+        console.log('🖱️ Iniciando drag da planta');
+    }
+    
+    drag(e) {
+        if (!this.isDragging) return;
+        
+        // Obter coordenadas do evento (mouse ou touch)
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        
+        // Calcular nova posição
+        let newX = clientX - this.dragStartX;
+        let newY = clientY - this.dragStartY;
+        
+        // Aplicar limites para manter a planta dentro da tela
+        const plantSize = 350 * this.zoomLevel;
+        const maxOffsetX = (this.screenBounds.width - plantSize) / 2;
+        const maxOffsetY = (this.screenBounds.height - plantSize) / 2;
+        
+        // Limitar movimento horizontal
+        if (newX > maxOffsetX) newX = maxOffsetX;
+        if (newX < -maxOffsetX) newX = -maxOffsetX;
+        
+        // Limitar movimento vertical
+        if (newY > maxOffsetY) newY = maxOffsetY;
+        if (newY < -maxOffsetY) newY = -maxOffsetY;
+        
+        // Atualizar offset da planta
+        this.plantOffsetX = newX;
+        this.plantOffsetY = newY;
+        
+        // Aplicar nova posição
+        this.updatePlantPosition();
+    }
+    
+    stopDrag() {
+        if (!this.isDragging) return;
+        
+        this.isDragging = false;
+        
+        // Restaurar cursor normal
+        if (this.vasoElement) {
+            this.vasoElement.style.cursor = 'grab';
+        }
+        
+        console.log('🖱️ Parando drag da planta');
+    }
+    
+    updatePlantPosition() {
+        if (!this.vasoElement) return;
+        
+        // Aplicar posição com zoom e offset
+        this.vasoElement.style.transform = `translate(calc(-50% + ${this.plantOffsetX}px), calc(0% + ${this.plantOffsetY}px)) scale(${this.zoomLevel})`;
     }
     
     // Detectar se é dispositivo móvel
@@ -913,8 +1173,16 @@ class SelfieScreen extends BaseScreen {
     cleanupVasoSystem() {
         // Remover elemento do vaso
         if (this.vasoElement) {
+            // Remover eventos de drag
+            this.removeDragEvents();
             this.vasoElement.remove();
             this.vasoElement = null;
+        }
+        
+        // Remover controles de zoom
+        const zoomControls = this.element.querySelector('#zoom-controls');
+        if (zoomControls) {
+            zoomControls.remove();
         }
         
         // Esconder botão finalizar
@@ -924,7 +1192,30 @@ class SelfieScreen extends BaseScreen {
             finalizarBtn.style.opacity = '0';
         }
         
-        console.log('🧹 Sistema do vaso limpo');
+        // Resetar zoom e posição
+        this.zoomLevel = 1.0;
+        this.plantOffsetX = 0;
+        this.plantOffsetY = 0;
+        this.isDragging = false;
+        
+        console.log('🧹 Sistema do vaso e controles de zoom limpos');
+    }
+    
+    removeDragEvents() {
+        // Remover eventos de mouse
+        document.removeEventListener('mousemove', (e) => this.drag(e));
+        document.removeEventListener('mouseup', () => this.stopDrag());
+        
+        // Remover eventos de touch
+        document.removeEventListener('touchmove', (e) => this.drag(e));
+        document.removeEventListener('touchend', () => this.stopDrag());
+        
+        // Remover listener de redimensionamento
+        if (this.resizeListener) {
+            window.removeEventListener('resize', this.resizeListener);
+        }
+        
+        console.log('🖱️ Eventos de drag removidos');
     }
 }
 
