@@ -207,7 +207,6 @@ class FinalScreen extends BaseScreen {
             this.vasoElement.style.setProperty('opacity', '1', 'important');
             this.vasoElement.style.setProperty('transform', 'translate(-50%, -50%) scale(1)', 'important');
             this.vasoElement.style.setProperty('z-index', '999999', 'important');
-            
             // Adicionar classe para debug
             this.vasoElement.classList.add('vaso-visible');
             

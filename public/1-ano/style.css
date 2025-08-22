@@ -410,9 +410,8 @@ input, textarea {
 
 #reacao-container-tutorial {
     position: fixed;
-    bottom: -75%;
-    width: 100%;
-    height: 80%;
+    bottom: -64%;
+    height: 70%;
     z-index: 2100;
     background-image: url(assets/textures/reacoes-box.png);
     background-size: contain;
@@ -421,23 +420,22 @@ input, textarea {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 10px;
-    padding: 20px;
+    padding: 5px;
     align-items: center;
     justify-items: center;
 }
 
 .fase-item {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    border-radius: 10px;
     overflow: hidden;
     position: relative;
+    margin: 5px;
 }
 
 .fase-item img {
@@ -823,6 +821,48 @@ input, textarea {
     z-index: 1002;
 }
 
+#interacao-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    text-align: center;
+}
+
+#mover-cabeca {
+    display: none; /* Escondido por padrão */
+}
+
+#mover-cabeca-icon {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+#detectar-sorriso {
+    display: none; /* Escondido por padrão */
+}
+
+#detectar-sorriso-icon {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+#detectar-olho {
+    display: none; /* Escondido por padrão */
+}
+
+#detectar-olho-icon {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
 
 
 /* Vaso/planta do jogo */
@@ -1059,6 +1099,7 @@ input, textarea {
     object-fit: cover;
     z-index: 10000;
     pointer-events: none;
+    display: none;
 }
 
 

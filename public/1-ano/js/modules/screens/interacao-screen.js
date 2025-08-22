@@ -45,13 +45,10 @@ class InteracaoScreen extends BaseScreen {
         this.detectionInterval = 100; // 10fps
         
         // Sistema de feedback
-        this.feedbackTimeout = null;
         this.isShowingFeedback = false;
         
         // Elementos da interface
-        this.instructionElement = null;
         this.feedbackElement = null;
-        this.progressElement = null;
         
         // Overlays
         this.loadingOverlay = null;
@@ -928,9 +925,6 @@ class InteracaoScreen extends BaseScreen {
         // Mostrar feedback de acerto
         this.showFeedback(true);
         
-        // Atualizar progresso
-        this.updateProgressOnComplete();
-        
         // Avançar para próxima instrução
         this.currentInstructionIndex++;
         
@@ -949,31 +943,36 @@ class InteracaoScreen extends BaseScreen {
         const instruction = this.instructions[this.currentInstructionIndex];
         this.currentInstruction = instruction;
         
-        if (this.instructionElement) {
-            this.instructionElement.textContent = instruction.text;
-            this.instructionElement.style.animation = 'instruction-pulse 2s ease-in-out infinite';
-            
-            // Adicionar emoji baseado no tipo de instrução
-            let emoji = '';
-            switch (instruction.type) {
-                case 'head-rotation':
-                    emoji = '🔄';
-                    break;
-                case 'smile-detection':
-                    emoji = '😊';
-                    break;
-                case 'eye-detection':
-                    emoji = '👀';
-                    break;
-            }
-            
-            if (emoji) {
-                this.instructionElement.innerHTML = `${emoji} ${instruction.text}`;
-            }
+        // Atualizar ícone para mover cabeça
+        if (this.tipoInteracao === 'mover-cabeca' && instruction.type === 'head-rotation') {
+            this.updateMoverCabecaIcon(instruction.direction);
         }
         
         this.gameState = 'detecting';
         console.log(`🎯 Nova instrução: ${instruction.text}`);
+    }
+    
+    updateMoverCabecaIcon(direction) {
+        const moverCabecaIcon = document.getElementById('mover-cabeca-icon');
+        if (moverCabecaIcon) {
+            let iconPath = '';
+            switch (direction) {
+                case 'right':
+                    iconPath = 'assets/textures/interacoes/mover-cabeca/direita.png';
+                    break;
+                case 'left':
+                    iconPath = 'assets/textures/interacoes/mover-cabeca/esquerda.png';
+                    break;
+                case 'center':
+                    iconPath = 'assets/textures/interacoes/mover-cabeca/centro.png';
+                    break;
+                default:
+                    iconPath = 'assets/textures/interacoes/mover-cabeca/centro.png';
+            }
+            
+            moverCabecaIcon.src = iconPath;
+            console.log(`🔄 Ícone atualizado para: ${direction} (${iconPath})`);
+        }
     }
     
     showFeedback(isCorrect) {
@@ -1020,26 +1019,22 @@ class InteracaoScreen extends BaseScreen {
         this.gameState = 'completed';
         
         // Mostrar mensagem de conclusão baseada no tipo
-        if (this.instructionElement) {
-            let completionMessage = '';
-            switch (this.tipoInteracao) {
-                case 'mover-cabeca':
-                    completionMessage = '🎉 Parabéns! Você completou todas as instruções de rotação da cabeça!';
-                    break;
-                case 'detectar-sorriso':
-                    completionMessage = '🎉 Parabéns! Você completou todas as instruções de detecção de sorriso!';
-                    break;
-                case 'detectar-olho':
-                    completionMessage = '🎉 Parabéns! Você completou todas as instruções de detecção de olhos!';
-                    break;
-                default:
-                    completionMessage = '🎉 Parabéns! Você completou todas as instruções!';
-            }
-            
-            this.instructionElement.textContent = completionMessage;
-            this.instructionElement.style.animation = 'none';
-            this.instructionElement.style.color = '#4ECDC4';
+        let completionMessage = '';
+        switch (this.tipoInteracao) {
+            case 'mover-cabeca':
+                completionMessage = '🎉 Parabéns! Você completou todas as instruções de rotação da cabeça!';
+                break;
+            case 'detectar-sorriso':
+                completionMessage = '🎉 Parabéns! Você completou todas as instruções de detecção de sorriso!';
+                break;
+            case 'detectar-olho':
+                completionMessage = '🎉 Parabéns! Você completou todas as instruções de detecção de olhos!';
+                break;
+            default:
+                completionMessage = '🎉 Parabéns! Você completou todas as instruções!';
         }
+        
+        console.log(completionMessage);
         
         // Ir para próxima tela após delay
         setTimeout(() => {
@@ -1067,140 +1062,47 @@ class InteracaoScreen extends BaseScreen {
         }
     }
     
-    createInstructionUI() {
-        // Container principal
-        const container = document.createElement('div');
-        container.id = 'instruction-container';
-        container.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            max-width: 90%;
-        `;
+    setupInstructionUI() {
+        // Esconder todos os containers primeiro
+        const moverCabecaContainer = document.getElementById('mover-cabeca');
+        const detectarSorrisoContainer = document.getElementById('detectar-sorriso');
+        const detectarOlhoContainer = document.getElementById('detectar-olho');
         
-        // Título baseado no tipo de interação
-        const title = document.createElement('h2');
-        let titleText = '';
+        if (moverCabecaContainer) moverCabecaContainer.style.display = 'none';
+        if (detectarSorrisoContainer) detectarSorrisoContainer.style.display = 'none';
+        if (detectarOlhoContainer) detectarOlhoContainer.style.display = 'none';
+        
+        // Mostrar apenas o container da interação atual
         switch (this.tipoInteracao) {
             case 'mover-cabeca':
-                titleText = 'Instruções de Rotação da Cabeça';
+                if (moverCabecaContainer) {
+                    moverCabecaContainer.style.display = 'block';
+                    console.log('✅ Container mover-cabeca exibido');
+                }
                 break;
+                
             case 'detectar-sorriso':
-                titleText = 'Instruções de Detecção de Sorriso';
+                if (detectarSorrisoContainer) {
+                    detectarSorrisoContainer.style.display = 'block';
+                    console.log('✅ Container detectar-sorriso exibido');
+                }
                 break;
+                
             case 'detectar-olho':
-                titleText = 'Instruções de Detecção de Olhos';
+                if (detectarOlhoContainer) {
+                    detectarOlhoContainer.style.display = 'block';
+                    console.log('✅ Container detectar-olho exibido');
+                }
                 break;
+                
             default:
-                titleText = 'Instruções de Interação';
+                console.warn(`⚠️ Tipo de interação desconhecido: ${this.tipoInteracao}`);
         }
         
-        title.textContent = titleText;
-        title.style.cssText = `
-                color: white;
-            font-family: 'Nunito', Arial, sans-serif;
-            font-size: 24px;
-                font-weight: 700;
-            margin: 0 0 20px 0;
-        `;
-        
-        // Instrução atual
-        this.instructionElement = document.createElement('div');
-        this.instructionElement.id = 'current-instruction';
-        this.instructionElement.style.cssText = `
-            color: white;
-            font-family: 'Nunito', Arial, sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(78, 205, 196, 0.2);
-            border-radius: 15px;
-            border: 2px solid #4ECDC4;
-        `;
-        
-        // Barra de progresso
-        this.progressElement = document.createElement('div');
-        this.progressElement.id = 'progress-container';
-        this.progressElement.style.cssText = `
-            margin: 20px 0;
-        `;
-        
-        const progressText = document.createElement('div');
-        progressText.textContent = 'Progresso: 0/3';
-        progressText.style.cssText = `
-            color: white;
-            font-family: 'Nunito', Arial, sans-serif;
-            font-size: 14px;
-            margin-bottom: 10px;
-        `;
-        
-        const progressBar = document.createElement('div');
-        progressBar.style.cssText = `
-            width: 200px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 0 auto;
-        `;
-        
-        const progressFill = document.createElement('div');
-        progressFill.id = 'progress-fill';
-        progressFill.style.cssText = `
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #4ECDC4, #45B7AA);
-            transition: width 0.5s ease-in-out;
-        `;
-        
-        progressBar.appendChild(progressFill);
-        this.progressElement.appendChild(progressText);
-        this.progressElement.appendChild(progressBar);
-        
-        // Adicionar elementos ao container
-        container.appendChild(title);
-        container.appendChild(this.instructionElement);
-        container.appendChild(this.progressElement);
-        
-        document.body.appendChild(container);
-        
-        console.log(`✅ Interface de instruções criada para ${this.tipoInteracao}`);
+        console.log(`✅ Interface de instruções configurada para ${this.tipoInteracao}`);
     }
     
-    updateProgress() {
-        if (this.progressElement) {
-            const progressText = this.progressElement.querySelector('div');
-            const progressFill = this.progressElement.querySelector('#progress-fill');
-            
-            if (progressText && progressFill) {
-                const progress = (this.currentInstructionIndex / this.instructions.length) * 100;
-                progressText.textContent = `Progresso: ${this.currentInstructionIndex}/${this.instructions.length}`;
-                progressFill.style.width = `${progress}%`;
-            }
-        }
-    }
-    
-    // Método para atualizar progresso quando uma instrução é completada
-    updateProgressOnComplete() {
-        if (this.progressElement) {
-            const progressText = this.progressElement.querySelector('div');
-            const progressFill = this.progressElement.querySelector('#progress-fill');
-            
-            if (progressText && progressFill) {
-                const progress = (this.currentInstructionIndex / this.instructions.length) * 100;
-                progressText.textContent = `Progresso: ${this.currentInstructionIndex}/${this.instructions.length}`;
-                progressFill.style.width = `${progress}%`;
-            }
-        }
-    }
+
     
     handleEnter() {
         console.log(`🎯 Entrou na tela de interação (${this.tipoInteracao})`);
@@ -1240,8 +1142,8 @@ class InteracaoScreen extends BaseScreen {
                     this.startFaceDetection();
                     console.log(`✅ Face tracking iniciado para ${this.tipoInteracao}`);
                     
-                    // Criar interface de instruções
-                    this.createInstructionUI();
+                    // Configurar interface de instruções
+                    this.setupInstructionUI();
                     
                     // Iniciar jogo após delay
                     setTimeout(() => {
@@ -1287,9 +1189,6 @@ class InteracaoScreen extends BaseScreen {
         // Mostrar primeira instrução
         this.showNextInstruction();
         
-        // Atualizar progresso
-        this.updateProgress();
-        
         console.log(`🎮 Jogo de ${this.tipoInteracao} iniciado com sucesso!`);
     }
     
@@ -1320,22 +1219,19 @@ class InteracaoScreen extends BaseScreen {
             this.silhouetteOverlay = null;
         }
         
-        // Limpar interface
-        const instructionContainer = document.getElementById('instruction-container');
-        if (instructionContainer && instructionContainer.parentNode) {
-            instructionContainer.parentNode.removeChild(instructionContainer);
-        }
+        // Esconder todos os containers de interação
+        const moverCabecaContainer = document.getElementById('mover-cabeca');
+        const detectarSorrisoContainer = document.getElementById('detectar-sorriso');
+        const detectarOlhoContainer = document.getElementById('detectar-olho');
+        
+        if (moverCabecaContainer) moverCabecaContainer.style.display = 'none';
+        if (detectarSorrisoContainer) detectarSorrisoContainer.style.display = 'none';
+        if (detectarOlhoContainer) detectarOlhoContainer.style.display = 'none';
         
         // Limpar timeout
         if (this.faceLostTimeout) {
             clearTimeout(this.faceLostTimeout);
             this.faceLostTimeout = null;
-        }
-        
-        // Limpar feedback timeout
-        if (this.feedbackTimeout) {
-            clearTimeout(this.feedbackTimeout);
-            this.feedbackTimeout = null;
         }
     }
 }

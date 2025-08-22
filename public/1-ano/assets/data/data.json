@@ -43,34 +43,241 @@
                 }
             ],
             "cena": "interacao",
-            "tipo-interacao": "detectar-sorriso",
-            "missao-dialogo": [{
-                "id": "01",
-                "url": "assets/textures/reacoes/raiva/ultima-missao/01.png"
-            },
-            {
-                "id": "02",
-                "url": "assets/textures/reacoes/raiva/ultima-missao/02.png"
-            },
-            {
-                "id": "03",
-                "url": "assets/textures/reacoes/raiva/ultima-missao/03.png"
-            }]
+            "tipo-interacao": "mover-cabeca",
+            "missao-dialogo": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/03.png"
+                }
+            ]
+        },
+        {
+            "id": "02",
+            "nome": "assustado",
+            "url": "assets/textures/reacoes/assustado/icon.png",
+            "enunciado": "assets/textures/reacoes/assustado/enunciado.png",
+            "enunciado-final": "assets/textures/reacoes/assustado/enunciado_final.png",
+            "vazo-final": "assets/textures/reacoes/assustado/vazo_final.png",
+            "vazo-final-completo": "assets/textures/reacoes/assustado/vazo_final_completo.png",
+            "botoes": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/buttons/01.png",
+                    "url_selected": "assets/textures/buttons/01_sel.png",
+                    "ordem": 1
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/buttons/02.png",
+                    "url_selected": "assets/textures/buttons/02_sel.png",
+                    "ordem": 2
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/buttons/03.png",
+                    "url_selected": "assets/textures/buttons/03_sel.png",
+                    "ordem": 3
+                }
+            ],
+            "vazos": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/assustado/vazo_01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/assustado/vazo_02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/assustado/vazo_03.png"
+                }
+            ],
+            "cena": "interacao",
+            "tipo-interacao": "detectar-olho",
+            "missao-dialogo": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/assustado/ultima-missao/01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/assustado/ultima-missao/02.png"
+                }
+            ]
+        },
+        {
+            "id": "04",
+            "nome": "estressado",
+            "url": "assets/textures/reacoes/estressado/icon.png",
+            "enunciado": "assets/textures/reacoes/estressado/enunciado.png",
+            "enunciado-final": "assets/textures/reacoes/estressado/enunciado_final.png",
+            "vazo-final": "assets/textures/reacoes/estressado/vazo_final.png",
+            "vazo-final-completo": "assets/textures/reacoes/estressado/vazo_final_completo.png",
+            "botoes": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/buttons/01.png",
+                    "url_selected": "assets/textures/buttons/01_sel.png",
+                    "ordem": 1
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/buttons/02.png",
+                    "url_selected": "assets/textures/buttons/02_sel.png",
+                    "ordem": 2
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/buttons/03.png",
+                    "url_selected": "assets/textures/buttons/03_sel.png",
+                    "ordem": 3
+                }
+            ],
+            "vazos": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/estressado/vazo_01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/estressado/vazo_02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/estressado/vazo_03.png"
+                }
+            ],
+            "cena": "interacao",
+            "tipo-interacao": "detectar-olho",
+            "missao-dialogo": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/estressado/ultima-missao/01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/estressado/ultima-missao/02.png"
+                }
+            ]
+        },
+        {
+            "id": "03",
+            "nome": "triste",
+            "url": "assets/textures/reacoes/triste/icon.png",
+            "enunciado": "assets/textures/reacoes/triste/enunciado.png",
+            "enunciado-final": "assets/textures/reacoes/triste/enunciado_final.png",
+            "vazo-final": "assets/textures/reacoes/triste/vazo_final.png",
+            "vazo-final-completo": "assets/textures/reacoes/triste/vazo_final_completo.png",
+            "botoes": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/buttons/01.png",
+                    "url_selected": "assets/textures/buttons/01_sel.png",
+                    "ordem": 1
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/buttons/02.png",
+                    "url_selected": "assets/textures/buttons/02_sel.png",
+                    "ordem": 2
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/buttons/03.png",
+                    "url_selected": "assets/textures/buttons/03_sel.png",
+                    "ordem": 3
+                }
+            ],
+            "vazos": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/triste/vazo_01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/triste/vazo_02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/triste/vazo_03.png"
+                }
+            ],
+            "cena": "interacao",
+            "tipo-interacao": "detectar-olho",
+            "missao-dialogo": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/triste/ultima-missao/01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/triste/ultima-missao/02.png"
+                }
+            ]
+        },
+        {
+            "id": "03",
+            "nome": "feliz",
+            "url": "assets/textures/reacoes/feliz/icon.png",
+            "enunciado": "assets/textures/reacoes/feliz/enunciado.png",
+            "enunciado-final": "assets/textures/reacoes/feliz/enunciado_final.png",
+            "vazo-final": "assets/textures/reacoes/feliz/vazo_final.png",
+            "vazo-final-completo": "assets/textures/reacoes/feliz/vazo_final_completo.png",
+            "botoes": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/buttons/01.png",
+                    "url_selected": "assets/textures/buttons/01_sel.png",
+                    "ordem": 1
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/buttons/02.png",
+                    "url_selected": "assets/textures/buttons/02_sel.png",
+                    "ordem": 2
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/buttons/03.png",
+                    "url_selected": "assets/textures/buttons/03_sel.png",
+                    "ordem": 3
+                }
+            ],
+            "vazos": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/feliz/vazo_01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/feliz/vazo_02.png"
+                },
+                {
+                    "id": "03",
+                    "url": "assets/textures/reacoes/feliz/vazo_03.png"
+                }
+            ],
+            "cena": "interacao",
+            "tipo-interacao": "detectar-olho",
+            "missao-dialogo": [
+                {
+                    "id": "01",
+                    "url": "assets/textures/reacoes/feliz/ultima-missao/01.png"
+                },
+                {
+                    "id": "02",
+                    "url": "assets/textures/reacoes/feliz/ultima-missao/02.png"
+                }
+            ]
         }
-    ],
-    "emojis": [
-        { "id": "01", "nome": "calma", "url": "assets/textures/emojis/01.png", "acerto": "sim" },
-        { "id": "02", "nome": "triste", "url": "assets/textures/emojis/02.png", "acerto": "nao" },
-        { "id": "03", "nome": "sorrindo", "url": "assets/textures/emojis/03.png", "acerto": "sim" },
-        { "id": "04", "nome": "angustia", "url": "assets/textures/emojis/04.png", "acerto": "nao" },
-        { "id": "05", "nome": "triste", "url": "assets/textures/emojis/05.png", "acerto": "nao" },
-        { "id": "06", "nome": "entediado", "url": "assets/textures/emojis/06.png", "acerto": "nao" },
-        { "id": "07", "nome": "alegre", "url": "assets/textures/emojis/07.png", "acerto": "sim" }
-    ],
-    "reacoes": [
-        { "nivel": "1", "nome": "alegre", "url": "assets/textures/reacoes/feliz.png" },
-        { "nivel": "2", "nome": "sorrindo", "url": "assets/textures/reacoes/feliz.png" },
-        { "nivel": "3", "nome": "tranquilo", "url": "assets/textures/reacoes/feliz.png" },
-        { "nivel": "4", "nome": "triste", "url": "assets/textures/reacoes/triste.png" }
     ]
 }
