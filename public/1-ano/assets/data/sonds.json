@@ -1,10 +1,6 @@
 {
     "sounds": [
         {
-            "id": "NA001",
-            "sound": "assets/sounds/NA001.mp3"
-        },
-        {
             "id": "NA002",
             "sound": "assets/sounds/NA002.mp3"
         },
@@ -15,6 +11,42 @@
         {
             "id": "NA004",
             "sound": "assets/sounds/NA004.mp3"
+        },
+        {
+            "id": "NA005",
+            "sound": "assets/sounds/NA005.mp3"
+        },
+        {
+            "id": "NA006",
+            "sound": "assets/sounds/NA006.mp3"
+        },
+        {
+            "id": "NA007",
+            "sound": "assets/sounds/NA007.mp3"
+        },
+        {
+            "id": "NA008",
+            "sound": "assets/sounds/NA008.mp3"
+        },
+        {
+            "id": "NA009",
+            "sound": "assets/sounds/NA009.mp3"
+        },
+        {
+            "id": "NA010",
+            "sound": "assets/sounds/NA010.mp3"
+        },
+        {
+            "id": "NA011",
+            "sound": "assets/sounds/NA011.mp3"
+        },
+        {
+            "id": "NA012",
+            "sound": "assets/sounds/NA012.mp3"
+        },
+        {
+            "id": "NA013",
+            "sound": "assets/sounds/NA013.mp3"
         },
         {
             "id": "click",

@@ -151,9 +151,25 @@ class FinalScreen extends BaseScreen {
         const narracaoButton = this.element.querySelector('#narracao-final');
         if (narracaoButton) {
             narracaoButton.addEventListener('click', () => {
-                window.SoundManager.forceAudioActivation();
-                window.SoundManager.playSoundWithControl('NA003');
+                this.playEnunciadoFinalNarracao();
             });
+        }
+    }
+    
+    playEnunciadoFinalNarracao() {
+        if (!window.selectedFase || !window.selectedFase['enunciado-final-narracao']) {
+            console.warn('⚠️ Nenhuma narração de enunciado final encontrada para esta fase');
+            return;
+        }
+        
+        const soundId = window.selectedFase['enunciado-final-narracao'];
+        console.log(`🔊 Tocando narração do enunciado final: ${soundId}`);
+        
+        // Verificar se o SoundManager está disponível
+        if (window.SoundManager && typeof window.SoundManager.playSoundWithControl === 'function') {
+            window.SoundManager.playSoundWithControl(soundId);
+        } else {
+            console.error('❌ SoundManager não está disponível');
         }
     }
     
@@ -409,7 +425,8 @@ class FinalScreen extends BaseScreen {
         requestAnimationFrame(() => {
             this.element.style.opacity = '1';
             window.SoundManager.forceAudioActivation();
-            window.SoundManager.playSoundWithControl('NA003');
+            // Tocar narração do enunciado final automaticamente
+            this.playEnunciadoFinalNarracao();
         });
         
         // Executar função de entrada após a transição

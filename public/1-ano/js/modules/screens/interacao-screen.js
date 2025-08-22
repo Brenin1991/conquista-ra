@@ -436,6 +436,9 @@ class InteracaoScreen extends BaseScreen {
         if (dialogContainer) {
             dialogContainer.style.backgroundImage = `url(${currentDialog.url})`;
             console.log(`📚 Mostrando diálogo ${this.currentDialogIndex + 1}/${this.missaoDialogos.length}: ${currentDialog.url}`);
+            
+            // Tocar narração do diálogo se disponível
+            this.playDialogNarracao(currentDialog);
         }
         
         // Atualizar indicador de progresso
@@ -456,6 +459,23 @@ class InteracaoScreen extends BaseScreen {
             } else {
                 nextButton.textContent = '';
             }
+        }
+    }
+    
+    playDialogNarracao(dialog) {
+        if (!dialog || !dialog.narracao) {
+            console.warn('⚠️ Nenhuma narração encontrada para este diálogo');
+            return;
+        }
+        
+        const soundId = dialog.narracao;
+        console.log(`🔊 Tocando narração do diálogo: ${soundId}`);
+        
+        // Verificar se o SoundManager está disponível
+        if (window.SoundManager && typeof window.SoundManager.playSoundWithControl === 'function') {
+            window.SoundManager.playSoundWithControl(soundId);
+        } else {
+            console.error('❌ SoundManager não está disponível');
         }
     }
     
@@ -1040,6 +1060,37 @@ class InteracaoScreen extends BaseScreen {
         setTimeout(() => {
             this.nextScreen();
         }, 3000);
+    }
+    
+    nextScreen() {
+        console.log('🎯 Indo para próxima tela...');
+        
+        // Tocar narração do enunciado final se disponível
+        this.playEnunciadoFinalNarracao();
+        
+        // Ir para a tela final
+        if (window.screenManager) {
+            window.screenManager.showScreen('final');
+        } else {
+            console.error('❌ ScreenManager não encontrado');
+        }
+    }
+    
+    playEnunciadoFinalNarracao() {
+        if (!window.selectedFase || !window.selectedFase['enunciado-final-narracao']) {
+            console.warn('⚠️ Nenhuma narração de enunciado final encontrada para esta fase');
+            return;
+        }
+        
+        const soundId = window.selectedFase['enunciado-final-narracao'];
+        console.log(`🔊 Tocando narração do enunciado final: ${soundId}`);
+        
+        // Verificar se o SoundManager está disponível
+        if (window.SoundManager && typeof window.SoundManager.playSoundWithControl === 'function') {
+            window.SoundManager.playSoundWithControl(soundId);
+        } else {
+            console.error('❌ SoundManager não está disponível');
+        }
     }
     
     detectLoop() {

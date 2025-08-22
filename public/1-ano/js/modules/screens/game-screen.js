@@ -181,9 +181,25 @@ class GameScreen extends BaseScreen {
         const narracaoButton = document.getElementById('narracao-enunciado');
         if (narracaoButton) {
             narracaoButton.addEventListener('click', () => {
-                window.SoundManager.forceAudioActivation();
-                window.SoundManager.playSoundWithControl('NA001');
+                this.playEnunciadoNarracao();
             });
+        }
+    }
+    
+    playEnunciadoNarracao() {
+        if (!this.currentFase || !this.currentFase['enunciado-narracao']) {
+            console.warn('⚠️ Nenhuma narração de enunciado encontrada para esta fase');
+            return;
+        }
+        
+        const soundId = this.currentFase['enunciado-narracao'];
+        console.log(`🔊 Tocando narração do enunciado: ${soundId}`);
+        
+        // Verificar se o SoundManager está disponível
+        if (window.SoundManager && typeof window.SoundManager.playSoundWithControl === 'function') {
+            window.SoundManager.playSoundWithControl(soundId);
+        } else {
+            console.error('❌ SoundManager não está disponível');
         }
     }
     

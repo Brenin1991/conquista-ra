@@ -39,7 +39,7 @@ class TutorialScreen extends BaseScreen {
         if (narracaoButton) {
             narracaoButton.addEventListener('click', () => {
                 window.SoundManager.forceAudioActivation();
-                window.SoundManager.playSoundWithControl('NA001');
+                window.SoundManager.playSoundWithControl('NA002');
             });
         }
     }
@@ -307,7 +307,7 @@ class TutorialScreen extends BaseScreen {
         requestAnimationFrame(() => {
             this.element.style.opacity = '1';
             window.SoundManager.forceAudioActivation();
-            window.SoundManager.playSoundWithControl('NA001');
+            window.SoundManager.playSoundWithControl('NA002');
         });
         
         // Executar função de entrada após a transição

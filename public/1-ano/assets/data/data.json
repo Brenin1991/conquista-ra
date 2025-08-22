@@ -5,7 +5,9 @@
             "nome": "raiva",
             "url": "assets/textures/reacoes/raiva/icon.png",
             "enunciado": "assets/textures/reacoes/raiva/enunciado.png",
+            "enunciado-narracao": "NA003",
             "enunciado-final": "assets/textures/reacoes/raiva/enunciado_final.png",
+            "enunciado-final-narracao": "NA006",
             "vazo-final": "assets/textures/reacoes/raiva/vazo_final.png",
             "vazo-final-completo": "assets/textures/reacoes/raiva/vazo_final_completo.png",
             "botoes": [
@@ -47,15 +49,18 @@
             "missao-dialogo": [
                 {
                     "id": "01",
-                    "url": "assets/textures/reacoes/raiva/ultima-missao/01.png"
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/01.png",
+                    "narracao": "NA004"
                 },
                 {
                     "id": "02",
-                    "url": "assets/textures/reacoes/raiva/ultima-missao/02.png"
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/02.png",
+                    "narracao": "NA005"
                 },
                 {
                     "id": "03",
-                    "url": "assets/textures/reacoes/raiva/ultima-missao/03.png"
+                    "url": "assets/textures/reacoes/raiva/ultima-missao/03.png",
+                    "narracao": "NA006"
                 }
             ]
         },
@@ -64,7 +69,9 @@
             "nome": "assustado",
             "url": "assets/textures/reacoes/assustado/icon.png",
             "enunciado": "assets/textures/reacoes/assustado/enunciado.png",
+            "enunciado-narracao": "NA008",
             "enunciado-final": "assets/textures/reacoes/assustado/enunciado_final.png",
+            "enunciado-final-narracao": "NA009",
             "vazo-final": "assets/textures/reacoes/assustado/vazo_final.png",
             "vazo-final-completo": "assets/textures/reacoes/assustado/vazo_final_completo.png",
             "botoes": [
@@ -106,11 +113,13 @@
             "missao-dialogo": [
                 {
                     "id": "01",
-                    "url": "assets/textures/reacoes/assustado/ultima-missao/01.png"
+                    "url": "assets/textures/reacoes/assustado/ultima-missao/01.png",
+                    "narracao": "NA009"
                 },
                 {
                     "id": "02",
-                    "url": "assets/textures/reacoes/assustado/ultima-missao/02.png"
+                    "url": "assets/textures/reacoes/assustado/ultima-missao/02.png",
+                    "narracao": "NA010"
                 }
             ]
         },
@@ -119,7 +128,9 @@
             "nome": "estressado",
             "url": "assets/textures/reacoes/estressado/icon.png",
             "enunciado": "assets/textures/reacoes/estressado/enunciado.png",
+            "enunciado-narracao": "NA010",
             "enunciado-final": "assets/textures/reacoes/estressado/enunciado_final.png",
+            "enunciado-final-narracao": "NA011",
             "vazo-final": "assets/textures/reacoes/estressado/vazo_final.png",
             "vazo-final-completo": "assets/textures/reacoes/estressado/vazo_final_completo.png",
             "botoes": [
@@ -161,11 +172,13 @@
             "missao-dialogo": [
                 {
                     "id": "01",
-                    "url": "assets/textures/reacoes/estressado/ultima-missao/01.png"
+                    "url": "assets/textures/reacoes/estressado/ultima-missao/01.png",
+                    "narracao": "NA011"
                 },
                 {
                     "id": "02",
-                    "url": "assets/textures/reacoes/estressado/ultima-missao/02.png"
+                    "url": "assets/textures/reacoes/estressado/ultima-missao/02.png",
+                    "narracao": "NA012"
                 }
             ]
         },
@@ -174,7 +187,9 @@
             "nome": "triste",
             "url": "assets/textures/reacoes/triste/icon.png",
             "enunciado": "assets/textures/reacoes/triste/enunciado.png",
+            "enunciado-narracao": "NA007",
             "enunciado-final": "assets/textures/reacoes/triste/enunciado_final.png",
+            "enunciado-final-narracao": "NA013",
             "vazo-final": "assets/textures/reacoes/triste/vazo_final.png",
             "vazo-final-completo": "assets/textures/reacoes/triste/vazo_final_completo.png",
             "botoes": [
@@ -216,11 +231,13 @@
             "missao-dialogo": [
                 {
                     "id": "01",
-                    "url": "assets/textures/reacoes/triste/ultima-missao/01.png"
+                    "url": "assets/textures/reacoes/triste/ultima-missao/01.png",
+                    "narracao": "NA013"
                 },
                 {
                     "id": "02",
-                    "url": "assets/textures/reacoes/triste/ultima-missao/02.png"
+                    "url": "assets/textures/reacoes/triste/ultima-missao/02.png",
+                    "narracao": "NA012"
                 }
             ]
         },
@@ -229,7 +246,9 @@
             "nome": "feliz",
             "url": "assets/textures/reacoes/feliz/icon.png",
             "enunciado": "assets/textures/reacoes/feliz/enunciado.png",
+            "enunciado-narracao": "NA008",
             "enunciado-final": "assets/textures/reacoes/feliz/enunciado_final.png",
+            "enunciado-final-narracao": "NA009",
             "vazo-final": "assets/textures/reacoes/feliz/vazo_final.png",
             "vazo-final-completo": "assets/textures/reacoes/feliz/vazo_final_completo.png",
             "botoes": [
